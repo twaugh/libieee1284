@@ -83,8 +83,8 @@ default_negotiate (struct parport_internal *port, int mode)
 
   if (mode == M1284_COMPAT)
     {
-      default_terminate (port);
-      return E1284_OK;
+      ret = E1284_OK;
+      goto abort;
     }
 
   switch (mode)
