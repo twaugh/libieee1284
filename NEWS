@@ -1,6 +1,10 @@
 libieee1284 news
 ----------------
 
+0.2.7 (stable)
+
+	Fallback implementation for ECP address transfers.
+
 0.2.6 (stable)
 
 	Minor bugfixes.
