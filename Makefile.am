@@ -8,7 +8,7 @@ libieee1284_la_SOURCES = src/detect.c src/detect.h src/ports.c src/deviceid.c \
 	libieee1284.sym
 # When rolling a release, remember to adjust the version info.
 # It's current:release:age.
-libieee1284_la_LDFLAGS = -version-info 3:2:0 \
+libieee1284_la_LDFLAGS = -version-info 3:3:0 \
 	-export-symbols $(top_srcdir)/libieee1284.sym
 include_HEADERS = include/ieee1284.h
 INCLUDES = -I$(top_srcdir)/include
