@@ -14,6 +14,7 @@
 	* src/interface.c (ieee1284_ref): New function.
 	(ieee1284_unref): New function.
 	* doc/interface.xml: Document them.
+	* libieee1284.sym: Export them.
 
 	* src/ports.c (deref_port): Return the new reference count.
 	* src/detect.h: Adjust prototype.
