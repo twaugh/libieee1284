@@ -1,3 +1,10 @@
+2001-11-13  Tim Waugh  <twaugh@redhat.com>
+
+	* deviceid.c (get_fresh): Honour buffer length properly.
+	Don't terminate with 0 unless the entire ID fits in the buffer.
+	(get_from_proc_parport): Likewise.
+	(get_from_sys_dev_parport): Likewise.
+
 2001-11-01  Tim Waugh  <twaugh@redhat.com>
 
 	* libieee1284.sym: List exported symbols.

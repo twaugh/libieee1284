@@ -190,9 +190,10 @@ get_fresh (struct parport *port, int daisy,
 
   idlen = buffer[0] * 256 + buffer[1];
   if (idlen >= len - 2)
-    idlen--;
+    idlen = len - 2;
   got += ieee1284_nibble_read (port, buffer + 2, idlen);
-  buffer[got] = '\0';
+  if (got < len)
+    buffer[got] = '\0';
 
   ieee1284_terminate (port);
   return got;
@@ -222,12 +223,13 @@ get_from_proc_parport (struct parport *port, int daisy,
   free (name);
   if (fd >= 0)
     {
-      ssize_t got = read (fd, buffer + 2, len - 3);
+      ssize_t got = read (fd, buffer + 2, len - 2);
       close (fd);
       if (got < 1)
 	return -ETRYNEXT;
 
-      buffer[2 + got] = '\0';
+      if ((2 + got) < len)
+	buffer[2 + got] = '\0';
       buffer[0] = got / (1<<8);
       buffer[1] = got % (1<<8);
 
@@ -260,12 +262,13 @@ get_from_sys_dev_parport (struct parport *port, int daisy,
   fd = open (name, O_RDONLY | O_NOCTTY);
   if (fd >= 0)
     {
-      ssize_t got = read (fd, buffer, len - 1);
+      ssize_t got = read (fd, buffer, len);
       free (name);
       close (fd);
       if (got < 1)
 	return -ETRYNEXT;
-      buffer[got] = '\0';
+      if (got < len)
+	buffer[got] = '\0';
       return got;
     }
 
