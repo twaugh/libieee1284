@@ -51,13 +51,30 @@
      assistance to get the job done.  So, using &libieee1284;, ECP
      transfers using DMA are possible.</para>
 
+    <para>The normal sequence of events will be that the application
+     calls <function>ieee1284_find_ports</function> to get a list of
+     available ports, then <function>ieee1284_get_deviceid</function>
+     to look for a device on each port that it is interested in, and
+     then <function>ieee1284_open</function> to open each port it
+     finds a device it can control on.  The list of ports returned
+     from <function>ieee1284_find_ports</function> can be disposed of
+     using <function>ieee1284_free_ports</function>.  Then when it
+     wants to control the device, it will call
+     <function>ieee1284_claim</function> to prevent other drivers from
+     using the port, then perhaps do some data transfers, and then
+     <function>ieee1284_release</function> when it is finished that
+     that particular command.  This claim-control-release sequence
+     will be repeated each time it wants to tell the device to do
+     something.  Finally when the application is finished with the
+     device it will call <function>ieee1284_close</function>.</para>
+
     <para>Usually a port needs to be claimed before it can be used.
      This is to prevent multiple drivers from trampling on each other
      if they both want to use the same port.  The exception to this
      rule is the collection of IEEE 1284 Device IDs, which has an
-     implicit claim and release sequence.  The reason for this is that
-     it may be possible to collect a Device ID from the operating
-     system, without bothering the device with it.</para>
+     implicit open-claim-release-close sequence.  The reason for
+     this is that it may be possible to collect a Device ID from the
+     operating system, without bothering the device with it.</para>
   </preface>
 
   <reference>
@@ -93,11 +110,6 @@
 	<programlisting><![CDATA[struct parport {
   /* An artibrary name for the port. */
   const char *name;
-
-  /* A set of bits indicating the capabilities of the port that we
-   * can use.  Whether hardware-assisted ECP is available; whether
-   * that includes DMA, etc. */
-  int modes;
 
   /* -1, or else a file descriptor that can be used by select() for
    * wait for nAck. */
@@ -197,23 +209,8 @@
          <constant>NULL</constant>; it is there for when &libieee1284;
          has a configuration file format defined.</para>
 
-	<para>Available flags are:</para>
-
-	<variablelist>
-	  <varlistentry>
-	    <term><constant>F1284_EXCL</constant></term>
-	    <listitem>
-	      <para>This device cannot share the port with any other
-	       device.  If this is the case it must be declared at
-	       this stage, so that other drivers trying to access the
-	       port know not to bother; otherwise they will wait until
-	       this driver releases the port, i.e. never.</para>
-
-	      <remark>The iopl/dev-port access methods don't support
-	       this yet, but the ppdev ones do.</remark>
-	    </listitem>
-	  </varlistentry>
-	</variablelist>
+	<para>There are no <parameter>flags</parameter> defined; use
+	 zero for this parameter.</para>
       </refsect1>
 
       <refsect1>
@@ -275,25 +272,18 @@
       <refsect1>
 	<title>Description</title>
 
-	<para>When the &libieee1284; library will no longer be used,
-	 the program should call
-	 <function>ieee1284_free_ports</function> giving it a pointer
-	 to the <structname>parport_list</structname> structure that
-	 holds the list of ports returned by
+	<para>When the port list will no longer be used, the program
+	 should call <function>ieee1284_free_ports</function> giving
+	 it a pointer to the <structname>parport_list</structname>
+	 structure that holds the list of ports returned by
 	 <citerefentry>
 	    <refentrytitle>ieee1284_find_ports</refentrytitle>
 	    <manvolnum>3</manvolnum>
-	  </citerefentry>.  Note that the
-	 ports are <emphasis>not</emphasis> reference counted, and so
-	 the port list must not be freed until the program no longer
-	 wishes to use the ports in the list.</para>
-
-	<para>After freeing the ports, it is possible to call
-	 <function>ieee1284_find_ports</function> again.  This
-	 function may perform initial set-up on ports that it finds,
-	 and so the only safe times to call it are before any other
-	 &libieee1284; functions or after
-	 <function>ieee1284_free_ports</function>.</para>
+         </citerefentry>.  The ports are reference counted with the
+	 <function>ieee1284_open</function> and
+	 <function>ieee1284_close</function> functions, and so the
+	 port list may be freed even if it contains pointers to ports
+	 that are still open.</para>
       </refsect1>
     </refentry>
 
@@ -454,6 +444,288 @@
       </refsect1>
     </refentry>
 
+    <refentry id="open">
+      <refmeta>
+	<refentrytitle>ieee1284_open</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_open</refname>
+	<refpurpose>open a port</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_open</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	      <parameter>flags</parameter>, int
+	      *<parameter>capabilities</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>In order to begin using a port it must be opened.  Any
+	 initial set-up of the port is done at this stage.  When an
+	 open port is no longer needed it should be closed with
+	 <citerefentry>
+	    <refentrytitle>ieee1284_close</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	  </citerefentry>.</para>
+
+	<para>The possible <parameter>flags</parameter> are:</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term><constant>F1284_EXCL</constant></term>
+	    <listitem>
+	      <para>This device cannot share the port with any other
+	       device.  If this is the case it must be declared at
+	       this stage, so that other drivers trying to access the
+	       port know not to bother; otherwise they will wait until
+	       this driver releases the port, i.e. never.</para>
+
+	      <remark>The iopl/dev-port access methods don't support
+	       this yet, but the ppdev ones do.</remark>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+	<para>If <parameter>capabilities</parameter> is not
+	  <constant>NULL</constant> it must point to storage for an
+	  <type>int</type>, which will be treated as a set of flags,
+	  one per bit.  If a capability is present it will be used
+	  when asked for.  They are:</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term><constant>CAP1284_NIBBLE</constant></term>
+	    <listitem>
+	      <para>There is an implementation of nibble mode for this
+	       port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>CAP1284_BYTE</constant></term>
+	    <listitem>
+	      <para>There is an implementation of byte mode for this
+	       port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>CAP1284_COMPAT</constant></term>
+	    <listitem>
+	      <para>There is an implementation of compatibility mode
+	       for this port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>CAP1284_ECP</constant></term>
+	    <listitem>
+	      <para>There is a hardware implementation of ECP mode for
+	       this port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>CAP1284_ECPRLE</constant></term>
+	    <listitem>
+	      <para>There is an RLE-aware implementation of ECP mode
+	       for this port (the <constant>F1284_RLE</constant> flag
+	       is recognised by the ECP transfer functions).</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>CAP1284_ECPSWE</constant></term>
+	    <listitem>
+	      <para>There is a software implementation of ECP mode for
+	       this port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>CAP1284_BECP</constant></term>
+	    <listitem>
+	      <para>There is an implementation of bounded ECP mode for
+	       this port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>CAP1284_EPP</constant></term>
+	    <listitem>
+	      <para>There is a hardware implementation of EPP mode for
+	       this port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>CAP1284_EPPSWE</constant></term>
+	    <listitem>
+	      <para>There is a software implementation of EPP mode for
+	      this port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>CAP1284_IRQ</constant></term>
+	    <listitem>
+	      <para>An interrupt line is configured for this
+	       port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>CAP1284_DMA</constant></term>
+	    <listitem>
+	      <para>A DMA channel is configured for this port.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284ok;</term>
+	    <listitem>
+	      <para>The port is now opened.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284init;</term>
+	    <listitem>
+	      <para>There was a problem during port initialization.
+	       This could be because another driver has opened the
+	       port exclusively, or some other reason.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284nomem;</term>
+	    <listitem>
+	      <para>There was not enough memory.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284notavail;</term>
+	    <listitem>
+	      <para>One or more of the flags supplied to
+	       <function>ieee1284_find_ports</function> is not
+	       supported by this type of port.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284invalidport;</term>
+	    <listitem>
+	      <para>The <parameter>port</parameter> parameter was
+	       invalid.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284sys;</term>
+	    <listitem>
+	      <para>There was a problem at the operating system
+	       level.  The global variable <varname>errno</varname>
+	       has been set appropriately.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+
+      <refsect1>
+	<title>See also</title>
+
+	<para><citerefentry>
+	    <refentrytitle>ieee1284_close</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	  </citerefentry></para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="close">
+      <refmeta>
+	<refentrytitle>ieee1284_close</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_close</refname>
+	<refpurpose>close an open port</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_close</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>To close an open port and free any resources associated
+	 with it, call <function>ieee1284_close</function>.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284ok;</term>
+	    <listitem>
+	      <para>The port is now closed.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284invalidport;</term>
+	    <listitem>
+	      <para>The <parameter>port</parameter> parameter was
+	       invalid.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284sys;</term>
+	    <listitem>
+	      <para>There was a problem at the operating system
+	       level.  The global variable <varname>errno</varname>
+	       has been set appropriately.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+
+      <refsect1>
+	<title>See also</title>
+
+	<para><citerefentry>
+	    <refentrytitle>ieee1284_open</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	  </citerefentry></para>
+      </refsect1>
+    </refentry>
+
     <refentry id="claim">
       <refmeta>
 	<refentrytitle>ieee1284_claim</refentrytitle>
@@ -482,9 +754,8 @@
 	    <refentrytitle>ieee1284_get_deviceid</refentrytitle>
 	    <manvolnum>3</manvolnum>
 	  </citerefentry>, <function>ieee1284_claim</function> must be
-	 called before any other &libieee1284; function for accessing
-	 a device on a port.  Any necessary port initialization is
-	 performed at the first call to this function.</para>
+	 called on an open port before any other &libieee1284;
+	 function for accessing a device on it.</para>
       </refsect1>
 
       <refsect1>
@@ -509,26 +780,19 @@
 	  </varlistentry>
 
 	  <varlistentry>
-	    <term>&e1284init;</term>
-	    <listitem>
-	      <para>There was a problem during port initialization.</para>
-	    </listitem>
-	  </varlistentry>
-
-	  <varlistentry>
-	    <term>&e1284notavail;</term>
-	    <listitem>
-	      <para>One or more of the flags supplied to
-	       <function>ieee1284_find_ports</function> is not
-	       supported by this type of port.</para>
-	    </listitem>
-	  </varlistentry>
-
-	  <varlistentry>
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter was
 	       invalid.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284sys;</term>
+	    <listitem>
+	      <para>There was a problem at the operating system
+	       level.  The global variable <varname>errno</varname>
+	       has been set appropriately.</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
@@ -576,7 +840,7 @@
 	 drivers.  It is good practice to release the port whenever
 	 convenient.  If it is never convenient to do so, the
 	 <constant>F1284_EXCL</constant> flag should be specified at
-	 initialisation.</para>
+	 initialization.</para>
       </refsect1>
     </refentry>
 
