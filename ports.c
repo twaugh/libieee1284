@@ -33,15 +33,16 @@
 
 #define MAX_PORTS 20
 
-static int add_port (struct parport_list *list,
-		     const char *name, const char *device, unsigned long base,
-		     int interrupt)
+static int
+add_port (struct parport_list *list,
+	  const char *name, const char *device, unsigned long base,
+	  int interrupt)
 {
   struct parport *p;
   struct parport_internal *priv;
 
   if (list->portc == (MAX_PORTS - 1))
-    // Ridiculous.
+    /* Ridiculous. */
     return -1;
 
   p = malloc (sizeof *p);
@@ -89,7 +90,8 @@ static int add_port (struct parport_list *list,
   return 0;
 }
 
-static int populate_from_parport (struct parport_list *list)
+static int
+populate_from_parport (struct parport_list *list)
 {
   struct dirent *de;
   DIR *parport = opendir ("/proc/parport");
@@ -107,7 +109,7 @@ static int populate_from_parport (struct parport_list *list)
 	  int interrupt = -1;
 	  int fd;
 
-	  // Device
+	  /* Device */
 	  if (capabilities & PPDEV_CAPABLE)
 	    sprintf (device, "/dev/parport%s", de->d_name);
 	  else
@@ -118,7 +120,7 @@ static int populate_from_parport (struct parport_list *list)
 		strcpy (device, "/dev/port");
 	    }
 
-	  // Base and interrupt
+	  /* Base and interrupt */
 	  sprintf (hardware, "/proc/parport/%s/hardware", de->d_name);
 	  fd = open (hardware, O_RDONLY | O_NOCTTY);
 	  if (fd >= 0)
@@ -157,7 +159,8 @@ static int populate_from_parport (struct parport_list *list)
   return 0;
 }
 
-static int populate_from_sys_dev_parport (struct parport_list *list)
+static int
+populate_from_sys_dev_parport (struct parport_list *list)
 {
   struct dirent *de;
   DIR *parport = opendir ("/proc/sys/dev/parport");
@@ -184,7 +187,7 @@ static int populate_from_sys_dev_parport (struct parport_list *list)
 
 	  p = de->d_name + len + 1;
 
-	  // Device
+	  /* Device */
 	  if (*p && capabilities & PPDEV_CAPABLE)
 	    sprintf (device, "/dev/parport%s", p);
 	  else
@@ -195,7 +198,7 @@ static int populate_from_sys_dev_parport (struct parport_list *list)
 		strcpy (device, "/dev/port");
 	    }
 
-	  // Base
+	  /* Base */
 	  sprintf (filename, "/proc/sys/dev/parport/%s/base-addr", de->d_name);
 	  fd = open (filename, O_RDONLY | O_NOCTTY);
 	  if (fd >= 0)
@@ -207,7 +210,7 @@ static int populate_from_sys_dev_parport (struct parport_list *list)
 		base = strtoul (contents, NULL, 0);
 	    }
       
-	  // Interrupt
+	  /* Interrupt */
 	  sprintf (filename, "/proc/sys/dev/parport/%s/irq", de->d_name);
 	  fd = open (filename, O_RDONLY | O_NOCTTY);
 	  if (fd >= 0)
@@ -229,7 +232,8 @@ static int populate_from_sys_dev_parport (struct parport_list *list)
   return 0;
 }
 
-static int populate_by_guessing (struct parport_list *list)
+static int
+populate_by_guessing (struct parport_list *list)
 {
   add_port (list, "0x378", "/dev/port", 0x378, -1);
   add_port (list, "0x278", "/dev/port", 0x278 ,-1);
@@ -237,9 +241,10 @@ static int populate_by_guessing (struct parport_list *list)
   return 0;
 }
 
-// Find out what ports there are.
-int ieee1284_find_ports (struct parport_list *list,
-			 const char *config_file, int flags)
+/* Find out what ports there are. */
+int
+ieee1284_find_ports (struct parport_list *list,
+		     const char *config_file, int flags)
 {
   detect_environment (0);
   list->portc = 0;
@@ -260,8 +265,9 @@ int ieee1284_find_ports (struct parport_list *list,
   return 0;
 }
 
-// Free up a parport_list structure.
-void ieee1284_free_ports (struct parport_list *list)
+/* Free up a parport_list structure. */
+void
+ieee1284_free_ports (struct parport_list *list)
 {
   int i;
 
@@ -285,3 +291,9 @@ void ieee1284_free_ports (struct parport_list *list)
   list->portv = NULL;
   list->portc = 0;
 }
+
+/*
+ * Local Variables:
+ * eval: (c-set-style "gnu")
+ * End:
+ */

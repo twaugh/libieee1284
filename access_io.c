@@ -36,20 +36,20 @@
 #include "parport.h"
 #include "ppdev.h"
 
-static unsigned char raw_inb (struct parport_internal *port,
-			      unsigned long addr)
+static unsigned char
+raw_inb (struct parport_internal *port, unsigned long addr)
 {
   return inb (addr);
 }
 
-static void raw_outb (struct parport_internal *port, unsigned char val,
-		      unsigned long addr)
+static void
+raw_outb (struct parport_internal *port, unsigned char val, unsigned long addr)
 {
   outb_p (val, addr);
 }
 
-static unsigned char port_inb (struct parport_internal *port,
-			       unsigned long addr)
+static unsigned char
+port_inb (struct parport_internal *port, unsigned long addr)
 {
   unsigned char byte = 0xff;
 
@@ -59,14 +59,16 @@ static unsigned char port_inb (struct parport_internal *port,
   return byte;
 }
 
-static void port_outb (struct parport_internal *port, unsigned char val,
-		       unsigned long addr)
+static void
+port_outb (struct parport_internal *port, unsigned char val,
+	   unsigned long addr)
 {
   if (lseek (port->fd, addr, SEEK_SET) != (off_t)-1)
     write (port->fd, &val, 1);
 }
 
-static int init (struct parport_internal *port)
+static int
+init (struct parport_internal *port)
 {
   struct parport_access_methods *fn = malloc (sizeof *fn);
 
@@ -91,16 +93,17 @@ static int init (struct parport_internal *port)
       break;
     }
 
-  // Need to write this.
-  // If we find an ECP port, we can adjust some of the access function
-  // pointers in io_access_functions to point to functions that use
-  // hardware assistance.
+  /* Need to write this.
+   * If we find an ECP port, we can adjust some of the access function
+   * pointers in io_access_functions to point to functions that use
+   * hardware assistance. */
 
   port->fn = fn;
   return E1284_OK;
 }
 
-static void cleanup (struct parport_internal *port)
+static void
+cleanup (struct parport_internal *port)
 {
   if (port->type != IO_CAPABLE && port->fd >= 0)
     close (port->fd);
@@ -108,24 +111,28 @@ static void cleanup (struct parport_internal *port)
   free ((struct parport_access_methods *) (port->fn));
 }
 
-static int read_data (struct parport_internal *port)
+static int
+read_data (struct parport_internal *port)
 {
   return port->fn->inb (port, port->base);
 }
 
-static void write_data (struct parport_internal *port, unsigned char reg)
+static void
+write_data (struct parport_internal *port, unsigned char reg)
 {
   port->fn->outb (port, reg, port->base);
 }
 
-static int read_status (struct parport_internal *port)
+static int
+read_status (struct parport_internal *port)
 {
   return port->fn->inb (port, port->base + 1) ^ S1284_INVERTED;
 }
 
-static void raw_frob_control (struct parport_internal *port,
-			      unsigned char mask,
-			      unsigned char val)
+static void
+raw_frob_control (struct parport_internal *port,
+		  unsigned char mask,
+		  unsigned char val)
 {
   unsigned char ctr = port->ctr;
   ctr = (ctr & ~mask) ^ val;
@@ -133,7 +140,8 @@ static void raw_frob_control (struct parport_internal *port,
   port->ctr = ctr;
 }
 
-static int read_control (struct parport_internal *port)
+static int
+read_control (struct parport_internal *port)
 {
   const unsigned char rm = (C1284_NSTROBE |
 			    C1284_NAUTOFD |
@@ -142,12 +150,14 @@ static int read_control (struct parport_internal *port)
   return port->ctr & rm;
 }
 
-static void data_dir (struct parport_internal *port, int reverse)
+static void
+data_dir (struct parport_internal *port, int reverse)
 {
   raw_frob_control (port, 0x20, reverse ? 0x20 : 0x00);
 }
 
-static void write_control (struct parport_internal *port, unsigned char reg)
+static void
+write_control (struct parport_internal *port, unsigned char reg)
 {
   const unsigned char wm = (C1284_NSTROBE |
 			    C1284_NAUTOFD |
@@ -162,9 +172,10 @@ static void write_control (struct parport_internal *port, unsigned char reg)
   raw_frob_control (port, wm, reg & wm);
 }
 
-static void frob_control (struct parport_internal *port,
-			  unsigned char mask,
-			  unsigned char val)
+static void
+frob_control (struct parport_internal *port,
+	      unsigned char mask,
+	      unsigned char val)
 {
   const unsigned char wm = (C1284_NSTROBE |
 			    C1284_NAUTOFD |
@@ -181,11 +192,12 @@ static void frob_control (struct parport_internal *port,
   raw_frob_control (port, mask, val);
 }
 
-static int wait_status (struct parport_internal *port,
-			unsigned char mask, unsigned char val,
-			struct timeval *timeout)
+static int
+wait_status (struct parport_internal *port,
+	     unsigned char mask, unsigned char val,
+	     struct timeval *timeout)
 {
-  // Simple-minded polling.  TODO: Use David Paschal's method for this.
+  /* Simple-minded polling.  TODO: Use David Paschal's method for this. */
   struct timeval deadline, now;
   gettimeofday (&deadline, NULL);
   deadline.tv_sec += timeout->tv_sec;
@@ -244,3 +256,9 @@ const struct parport_access_methods io_access_methods =
   default_ecp_read_addr,
   default_ecp_write_addr
 };
+
+/*
+ * Local Variables:
+ * eval: (c-set-style "gnu")
+ * End:
+ */

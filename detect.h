@@ -101,7 +101,7 @@ struct parport_internal
   unsigned char ctr;
   int *selectable_fd;
 
-  // IEEE 1284 stuff
+  /* IEEE 1284 stuff */
   int current_mode;
   int current_channel;
 
@@ -119,3 +119,9 @@ extern int capabilities;
 extern int detect_environment (int forbidden);
 
 #endif /* _DETECT_H_ */
+
+/*
+ * Local Variables:
+ * eval: (c-set-style "gnu")
+ * End:
+ */

@@ -26,9 +26,16 @@
 extern const struct parport_access_methods io_access_methods;
 extern const struct parport_access_methods ppdev_access_methods;
 
-static inline void delay (int which)
+static inline void
+delay (int which)
 {
   struct timeval tv;
   lookup_delay (which, &tv);
   select (0, NULL, NULL, NULL, &tv);
 }
+
+/*
+ * Local Variables:
+ * eval: (c-set-style "gnu")
+ * End:
+ */

@@ -33,7 +33,8 @@
 #include "parport.h"
 #include "ppdev.h"
 
-static int init (struct parport_internal *port)
+static int
+init (struct parport_internal *port)
 {
   struct parport_access_methods *fn = malloc (sizeof *fn);
 
@@ -47,8 +48,8 @@ static int init (struct parport_internal *port)
     return E1284_INIT;
 
   if (port->interrupt == -1)
-    // Our implementation of do_nack_handshake relies on interrupts
-    // being available.  They aren't, so use the default one instead.
+    /* Our implementation of do_nack_handshake relies on interrupts
+     * being available.  They aren't, so use the default one instead. */
     fn->do_nack_handshake = default_do_nack_handshake;
   else *(port->selectable_fd) = port->fd;
 
@@ -56,13 +57,15 @@ static int init (struct parport_internal *port)
   return E1284_OK;
 }
 
-static void cleanup (struct parport_internal *port)
+static void
+cleanup (struct parport_internal *port)
 {
   if (port->fd >= 0)
     close (port->fd);
 }
 
-static int read_data (struct parport_internal *port)
+static int
+read_data (struct parport_internal *port)
 {
   unsigned char reg;
   if (ioctl (port->fd, PPRDATA, &reg))
@@ -71,12 +74,14 @@ static int read_data (struct parport_internal *port)
   return reg;
 }
 
-static void write_data (struct parport_internal *port, unsigned char reg)
+static void
+write_data (struct parport_internal *port, unsigned char reg)
 {
   ioctl (port->fd, PPWDATA, &reg);
 }
 
-static int read_status (struct parport_internal *port)
+static int
+read_status (struct parport_internal *port)
 {
   unsigned char reg;
   if (ioctl (port->fd, PPRSTATUS, &reg))
@@ -85,7 +90,8 @@ static int read_status (struct parport_internal *port)
   return reg ^ S1284_INVERTED;
 }
 
-static int read_control (struct parport_internal *port)
+static int
+read_control (struct parport_internal *port)
 {
   unsigned char reg;
   const unsigned char rm = (C1284_NSTROBE |
@@ -98,12 +104,14 @@ static int read_control (struct parport_internal *port)
   return (reg ^ C1284_INVERTED) & rm;
 }
 
-static void data_dir (struct parport_internal *port, int reverse)
+static void
+data_dir (struct parport_internal *port, int reverse)
 {
   ioctl (port->fd, PPDATADIR, &reverse);
 }
 
-static void write_control (struct parport_internal *port, unsigned char reg)
+static void
+write_control (struct parport_internal *port, unsigned char reg)
 {
   const unsigned char wm = (C1284_NSTROBE |
 			    C1284_NAUTOFD |
@@ -120,7 +128,8 @@ static void write_control (struct parport_internal *port, unsigned char reg)
   ioctl (port->fd, PPWCONTROL, &reg);
 }
 
-static void frob_control (struct parport_internal *port,
+static void
+frob_control (struct parport_internal *port,
 			  unsigned char mask,
 			  unsigned char val)
 {
@@ -137,15 +146,16 @@ static void frob_control (struct parport_internal *port,
   ioctl (port->fd, PPFCONTROL, &ppfs);
 }
 
-static int wait_status (struct parport_internal *port,
-			unsigned char mask, unsigned char val,
-			struct timeval *timeout)
+static int
+wait_status (struct parport_internal *port,
+	     unsigned char mask, unsigned char val,
+	     struct timeval *timeout)
 {
-  // This could be smarter: if we're just waiting for nAck, and we
-  // have interrutps to work with, we can just wait for an interrupt
-  // rather than polling.
+  /* This could be smarter: if we're just waiting for nAck, and we
+   * have interrutps to work with, we can just wait for an interrupt
+   * rather than polling. */
 
-  // Simple-minded polling.  TODO: Use David Paschal's method for this.
+  /* Simple-minded polling.  TODO: Use David Paschal's method for this. */
   struct timeval deadline, now;
   gettimeofday (&deadline, NULL);
   deadline.tv_sec += timeout->tv_sec;
@@ -168,10 +178,11 @@ static int wait_status (struct parport_internal *port,
   return E1284_TIMEDOUT;
 }
 
-static int do_nack_handshake (struct parport_internal *port,
-			      unsigned char ct_before,
-			      unsigned char ct_after,
-			      struct timeval *timeout)
+static int
+do_nack_handshake (struct parport_internal *port,
+		   unsigned char ct_before,
+		   unsigned char ct_after,
+		   struct timeval *timeout)
 {
   fd_set rfds;
   int count;
@@ -242,3 +253,9 @@ const struct parport_access_methods ppdev_access_methods =
   default_ecp_read_addr,
   default_ecp_write_addr
 };
+
+/*
+ * Local Variables:
+ * eval: (c-set-style "gnu")
+ * End:
+ */

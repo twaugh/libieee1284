@@ -1,3 +1,12 @@
+2001-10-17  Tim Waugh  <twaugh@redhat.com>
+
+	* access.h, access_io.c, access_ppdev.c, default.c, default.h,
+	delay.c, detect.c, detect.h, deviceid.c, interface.c, ports.c,
+	state.c: Change ISO C99 //-style comments to /*-style-*/ ones
+	to make it easier to include libieee1284 in projects with that
+	restriction.  Also, put function names at column 1 where they
+	are defined, to make grepping easier.
+
 2001-10-16  Tim Waugh  <twaugh@redhat.com>
 
 	* ieee1284.h: Clarify block I/O return value meaning.

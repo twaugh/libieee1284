@@ -49,3 +49,9 @@ extern ssize_t default_ecp_read_addr (struct parport_internal *port,
 				      char *buffer, size_t len);
 extern ssize_t default_ecp_write_addr (struct parport_internal *port,
 				       const char *buffer, size_t len);
+
+/*
+ * Local Variables:
+ * eval: (c-set-style "gnu")
+ * End:
+ */

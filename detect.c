@@ -29,94 +29,105 @@
 
 int capabilities;
 
-// Look for parport entries in /proc.
-// Linux 2.2.x has /proc/parport/.
-// Linux 2.4.x has /proc/sys/dev/parport/.
-static int check_proc_type (void)
+/* Look for parport entries in /proc.
+ * Linux 2.2.x has /proc/parport/.
+ * Linux 2.4.x has /proc/sys/dev/parport/. */
+static int
+check_proc_type (void)
 {
-	int which = 0;
-	struct stat st;
-	if (stat ("/proc/sys/dev/parport", &st) == 0 &&
-	    st.st_mode & S_IFDIR &&
-	    st.st_nlink > 2)
-		which = PROC_SYS_DEV_PARPORT_CAPABLE;
-	else if (stat ("/proc/parport", &st) == 0 &&
-		 st.st_mode & S_IFDIR &&
-		 st.st_nlink > 2)
-		which = PROC_PARPORT_CAPABLE;
-	capabilities |= which;
-	return which;
+  int which = 0;
+  struct stat st;
+  if (stat ("/proc/sys/dev/parport", &st) == 0 &&
+      st.st_mode & S_IFDIR &&
+      st.st_nlink > 2)
+    which = PROC_SYS_DEV_PARPORT_CAPABLE;
+  else if (stat ("/proc/parport", &st) == 0 &&
+	   st.st_mode & S_IFDIR &&
+	   st.st_nlink > 2)
+    which = PROC_PARPORT_CAPABLE;
+  capabilities |= which;
+  return which;
 }
 
-// Try to find a device node that works.
-static int check_dev_node (const char *type)
+/* Try to find a device node that works. */
+static int
+check_dev_node (const char *type)
 {
-	char name[50]; // only callers are in detect_environment
-	int fd;
-	int i;
+  char name[50]; /* only callers are in detect_environment */
+  int fd;
+  int i;
 
-	for (i = 0; i < 8; i++) {
-		sprintf (name, "/dev/%s%d", type, i);
-		fd = open (name, O_RDONLY | O_NOCTTY);
-		if (fd >= 0) {
-			close (fd);
-			return 1;
-		}
-	}
+  for (i = 0; i < 8; i++) {
+    sprintf (name, "/dev/%s%d", type, i);
+    fd = open (name, O_RDONLY | O_NOCTTY);
+    if (fd >= 0) {
+      close (fd);
+      return 1;
+    }
+  }
 
-	return 0;
+  return 0;
 }
 
-// Is /dev/port accessible?
-static int check_dev_port (void)
+/* Is /dev/port accessible? */
+static int
+check_dev_port (void)
 {
-	int fd = open ("/dev/port", O_RDWR | O_NOCTTY);
-	if (fd >= 0) {
-		close (fd);
-		capabilities |= DEV_PORT_CAPABLE;
-		return 1;
-	}
-	return 0;
+  int fd = open ("/dev/port", O_RDWR | O_NOCTTY);
+  if (fd >= 0) {
+    close (fd);
+    capabilities |= DEV_PORT_CAPABLE;
+    return 1;
+  }
+  return 0;
 }
 
-// Can we use direct I/O with inb and outb?
-static int check_io (void)
+/* Can we use direct I/O with inb and outb? */
+static int
+check_io (void)
 {
-	if (ioperm (0x378 /* say */, 3, 1) == 0) {
-		ioperm (0x378, 3, 0);
-		capabilities |= IO_CAPABLE;
-		return 1;
-	}
-	return 0;
+  if (ioperm (0x378 /* say */, 3, 1) == 0) {
+    ioperm (0x378, 3, 0);
+    capabilities |= IO_CAPABLE;
+    return 1;
+  }
+  return 0;
 }
 
-// Figure out what we can use to talk to the parallel port.
-// We aren't allowed to use the things set in forbidden though.
-int detect_environment (int forbidden)
+/* Figure out what we can use to talk to the parallel port.
+ * We aren't allowed to use the things set in forbidden though. */
+int
+detect_environment (int forbidden)
 {
 #define FORBIDDEN(bit) (forbidden & bit)
-	static int detected = 0;
-	if (detected && !forbidden) return 0;
-	detected = 1;
+  static int detected = 0;
+  if (detected && !forbidden) return 0;
+  detected = 1;
 
-	capabilities = 0;
+  capabilities = 0;
 
-	// Find out what access mechanisms there are.
-	if ((!FORBIDDEN(PPDEV_CAPABLE)) && check_dev_node ("parport"))
-		capabilities |= PPDEV_CAPABLE;
-	if (!FORBIDDEN (IO_CAPABLE))
-		check_io ();
-	if (!FORBIDDEN (DEV_PORT_CAPABLE))
-		check_dev_port ();
+  /* Find out what access mechanisms there are. */
+  if ((!FORBIDDEN(PPDEV_CAPABLE)) && check_dev_node ("parport"))
+    capabilities |= PPDEV_CAPABLE;
+  if (!FORBIDDEN (IO_CAPABLE))
+    check_io ();
+  if (!FORBIDDEN (DEV_PORT_CAPABLE))
+    check_dev_port ();
 
-	// Find out what kind of /proc structure we have.
-	if (!check_proc_type ()) {
-		// Maybe the low-level port driver wasn't loaded.
-		if ((!FORBIDDEN (DEV_LP_CAPABLE)) && check_dev_node ("lp"))
-			capabilities |= DEV_LP_CAPABLE;
+  /* Find out what kind of /proc structure we have. */
+  if (!check_proc_type ()) {
+    /* Maybe the low-level port driver wasn't loaded. */
+    if ((!FORBIDDEN (DEV_LP_CAPABLE)) && check_dev_node ("lp"))
+      capabilities |= DEV_LP_CAPABLE;
 
-		check_proc_type ();
-	}
+    check_proc_type ();
+  }
 
-	return 0;
+  return 0;
 }
+
+/*
+ * Local Variables:
+ * eval: (c-set-style "gnu")
+ * End:
+ */

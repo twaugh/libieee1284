@@ -29,16 +29,18 @@
 
 #define LOG_ERROR(x...) /* Need to write LOG_ERROR */
 
-int default_do_nack_handshake (struct parport_internal *port,
-			       unsigned char ct_before,
-			       unsigned char ct_after,
-			       struct timeval *timeout)
+int
+default_do_nack_handshake (struct parport_internal *port,
+			   unsigned char ct_before,
+			   unsigned char ct_after,
+			   struct timeval *timeout)
 {
   /* There is a possible implementation using /proc/interrupts on Linux.. */
   return E1284_NOTIMPL;
 }
 
-int default_negotiate (struct parport_internal *port, int mode)
+int
+default_negotiate (struct parport_internal *port, int mode)
 {
   const struct parport_access_methods *fn = port->fn;
   int ret = E1284_NEGFAILED;
@@ -125,7 +127,8 @@ int default_negotiate (struct parport_internal *port, int mode)
   return ret;
 }
 
-void default_terminate (struct parport_internal *port)
+void
+default_terminate (struct parport_internal *port)
 {
   const struct parport_access_methods *fn = port->fn;
   struct timeval tv;
@@ -149,18 +152,21 @@ void default_terminate (struct parport_internal *port)
   return;
 }
 
-int default_ecp_fwd_to_rev (struct parport_internal *port)
+int
+default_ecp_fwd_to_rev (struct parport_internal *port)
 {
   return E1284_NOTIMPL;
 }
 
-int default_ecp_rev_to_fwd (struct parport_internal *port)
+int
+default_ecp_rev_to_fwd (struct parport_internal *port)
 {
   return E1284_NOTIMPL;
 }
 
-ssize_t default_nibble_read (struct parport_internal *port,
-			     char *buffer, size_t len)
+ssize_t
+default_nibble_read (struct parport_internal *port,
+		     char *buffer, size_t len)
 {
   const struct parport_access_methods *fn = port->fn;
   size_t count = 0;
@@ -220,8 +226,9 @@ ssize_t default_nibble_read (struct parport_internal *port,
   return count;
 }
 
-ssize_t default_compat_write (struct parport_internal *port,
-			      const char *buffer, size_t len)
+ssize_t
+default_compat_write (struct parport_internal *port,
+		      const char *buffer, size_t len)
 {
   const struct parport_access_methods *fn = port->fn;
   size_t count = 0;
@@ -261,56 +268,71 @@ ssize_t default_compat_write (struct parport_internal *port,
   return count;  
 }
 
-ssize_t default_byte_read (struct parport_internal *port,
-			   char *buffer, size_t len)
+ssize_t
+default_byte_read (struct parport_internal *port,
+		   char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
-ssize_t default_epp_read_data (struct parport_internal *port,
-			       char *buffer, size_t len)
+ssize_t
+default_epp_read_data (struct parport_internal *port,
+		       char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
-ssize_t default_epp_write_data (struct parport_internal *port,
-				const char *buffer, size_t len)
+ssize_t
+default_epp_write_data (struct parport_internal *port,
+			const char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
-ssize_t default_epp_read_addr (struct parport_internal *port,
-			       char *buffer, size_t len)
+ssize_t
+default_epp_read_addr (struct parport_internal *port,
+		       char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
-ssize_t default_epp_write_addr (struct parport_internal *port,
-				const char *buffer, size_t len)
+ssize_t
+default_epp_write_addr (struct parport_internal *port,
+			const char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
-ssize_t default_ecp_read_data (struct parport_internal *port,
-			       char *buffer, size_t len)
+ssize_t
+default_ecp_read_data (struct parport_internal *port,
+		       char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
-ssize_t default_ecp_write_data (struct parport_internal *port,
-				const char *buffer, size_t len)
+ssize_t
+default_ecp_write_data (struct parport_internal *port,
+			const char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
-ssize_t default_ecp_read_addr (struct parport_internal *port,
-			       char *buffer, size_t len)
+ssize_t
+default_ecp_read_addr (struct parport_internal *port,
+		       char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
-ssize_t default_ecp_write_addr (struct parport_internal *port,
-				const char *buffer, size_t len)
+ssize_t
+default_ecp_write_addr (struct parport_internal *port,
+			const char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
+
+/*
+ * Local Variables:
+ * eval: (c-set-style "gnu")
+ * End:
+ */

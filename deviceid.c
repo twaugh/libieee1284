@@ -168,14 +168,15 @@ static ssize_t get_using_io (struct parport *port, int daisy,
 }
 #endif
 
-static ssize_t get_fresh (struct parport *port, int daisy,
-			  char *buffer, size_t len)
+static ssize_t
+get_fresh (struct parport *port, int daisy,
+	   char *buffer, size_t len)
 {
   ssize_t got;
   size_t idlen;
 
   if (daisy > -1)
-    // No implementation yet for IEEE 1284.3 devices.
+    /* No implementation yet for IEEE 1284.3 devices. */
     return -ETRYNEXT;
 
   ieee1284_terminate (port);
@@ -197,14 +198,15 @@ static ssize_t get_fresh (struct parport *port, int daisy,
   return got;
 }
 
-static ssize_t get_from_proc_parport (struct parport *port, int daisy,
-				      char *buffer, size_t len)
+static ssize_t
+get_from_proc_parport (struct parport *port, int daisy,
+		       char *buffer, size_t len)
 {
   int fd;
   char *name;
 
   if (strchr (port->name, '/') || port->name[0] == '.')
-    // Hmm, suspicious.
+    /* Hmm, suspicious. */
     return -ETRYNEXT;
 
   name = malloc (strlen (port->name) + 50);
@@ -235,14 +237,15 @@ static ssize_t get_from_proc_parport (struct parport *port, int daisy,
   return -ETRYNEXT;
 }
 
-static ssize_t get_from_sys_dev_parport (struct parport *port, int daisy,
-					 char *buffer, size_t len)
+static ssize_t
+get_from_sys_dev_parport (struct parport *port, int daisy,
+			  char *buffer, size_t len)
 {
   int fd;
   char *name;
 
   if (strchr (port->name, '/') || port->name[0] == '.')
-    // Hmm, suspicious.
+    /* Hmm, suspicious. */
     return -ETRYNEXT;
 
   name = malloc (strlen (port->name) + 50);
@@ -290,8 +293,9 @@ static ssize_t get_from_sys_dev_parport (struct parport *port, int daisy,
   return -ETRYNEXT;
 }
 
-ssize_t ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
-			       char *buffer, size_t len)
+ssize_t
+ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
+		       char *buffer, size_t len)
 {
   int ret = -1;
 
@@ -356,3 +360,9 @@ ssize_t ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
   ieee1284_release (port);
   return ret;
 }
+
+/*
+ * Local Variables:
+ * eval: (c-set-style "gnu")
+ * End:
+ */

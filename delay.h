@@ -29,3 +29,9 @@ enum Delays {
 extern void lookup_delay (int which, struct timeval *tv);
 
 #endif /* _DELAY_H_ */
+
+/*
+ * Local Variables:
+ * eval: (c-set-style "gnu")
+ * End:
+ */
