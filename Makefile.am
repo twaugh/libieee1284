@@ -5,7 +5,7 @@ libieee1284_la_SOURCES = src/detect.c src/detect.h src/ports.c src/deviceid.c \
 	src/state.c src/access.h src/delay.h src/delay.c src/default.h \
 	src/default.c src/access_io.c src/access_ppdev.c src/access_lpt.c \
 	src/interface.c src/parport.h src/ppdev.h src/debug.h src/debug.c \
-	src/conf.h src/conf.c libieee1284.sym
+	src/par_nt.h src/conf.h src/conf.c libieee1284.sym
 # When rolling a release, remember to adjust the version info.
 # It's current:release:age.
 libieee1284_la_LDFLAGS = -version-info 4:0:1 \
@@ -55,7 +55,9 @@ $(man3_MANS): $(top_srcdir)/doc/interface.xml
 EXTRA_DIST = libieee1284.spec doc/interface.xml doc/interface.txt \
 		$(man3_MANS) solaris_io/LICENSE solaris_io/README \
 		solaris_io/INSTALL solaris_io/Makefile.in \
-		solaris_io/iop.c solaris_io/iop.conf
+		solaris_io/iop.c solaris_io/iop.conf \
+		README.FreeBSD README.OpenBSD README.Solaris \
+		README.win95 README.winNT
 
 DISTCLEANFILES = include/stamp-h include/stamp-h[0-9]* \
 	doc/manpage.links doc/manpage.refs
