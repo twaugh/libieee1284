@@ -337,20 +337,29 @@ which_mode (int mode, int flags)
 	m = IEEE1284_MODE_ECPRLE;
       else if (flags & F1284_SWE)
 	m = IEEE1284_MODE_ECPSWE;
-      else if (flags)
-	return E1284_NOTIMPL;
+      else if (flags & ~F1284_NONBLOCK)
+	{
+	  dprintf ("flags is %x, but only F1284_RLE, F1284_SWE "
+		   "and F1284_NONBLOCK are implemented\n", flags);
+	  return E1284_NOTIMPL;
+	}
       else m = IEEE1284_MODE_ECP;
       break;
 
     case M1284_EPP:
       if (flags & F1284_SWE)
 	m = IEEE1284_MODE_EPPSWE;
-      else if (flags & ~F1284_FASTEPP)
-	return E1284_NOTIMPL;
+      else if (flags & ~(F1284_FASTEPP | F1284_NONBLOCK))
+	{
+	  dprintf ("flags is %x, but only F1284_SWE and F1284_NONBLOCK "
+		   "are implemented\n", flags);
+	  return E1284_NOTIMPL;
+	}
       else m = IEEE1284_MODE_EPP;
       break;
 
     default:
+      dprintf ("Unknown mode %x\n", mode);
       return E1284_NOTIMPL;
     }
 

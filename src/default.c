@@ -29,6 +29,8 @@
 #include "detect.h"
 #include "ieee1284.h"
 
+static const char *no_default = "no default implementation of %s\n";
+
 int
 default_wait_data (struct parport_internal *port, unsigned char mask,
 		   unsigned char val, struct timeval *timeout)
@@ -63,6 +65,7 @@ default_do_nack_handshake (struct parport_internal *port,
 			   struct timeval *timeout)
 {
   /* There is a possible implementation using /proc/interrupts on Linux.. */
+  dprintf (no_default, "no_nack_handshake");
   return E1284_NOTIMPL;
 }
 
@@ -206,12 +209,14 @@ default_terminate (struct parport_internal *port)
 int
 default_ecp_fwd_to_rev (struct parport_internal *port)
 {
+  dprintf (no_default, "ecp_fwd_to_rev");
   return E1284_NOTIMPL;
 }
 
 int
 default_ecp_rev_to_fwd (struct parport_internal *port)
 {
+  dprintf (no_default, "ecp_rev_to_fwd");
   return E1284_NOTIMPL;
 }
 
@@ -340,6 +345,7 @@ ssize_t
 default_byte_read (struct parport_internal *port, int flags,
 		   char *buffer, size_t len)
 {
+  dprintf (no_default, "byte_read");
   return E1284_NOTIMPL;
 }
 
@@ -347,6 +353,7 @@ ssize_t
 default_epp_read_data (struct parport_internal *port, int flags,
 		       char *buffer, size_t len)
 {
+  dprintf (no_default, "epp_read_data");
   return E1284_NOTIMPL;
 }
 
