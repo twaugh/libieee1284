@@ -1,3 +1,8 @@
+2003-08-28  Tim Waugh  <twaugh@redhat.com>
+
+	* src/access_ppdev.c (find_capabilities): Don't report impossible
+	modes for non-bidirectional ports.
+
 2003-05-30  Tim Waugh  <twaugh@redhat.com>
 
 	* configure.in, Makefile.am: Version 0.2.8 (stable).

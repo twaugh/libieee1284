@@ -72,6 +72,8 @@ find_capabilities (int fd, int *c)
     *c |= CAP1284_ECP | CAP1284_ECPRLE;
   if (m & PARPORT_MODE_DMA)
     *c |= CAP1284_DMA;
+  if (!(m & PARPORT_MODE_TRISTATE))
+    *c &= ~(CAP1284_BYTE | CAP1284_ECPSWE);
 }
 
 static int
