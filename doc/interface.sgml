@@ -1168,7 +1168,8 @@
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_epp_read_data</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	      <parameter>flags</parameter>,
 	      char *<parameter>buffer</parameter>, size_t
 	      <parameter>len</parameter></paramdef>
 	  </funcprototype>
@@ -1176,7 +1177,8 @@
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_epp_write_data</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	      <parameter>flags</parameter>,
 	      const char *<parameter>buffer</parameter>, size_t
 	      <parameter>len</parameter></paramdef>
 	  </funcprototype>
@@ -1184,7 +1186,8 @@
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_epp_read_addr</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	      <parameter>flags</parameter>,
 	      char *<parameter>buffer</parameter>, size_t
 	      <parameter>len</parameter></paramdef>
 	  </funcprototype>
@@ -1192,7 +1195,8 @@
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_epp_write_addr</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	      <parameter>flags</parameter>,
 	      const char *<parameter>buffer</parameter>, size_t
 	      <parameter>len</parameter></paramdef>
 	  </funcprototype>
@@ -1200,7 +1204,8 @@
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_ecp_read_data</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	      <parameter>flags</parameter>,
 	      char *<parameter>buffer</parameter>, size_t
 	      <parameter>len</parameter></paramdef>
 	  </funcprototype>
@@ -1208,7 +1213,8 @@
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_ecp_write_data</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	      <parameter>flags</parameter>,
 	      const char *<parameter>buffer</parameter>, size_t
 	      <parameter>len</parameter></paramdef>
 	  </funcprototype>
@@ -1216,7 +1222,8 @@
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_ecp_write_addr</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	      <parameter>flags</parameter>,
 	      const char *<parameter>buffer</parameter>, size_t
 	      <parameter>len</parameter></paramdef>
 	  </funcprototype>
@@ -1234,6 +1241,13 @@
 
 	<para>The supplied <parameter>buffer</parameter> must be at
 	 least <parameter>len</parameter> bytes long.</para>
+
+	<para>There are no <parameter>flags</parameter> defined yet,
+	 and so this parameter should be 0.</para>
+
+	<remark>Flags that will be defined in the future are for
+	 things like RLE, software emulation, and bounded
+	 ECP.</remark>
       </refsect1>
 
       <refsect1>
