@@ -1537,6 +1537,7 @@
 	<refname>ieee1284_epp_write_addr</refname>
 	<refname>ieee1284_ecp_read_data</refname>
 	<refname>ieee1284_ecp_write_data</refname>
+	<refname>ieee1284_ecp_read_addr</refname>
 	<refname>ieee1284_ecp_write_addr</refname>
 	<refpurpose>data transfer functions</refpurpose>
       </refnamediv>
@@ -1618,6 +1619,15 @@
 	    <paramdef>struct parport *<parameter>port</parameter>, int
 	      <parameter>flags</parameter>,
 	      const char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_ecp_read_addr</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	      <parameter>flags</parameter>,
+	      char *<parameter>buffer</parameter>, size_t
 	      <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
