@@ -1,6 +1,11 @@
 libieee1284 news
 ----------------
 
+0.2.10 (stable)
+
+	Several small bugs were fixed.  Modifications to support udev-054
+	were made.
+
 0.2.9 (stable)
 
 	Several small bugs were fixed.  A Python extension module was added.
