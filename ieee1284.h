@@ -201,6 +201,11 @@ extern int ieee1284_ecp_rev_to_fwd (struct parport *port);
 // Block I/O
 // The return value is the number of bytes successfully transferred,
 // or an error code (only if no transfer took place).
+enum ieee1284_transfer_flags
+{
+  F1284_SWE = (1<<1), // Don't use hardware assistance
+  F1284_RLE = (1<<2), // Use ECP RLE
+};
 extern ssize_t ieee1284_nibble_read (struct parport *port, char *buffer,
 				     size_t len);
 extern ssize_t ieee1284_compat_write (struct parport *port,

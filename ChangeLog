@@ -1,5 +1,8 @@
 2001-11-14  Tim Waugh  <twaugh@redhat.com>
 
+	* ieee1284.h (enum ieee1284_transfer_flags): Add F1284_SWE and
+	F1284_RLE flags.
+
 	* configure.in: Move AM_PROG_LIBTOOL to later to prevent warning.
 
 	* ieee1284.h: Add flags parameter for EPP/ECP functions.
