@@ -65,6 +65,9 @@ man3_MANS = doc/libieee1284.3 \
 $(man3_MANS): $(top_srcdir)/doc/interface.xml
 	xmlto man -o doc $<
 
+doc/interface.pdf: $(top_srcdir)/doc/interface.xml
+	xmlto pdf -o doc --extensions $<
+
 EXTRA_DIST = libieee1284.spec doc/interface.xml doc/interface.txt \
 		$(man3_MANS) solaris_io/LICENSE solaris_io/README \
 		solaris_io/INSTALL solaris_io/iop.conf \
