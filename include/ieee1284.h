@@ -229,6 +229,7 @@ enum ieee1284_transfer_flags
   F1284_NONBLOCK = (1<<0),	/* Non-blocking semantics */
   F1284_SWE = (1<<2),		/* Don't use hardware assistance */
   F1284_RLE = (1<<3),		/* Use ECP RLE */
+  F1284_FASTEPP = (1<<4),	/* Use faster EPP (counts are unreliable) */
 };
 extern ssize_t ieee1284_nibble_read (struct parport *port, int flags,
 				     char *buffer, size_t len);
