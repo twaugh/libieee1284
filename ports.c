@@ -56,8 +56,6 @@ add_port (struct parport_list *list, int flags,
       return E1284_NOMEM;
     }
 
-  p->selectable_fd = -1;
-
   priv = malloc (sizeof *priv);
   if (!priv)
     {
@@ -96,7 +94,6 @@ add_port (struct parport_list *list, int flags,
   priv->opened = 0;
   priv->claimed = 0;
   priv->ref = 1;
-  priv->selectable_fd = &p->selectable_fd;
 
   list->portv[list->portc++] = p;
   return 0;
