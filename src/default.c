@@ -81,6 +81,12 @@ default_negotiate (struct parport_internal *port, int mode)
       return E1284_OK;
     }
 
+  if (mode == M1284_COMPAT)
+    {
+      default_terminate (port);
+      return E1284_OK;
+    }
+
   switch (mode)
     {
     case M1284_ECPSWE:

@@ -1,5 +1,8 @@
 2002-08-07  Tim Waugh  <twaugh@redhat.com>
 
+	* src/default.c (default_negotiate): If M1284_COMPAT is requested,
+	perform termination.
+
 	* src/default.c (default_negotiate): Don't attempt a negotiation
 	to a mode we are already in.
 
