@@ -1,3 +1,22 @@
+2002-01-04  Tim Waugh  <twaugh@redhat.com>
+
+	* state.c (ieee1284_open): Check that the port is not already
+	opened.
+	* interface.c (ieee1284_close, ieee1284_claim,
+	ieee1284_get_irq_fd, ieee1284_release, ieee1284_read_data,
+	ieee1284_write_data, ieee1284_data_dir, ieee1284_read_status,
+	ieee1284_wait_status, ieee1284_read_control,
+	ieee1284_write_control, ieee1284_frob_control,
+	ieee1284_do_nack_handshake, ieee1284_negotiate,
+	ieee1284_terminate, ieee1284_ecp_fwd_to_rev,
+	ieee1284_ecp_rev_to_fwd, ieee1284_nibble_read,
+	ieee1284_compat_write, ieee1284_byte_read, ieee1284_epp_read_data,
+	ieee1284_epp_write_data, ieee1284_epp_read_addr,
+	ieee1284_epp_write_addr, ieee1284_ecp_read_data,
+	ieee1284_ecp_write_data, ieee1284_ecp_read_addr,
+	ieee1284_ecp_write_addr): Check that the port is in the right
+	state (opened, claimed) for the operation.
+
 2002-01-03  Tim Waugh  <twaugh@redhat.com>
 
 	* test.c (main): Test ieee1284_open and ieee1284_close a little.

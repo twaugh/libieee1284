@@ -80,6 +80,12 @@ ieee1284_open (struct parport *port, int flags, int *capabilities)
 
   dprintf ("==> ieee1284_open\n");
 
+  if (priv->opened)
+    {
+      dprintf ("<== E1284_INVALIDPORT (already open)\n");
+      return E1284_INVALIDPORT;
+    }
+
   if (capabilities)
     *capabilities = (CAP1284_NIBBLE | CAP1284_BYTE | CAP1284_COMPAT |
 		     CAP1284_ECPSWE);
