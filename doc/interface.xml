@@ -139,11 +139,53 @@
       </refsect1>
 
       <refsect1>
-	<title>Trouble-shooting</title>
+	<title>Configuration</title>
+
+	<para>When <function>ieee1284_find_ports</function> is first
+	  called, the library will look for a configuration file.
+	  First it will look for <filename>~/.ieee1284rc</filename>,
+	  and if that doesn't exist it will try
+	  <filename>/etc/ieee1284rc</filename>.</para>
+
+	<para>Comments begin with a '#' character and extend to the
+	  end of the line.  Everything else is freely-formatted
+	  tokens.  A non-quoted (or double-quoted) backslash character
+	  '\' preserves the literal value of the next character, and
+	  single and double quotes may be used for preserving
+	  white-space.</para>
+
+	<para>The only configuration instruction that is currently
+	  recognised is <quote>disallow ppdev</quote>, for preventing
+	  the use of the Linux ppdev driver.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Environment</title>
 
 	<para>You can enable debugging output from the library by
 	  setting the environment variable
 	  <envar>LIBIEEE1284_DEBUG</envar> to any value.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Files</title>
+
+	<variablelist>
+	  <varlistentry>
+	    <term><filename>/etc/ieee1284rc</filename></term>
+	    <listitem>
+	      <para>System-wide configuration file.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><filename>~/.ieee1284rc</filename></term>
+	    <listitem>
+	      <para>User configuration file.  If present, this is used
+	        instead of the system-wide configuration file.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
       </refsect1>
 
       <refsect1>
