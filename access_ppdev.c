@@ -97,6 +97,15 @@ release (struct parport_internal *port)
 }
 
 static int
+get_irq_fd (struct parport_internal *port)
+{
+  /* We _don't_ dup the file descriptor because reference counting is
+   * done at the port, and we don't want it to be valid after the port
+   * has been closed. */
+  return port->fd;
+}
+
+static int
 read_data (struct parport_internal *port)
 {
   unsigned char reg;
@@ -421,8 +430,10 @@ const struct parport_access_methods ppdev_access_methods =
   claim,
   release,
 
-  NULL,
-  NULL,
+  NULL, /* inb */
+  NULL, /* outb */
+
+  get_irq_fd,
 
   read_data,
   write_data,

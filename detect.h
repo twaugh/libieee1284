@@ -42,6 +42,8 @@ struct parport_access_methods
   void (*outb) (struct parport_internal *port, unsigned char val,
 		unsigned long addr);
 
+  int (*get_irq_fd) (struct parport_internal *port);
+
   int (*read_data) (struct parport_internal *port);
   void (*write_data) (struct parport_internal *port, unsigned char st);
   void (*data_dir) (struct parport_internal *port, int reverse);

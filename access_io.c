@@ -225,11 +225,13 @@ const struct parport_access_methods io_access_methods =
   init,
   cleanup,
 
-  NULL,
-  NULL,
+  NULL, /* claim */
+  NULL, /* release */
 
   raw_inb,
   raw_outb,
+
+  NULL, /* get_irq_fd */
 
   read_data,
   write_data,

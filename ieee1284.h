@@ -114,6 +114,11 @@ extern int ieee1284_claim (struct parport *port);
 extern void ieee1284_release (struct parport *port);
 
 /*
+ * Interrupt notification
+ */
+extern int ieee1284_get_irq_fd (struct parport *port);
+
+/*
  * Raw port access (PC-style port registers but within inversions)
  * Functions returning int may fail.
  */

@@ -1,5 +1,8 @@
 2001-11-29  Tim Waugh  <twaugh@redhat.com>
 
+	* interface.c (ieee1284_get_irq_fd): New function.
+	* access_ppdev (get_irq_fd): New function.
+
 	* ieee1284.h: New error code E1284_NOID.
 	* deviceid.c (get_fresh): Return E1284_NOID if there was no ID to
 	read.

@@ -5,6 +5,7 @@ ieee1284_open
 ieee1284_close
 ieee1284_claim
 ieee1284_release
+ieee1284_get_irq_fd
 ieee1284_read_data
 ieee1284_write_data
 ieee1284_data_dir

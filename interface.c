@@ -46,6 +46,16 @@ ieee1284_claim (struct parport *port)
   return ret;
 }
 
+int
+ieee1284_get_irq_fd (struct parport *port)
+{
+  int ret = E1284_NOTAVAIL;
+  struct parport_internal *priv = port->priv;
+  if (priv->fn->get_irq_fd)
+    ret = priv->fn->get_irq_fd (priv);
+  return ret;
+}
+
 void
 ieee1284_release (struct parport *port)
 {
