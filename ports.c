@@ -254,9 +254,6 @@ populate_by_guessing (struct parport_list *list, int flags)
 int
 ieee1284_find_ports (struct parport_list *list, int flags)
 {
-  if (config_file)
-    return E1284_NOTIMPL;
-
   list->portc = 0;
   list->portv = malloc (sizeof(char*) * MAX_PORTS);
   if (!list->portv)

@@ -31,7 +31,7 @@ int main ()
 {
   int i, j;
   struct parport_list pl;
-  ieee1284_find_ports (&pl, NULL, 0);
+  ieee1284_find_ports (&pl, 0);
   printf ("Found %d ports:\n", pl.portc);
   for (i = 0; i < pl.portc; i++)
     {
