@@ -1,5 +1,9 @@
 2002-01-07  Tim Waugh  <twaugh@redhat.com>
 
+	* configure.in, Makefile.am: Version 0.2.3 (devel).
+
+2002-01-07  Tim Waugh  <twaugh@redhat.com>
+
 	* detect.c (check_dev_node): Claim and release parport device nodes
 	in order to get the low-level port driver loaded.
 	(detect_environment): Try to open an lp device node in order to get
