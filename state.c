@@ -31,7 +31,7 @@
 #include "parport.h"
 #include "ppdev.h"
 
-static void init_port (struct parport *port)
+static int init_port (struct parport *port)
 {
   struct parport_internal *priv = port->priv;
   if ((capabilities & PPDEV_CAPABLE) && priv->device)
@@ -39,7 +39,7 @@ static void init_port (struct parport *port)
       priv->fd = open (priv->device, O_RDWR | O_NOCTTY);
       if (priv->fd > -1) {
 	priv->type = PPDEV_CAPABLE;
-	return;
+	return 0;
       }
     }
 
@@ -48,23 +48,25 @@ static void init_port (struct parport *port)
       if (!ioperm (priv->base, 3, 1) && !ioperm (0x80, 1, 1))
 	{
 	  priv->type = IO_CAPABLE;
-	  return;
+	  return 0;
 	}
     }
 
   if (capabilities & DEV_PORT_CAPABLE)
     priv->type = DEV_PORT_CAPABLE;
+  else return -1;
 }
 
 int ieee1284_claim (struct parport *port)
 {
   struct parport_internal *priv = port->priv;
   if (priv->type == 0)
-    init_port (port);
+    if (init_port (port))
+      return -1;
 
   switch (priv->type)
     {
-    case 0: // no way to talk to port
+    case 0: // no way to talk to port.  Shouldn't get here.
       return -1;
     case IO_CAPABLE:
     case DEV_PORT_CAPABLE:
