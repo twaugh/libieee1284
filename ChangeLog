@@ -1,3 +1,8 @@
+2003-02-15  Tim Waugh  <twaugh@redhat.com>
+
+	* doc/interface.xml (ieee1284_negotiate): Mention the IEEE 1284
+	restriction on mode transitions.
+
 2002-12-25  Tim Waugh  <twaugh@redhat.com>
 
 	* configure.in, Makefile.am: Version 0.2.6 (stable).

@@ -28,7 +28,7 @@
     </author>
 
     <copyright>
-      <year>2001-2002</year>
+      <year>2001-2003</year>
       <holder>Tim Waugh</holder>
     </copyright>
   </bookinfo>
@@ -1459,6 +1459,12 @@
 
 	<para>These functions act on the parallel port associated with
 	 <parameter>port</parameter>, which must be claimed.</para>
+
+	<para>With a device strictly complying to IEEE 1284 you will
+	 need to call <function>ieee1284_terminate</function> in
+	 between any two calls to
+	 <function>ieee1284_negotiate</function> for modes other than
+	 <constant>M1284_COMPAT</constant>.</para>
       </refsect1>
 
       <refsect1>
