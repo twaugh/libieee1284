@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "conf.h"
 #include "debug.h"
@@ -203,7 +204,6 @@ static char *
 disallow (FILE *f)
 {
   char *token = NULL;
-  int i;
 
   token = get_token (f);
   if (!token || strcmp (token, "method"))
