@@ -1,3 +1,8 @@
+2003-02-21  Tim Waugh  <twaugh@redhat.com>
+
+	* src/*.c, src/debug.h: Rename dprintf to debugprintf to avoid
+	conflicts with older versions of glibc.
+
 2003-02-15  Tim Waugh  <twaugh@redhat.com>
 
 	* doc/interface.xml (ieee1284_negotiate): Mention the IEEE 1284

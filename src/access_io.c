@@ -128,7 +128,7 @@ raw_inb (struct parport_internal *port, unsigned long addr)
   struct iopbuf tmpbuf;
   tmpbuf.port = addr;
   if(ioctl(port->fd, IOPREAD, &tmpbuf))
-    dprintf("IOP IOCTL failed on read\n");
+    debugprintf("IOP IOCTL failed on read\n");
   return tmpbuf.port_value;
 #endif
 }
@@ -149,7 +149,7 @@ raw_outb (struct parport_internal *port, unsigned char val, unsigned long addr)
   tmpbuf.port = addr;
   tmpbuf.port_value = val;
   if(ioctl(port->fd, IOPWRITE, &tmpbuf))
-    dprintf("IOP IOCTL failed on write\n");
+    debugprintf("IOP IOCTL failed on write\n");
 #endif
 }
 
@@ -202,7 +202,7 @@ init (struct parport_internal *port, int flags, int *capabilities)
 	/* open the special io device which does the ioperm change for us */
       if ((port->fd = open("/dev/io", O_RDONLY)) < 0)
       {
-	dprintf("Open on /dev/io failed\n");
+	debugprintf("Open on /dev/io failed\n");
         return E1284_INIT;
       }
 #elif defined(HAVE_OBSD_I386)
@@ -227,14 +227,14 @@ init (struct parport_internal *port, int flags, int *capabilities)
 #elif defined(HAVE_SOLARIS)
       if((port->fd=open("/devices/pseudo/iop@0:iop", O_RDWR)) < 0)
       {
-        dprintf("IOP Device open failed\n");
+        debugprintf("IOP Device open failed\n");
         return E1284_INIT;
       } else {
         tmpbuf.port = 0x80;
         tmpbuf.port_value = 0xFF;
         if(ioctl(port->fd, IOPREAD, &tmpbuf))
         {
-          dprintf("IOP IOCTL failed on read\n");
+          debugprintf("IOP IOCTL failed on read\n");
           return E1284_INIT;
         }
       }

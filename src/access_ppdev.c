@@ -128,13 +128,13 @@ cleanup (struct parport_internal *port)
 static int
 claim (struct parport_internal *port)
 {
-  dprintf ("==> claim\n");
+  debugprintf ("==> claim\n");
   if (ioctl (port->fd, PPCLAIM))
     {
-      dprintf ("<== E1284_SYS\n");
+      debugprintf ("<== E1284_SYS\n");
       return E1284_SYS;
     }
-  dprintf ("<== E1284_OK\n");
+  debugprintf ("<== E1284_OK\n");
   return E1284_OK;
 }
 
@@ -250,7 +250,7 @@ frob_control (struct parport_internal *port,
   /* Deal with inversion issues. */
   ppfs.mask = mask;
   ppfs.val = val ^ (mask & C1284_INVERTED);
-  dprintf ("frob_control: ioctl(%d, PPFCONTROL, { mask:%#02x, val:%#02x }\n",
+  debugprintf ("frob_control: ioctl(%d, PPFCONTROL, { mask:%#02x, val:%#02x }\n",
 	   port->fd, ppfs.mask, ppfs.val);
   ioctl (port->fd, PPFCONTROL, &ppfs);
   debug_frob_control (mask, val);
@@ -353,7 +353,7 @@ which_mode (int mode, int flags)
 	m = IEEE1284_MODE_ECPSWE;
       else if (flags & ~F1284_NONBLOCK)
 	{
-	  dprintf ("flags is %x, but only F1284_RLE, F1284_SWE "
+	  debugprintf ("flags is %x, but only F1284_RLE, F1284_SWE "
 		   "and F1284_NONBLOCK are implemented\n", flags);
 	  return E1284_NOTIMPL;
 	}
@@ -365,7 +365,7 @@ which_mode (int mode, int flags)
 	m = IEEE1284_MODE_EPPSWE;
       else if (flags & ~(F1284_FASTEPP | F1284_NONBLOCK))
 	{
-	  dprintf ("flags is %x, but only F1284_SWE and F1284_NONBLOCK "
+	  debugprintf ("flags is %x, but only F1284_SWE and F1284_NONBLOCK "
 		   "are implemented\n", flags);
 	  return E1284_NOTIMPL;
 	}
@@ -373,7 +373,7 @@ which_mode (int mode, int flags)
       break;
 
     default:
-      dprintf ("Unknown mode %x\n", mode);
+      debugprintf ("Unknown mode %x\n", mode);
       return E1284_NOTIMPL;
     }
 
@@ -432,14 +432,14 @@ do_nonblock (struct parport_internal *port, int flags)
 
       if (f == -1)
 	{
-	  dprintf ("do_nonblock: fcntl failed on F_GETFL\n");
+	  debugprintf ("do_nonblock: fcntl failed on F_GETFL\n");
 	  return -1;
 	}
 
       f |= O_NONBLOCK;
       if (fcntl (port->fd, F_SETFL, f))
 	{
-	  dprintf ("do_nonblock: fcntl failed on F_SETFL\n");
+	  debugprintf ("do_nonblock: fcntl failed on F_SETFL\n");
 	  return -1;
 	}
     }
@@ -450,14 +450,14 @@ do_nonblock (struct parport_internal *port, int flags)
 
       if (f == -1)
 	{
-	  dprintf ("do_nonblock: fcntl failed on F_GETFL\n");
+	  debugprintf ("do_nonblock: fcntl failed on F_GETFL\n");
 	  return -1;
 	}
 
       f &= O_NONBLOCK;
       if (fcntl (port->fd, F_SETFL, f))
 	{
-	  dprintf ("do_nonblock: fcntl failed on F_SETFL\n");
+	  debugprintf ("do_nonblock: fcntl failed on F_SETFL\n");
 	  return -1;
 	}
     }
@@ -471,7 +471,7 @@ negotiate (struct parport_internal *port, int mode)
   int m = which_mode (mode, 0);
   int ret;
 
-  dprintf ("==> negotiate (to %#02x)\n", mode);
+  debugprintf ("==> negotiate (to %#02x)\n", mode);
 
   ret = ioctl (port->fd, PPNEGOT, &m);
   if (!ret)
@@ -480,19 +480,19 @@ negotiate (struct parport_internal *port, int mode)
   } else {
     if (errno == EIO)
       {
-	dprintf ("<== E1284_NEGFAILED\n");
+	debugprintf ("<== E1284_NEGFAILED\n");
 	return E1284_NEGFAILED;
       }
 
     if (errno == ENXIO)
       {
-	dprintf ("<== E1284_REJECTED\n");
+	debugprintf ("<== E1284_REJECTED\n");
 	return E1284_REJECTED;
       }
   }
 
   m = translate_error_code (ret);
-  dprintf ("<== %d\n", m);
+  debugprintf ("<== %d\n", m);
   return m;
 }
 

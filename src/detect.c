@@ -61,14 +61,14 @@ check_proc_type (void)
       st.st_nlink > 2)
     {
       which = PROC_SYS_DEV_PARPORT_CAPABLE;
-      dprintf ("This system has /proc/sys/dev/parport\n");
+      debugprintf ("This system has /proc/sys/dev/parport\n");
     }
   else if (stat ("/proc/parport", &st) == 0 &&
 	   S_ISDIR (st.st_mode) &&
 	   st.st_nlink > 2)
     {
       which = PROC_PARPORT_CAPABLE;
-      dprintf ("This system has /proc/parport\n");
+      debugprintf ("This system has /proc/parport\n");
     }
   capabilities |= which;
   return which;
@@ -97,7 +97,7 @@ check_dev_node (const char *type)
 #endif
 
       close (fd);
-      dprintf ("%s is accessible\n", name);
+      debugprintf ("%s is accessible\n", name);
       return 1;
     }
   }
@@ -113,7 +113,7 @@ check_dev_port (void)
   if (fd >= 0) {
     close (fd);
     capabilities |= DEV_PORT_CAPABLE;
-    dprintf ("/dev/port is accessible\n");
+    debugprintf ("/dev/port is accessible\n");
     return 1;
   }
   return 0;
@@ -128,7 +128,7 @@ check_io (void)
   if ((iomap = malloc(1024/8)) == NULL) return 0;
   if ((i386_get_ioperm(iomap) == 0) && (i386_set_ioperm(iomap) == 0)) {
     capabilities |= IO_CAPABLE;
-    dprintf ("We can use i386_get_ioperm()\n");
+    debugprintf ("We can use i386_get_ioperm()\n");
     free(iomap);
     return 1;
   }
@@ -137,7 +137,7 @@ check_io (void)
   int fd;
   if ((fd = open("/dev/io", O_RDONLY)) >= 0) {
     capabilities |= IO_CAPABLE;
-    dprintf("We can use /dev/io\n");
+    debugprintf("We can use /dev/io\n");
     close(fd);
     return 1;
   }
@@ -146,11 +146,11 @@ check_io (void)
   if (ioperm (0x378 /* say */, 3, 1) == 0) {
     ioperm (0x378, 3, 0);
     capabilities |= IO_CAPABLE;
-    dprintf ("We can use ioperm()\n");
+    debugprintf ("We can use ioperm()\n");
     return 1;
   }
   #else
-  dprintf ("We cannot use ioperm() : not supported\n");
+  debugprintf ("We cannot use ioperm() : not supported\n");
   return 0;
   #endif /* HAVE_SYS_IO_H */
   
@@ -158,13 +158,13 @@ check_io (void)
   int fd;
   if (fd=open("/devices/pseudo/iop@0:iop", O_RDWR) > 0) {
     capabilities |= IO_CAPABLE;
-    dprintf ("We can use iop\n");
+    debugprintf ("We can use iop\n");
     return 1;
   }
-  dprintf ("We can't use IOP, nothing will work\n");
+  debugprintf ("We can't use IOP, nothing will work\n");
   #elif defined(HAVE_CYGWIN_9X)
   /* note: 95 allows apps direct IO access */
-  dprintf ("Taking a guess on port availability (win9x)\n");
+  debugprintf ("Taking a guess on port availability (win9x)\n");
   capabilities |= IO_CAPABLE;
   return 1;
   #endif

@@ -29,7 +29,7 @@
 #endif
 
 struct parport_internal;
-extern void dprintf (const char *fmt, ...) FORMAT ((__printf__, 1, 2));
+extern void debugprintf (const char *fmt, ...) FORMAT ((__printf__, 1, 2));
 extern unsigned char debug_display_status (unsigned char st);
 extern unsigned char debug_display_control (unsigned char ct);
 extern void debug_frob_control (unsigned char mask, unsigned char val);

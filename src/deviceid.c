@@ -44,12 +44,12 @@ get_fresh (struct parport *port, int daisy,
   ssize_t got;
   size_t idlen;
 
-  dprintf ("==> get_fresh\n");
+  debugprintf ("==> get_fresh\n");
 
   if (daisy > -1)
     {
       /* No implementation yet for IEEE 1284.3 devices. */
-      dprintf ("<== E1284_NOTIMPL (IEEE 1284.3)\n");
+      debugprintf ("<== E1284_NOTIMPL (IEEE 1284.3)\n");
       return E1284_NOTIMPL;
     }
 
@@ -57,14 +57,14 @@ get_fresh (struct parport *port, int daisy,
   if (ieee1284_negotiate (port,
 			  M1284_NIBBLE | M1284_FLAG_DEVICEID) != E1284_OK)
     {
-      dprintf ("<== E1284_NOTAVAIL (couldn't negotiate)\n");
+      debugprintf ("<== E1284_NOTAVAIL (couldn't negotiate)\n");
       return E1284_NOTAVAIL;
     }
 
   got = ieee1284_nibble_read (port, 0, buffer, 2);
   if (got < 2)
     {
-      dprintf ("<== E1284_NOID (no data)\n");
+      debugprintf ("<== E1284_NOID (no data)\n");
       return E1284_NOID;
     }
 
@@ -76,7 +76,7 @@ get_fresh (struct parport *port, int daisy,
     buffer[got] = '\0';
 
   ieee1284_terminate (port);
-  dprintf ("<== %d\n", got);
+  debugprintf ("<== %d\n", got);
   return got;
 }
 
@@ -183,11 +183,11 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
 {
   int ret = -1;
 
-  dprintf ("==> libieee1284_get_deviceid\n");
+  debugprintf ("==> libieee1284_get_deviceid\n");
 
   if (flags & ~(F1284_FRESH))
     {
-      dprintf ("<== E1284_NOTIMPL (flags)\n");
+      debugprintf ("<== E1284_NOTIMPL (flags)\n");
       return E1284_NOTIMPL;
     }
 
@@ -198,39 +198,39 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
       if (capabilities & PROC_SYS_DEV_PARPORT_CAPABLE)
 	{
 	  ret = get_from_sys_dev_parport (port, daisy, buffer, len);
-	  dprintf ("Trying /proc/sys/dev/parport: %s\n",
+	  debugprintf ("Trying /proc/sys/dev/parport: %s\n",
 		   ret < 0 ? "failed" : "success");
 	}
       else if (capabilities & PROC_PARPORT_CAPABLE)
 	{
 	  ret = get_from_proc_parport (port, daisy, buffer, len);
-	  dprintf ("Trying /proc/parport: %s\n",
+	  debugprintf ("Trying /proc/parport: %s\n",
 		   ret < 0 ? "failed" : "success");
 	}
 
       if (ret > -1)
 	{
-	  dprintf ("<== %d\n", ret);
+	  debugprintf ("<== %d\n", ret);
 	  return ret;
 	}
 
       if (ret == -ENODEVID)
 	{
-	  dprintf ("<== E1284_NOTAVAIL (got -ENODEVID)\n");
+	  debugprintf ("<== E1284_NOTAVAIL (got -ENODEVID)\n");
 	  return E1284_NOTAVAIL;
 	}
     }
 
-  dprintf ("Trying device...\n");
+  debugprintf ("Trying device...\n");
   if ((ret = ieee1284_open (port, 0, NULL)) != E1284_OK)
     {
-      dprintf ("<== %d (from ieee1284_open)\n", ret);
+      debugprintf ("<== %d (from ieee1284_open)\n", ret);
       return ret;
     }
 
   if ((ret = ieee1284_claim (port)) != E1284_OK)
     {
-      dprintf ("<== %d (from ieee1284_claim)\n", ret);
+      debugprintf ("<== %d (from ieee1284_claim)\n", ret);
       return ret;
     }
 
@@ -238,7 +238,7 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
 
   ieee1284_release (port);
   ieee1284_close (port);
-  dprintf ("<== %d (from get_fresh)\n", ret);
+  debugprintf ("<== %d (from get_fresh)\n", ret);
   return ret;
 }
 

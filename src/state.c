@@ -41,14 +41,14 @@ init_port (struct parport *port, int flags, int *caps)
   struct parport_internal *priv = port->priv;
   int ret = E1284_INIT;
 
-  dprintf ("==> init_port\n");
+  debugprintf ("==> init_port\n");
 
   if ((capabilities & PPDEV_CAPABLE) && priv->device && !conf.disallow_ppdev)
     {
       priv->type = PPDEV_CAPABLE;
       memcpy (priv->fn, &ppdev_access_methods, sizeof *priv->fn);
       ret = priv->fn->init (priv, flags, caps);
-      dprintf ("Got %d from ppdev init\n", ret);
+      debugprintf ("Got %d from ppdev init\n", ret);
     }
 
   if (ret && (capabilities & IO_CAPABLE))
@@ -56,7 +56,7 @@ init_port (struct parport *port, int flags, int *caps)
       priv->type = IO_CAPABLE;
       memcpy (priv->fn, &io_access_methods, sizeof *priv->fn);
       ret = priv->fn->init (priv, flags, caps);
-      dprintf ("Got %d from IO init\n", ret);
+      debugprintf ("Got %d from IO init\n", ret);
     }
 
   if (ret && (capabilities & DEV_PORT_CAPABLE))
@@ -64,7 +64,7 @@ init_port (struct parport *port, int flags, int *caps)
       priv->type = DEV_PORT_CAPABLE;
       memcpy (priv->fn, &io_access_methods, sizeof *priv->fn);
       ret = priv->fn->init (priv, flags, caps);
-      dprintf ("Got %d from /dev/port init\n", ret);
+      debugprintf ("Got %d from /dev/port init\n", ret);
     }
 
   if (ret && (capabilities & LPT_CAPABLE))
@@ -72,12 +72,12 @@ init_port (struct parport *port, int flags, int *caps)
       priv->type = LPT_CAPABLE;
       memcpy (priv->fn, &lpt_access_methods, sizeof *priv->fn);
       ret = priv->fn->init (priv, flags, caps);
-      dprintf ("Got %d from LPT init\n", ret);
+      debugprintf ("Got %d from LPT init\n", ret);
       /* No bi-dir support in NT :( */
       if (caps != NULL) *caps = CAP1284_COMPAT | CAP1284_NIBBLE;
     }
 
-  dprintf ("<== %d\n", ret);
+  debugprintf ("<== %d\n", ret);
   return ret;
 }
 
@@ -87,11 +87,11 @@ ieee1284_open (struct parport *port, int flags, int *capabilities)
   struct parport_internal *priv = port->priv;
   int ret;
 
-  dprintf ("==> ieee1284_open\n");
+  debugprintf ("==> ieee1284_open\n");
 
   if (priv->opened)
     {
-      dprintf ("<== E1284_INVALIDPORT (already open)\n");
+      debugprintf ("<== E1284_INVALIDPORT (already open)\n");
       return E1284_INVALIDPORT;
     }
 
@@ -102,7 +102,7 @@ ieee1284_open (struct parport *port, int flags, int *capabilities)
   ret = init_port (port, flags, capabilities);
   if (ret)
     {
-      dprintf ("<== %d (propagated)\n", ret);
+      debugprintf ("<== %d (propagated)\n", ret);
       return ret;
     }
 

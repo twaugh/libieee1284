@@ -58,7 +58,7 @@ init (struct parport_internal *port, int flags, int *capabilities)
   if (port->fd == (int)INVALID_HANDLE_VALUE) 
   {
     if (port->device != NULL) 
-      dprintf("Failed opening %s\n", port->device);
+      debugprintf("Failed opening %s\n", port->device);
     return E1284_SYS;
   }
 
@@ -90,7 +90,7 @@ write_data (struct parport_internal *port, unsigned char reg)
 
   if (!(DeviceIoControl((HANDLE)(port->fd), NT_IOCTL_DATA, &reg, sizeof(reg), 
           NULL, 0, (LPDWORD)&dummy, NULL)))
-      dprintf("raw_outb: DeviceIoControl failed!\n");
+      debugprintf("raw_outb: DeviceIoControl failed!\n");
 }
 
 static int
@@ -101,7 +101,7 @@ read_status (struct parport_internal *port)
 
   if (!(DeviceIoControl((HANDLE)(port->fd), NT_IOCTL_STATUS, NULL, 0, &ret, 
           sizeof(ret), (LPDWORD)&dummy, NULL)))
-      dprintf("read_status: DeviceIoControl failed!\n");
+      debugprintf("read_status: DeviceIoControl failed!\n");
 
   return debug_display_status (ret ^ S1284_INVERTED);
 }
@@ -119,7 +119,7 @@ raw_frob_control (struct parport_internal *port,
   ctr = (ctr & ~mask) ^ val;
   if (!(DeviceIoControl((HANDLE)(port->fd), NT_IOCTL_CONTROL, &ctr, 
           sizeof(ctr), &dummyc, sizeof(dummyc), (LPDWORD)&dummy, NULL)))
-      dprintf("frob_control: DeviceIoControl failed!\n");
+      debugprintf("frob_control: DeviceIoControl failed!\n");
   port->ctr = ctr;
   debug_frob_control (mask, val);
 }

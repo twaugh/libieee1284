@@ -69,7 +69,7 @@ debug_display_status (unsigned char st)
     goto out;
 
   last_status = st;
-  dprintf ("%s STATUS: %cnFault %cSelect %cPError %cnAck %cBusy\n",
+  debugprintf ("%s STATUS: %cnFault %cSelect %cPError %cnAck %cBusy\n",
 	   timeofday (),
 	   st & S1284_NFAULT ? ' ' : '!',
 	   st & S1284_SELECT ? ' ' : '!',
@@ -91,7 +91,7 @@ debug_display_control (unsigned char ct)
     goto out;
 
   soft_ctr = ct;
-  dprintf ("%s CONTROL: %cnStrobe %cnAutoFd %cnInit %cnSelectIn\n",
+  debugprintf ("%s CONTROL: %cnStrobe %cnAutoFd %cnInit %cnSelectIn\n",
 	   timeofday (),
 	   ct & C1284_NSTROBE ? ' ' : '!',
 	   ct & C1284_NAUTOFD ? ' ' : '!',
@@ -113,7 +113,7 @@ debug_frob_control (unsigned char mask, unsigned char val)
 }
 
 void
-dprintf (const char *fmt, ...)
+debugprintf (const char *fmt, ...)
 {
   if (!debugging_enabled)
     return;

@@ -208,7 +208,7 @@ disallow (FILE *f)
   token = get_token (f);
   if (!token || strcmp (token, "method"))
     {
-      dprintf ("'disallow' requires 'method'\n");
+      debugprintf ("'disallow' requires 'method'\n");
       return token;
     }
 
@@ -216,11 +216,11 @@ disallow (FILE *f)
   token = get_token (f);
   if (!token || strcmp (token, "ppdev"))
     {
-      dprintf ("'disallow method' requires a method name (e.g. ppdev)\n");
+      debugprintf ("'disallow method' requires a method name (e.g. ppdev)\n");
       return token;
     }
 
-  dprintf ("* Disallowing method: ppdev\n");
+  debugprintf ("* Disallowing method: ppdev\n");
   conf.disallow_ppdev = 1;
   free (token);
   return get_token (f);
@@ -235,7 +235,7 @@ try_read_config_file (const char *path)
   if (!f)
     return 1;
 
-  dprintf ("Reading configuration from %s:\n", path);
+  debugprintf ("Reading configuration from %s:\n", path);
 
   token = get_token (f);
   while (token)
@@ -247,7 +247,7 @@ try_read_config_file (const char *path)
 	}
       else
 	{
-	  dprintf ("Skipping unknown word: %s\n", token);
+	  debugprintf ("Skipping unknown word: %s\n", token);
 	  next_token = get_token (f);
 	}
 
@@ -256,7 +256,7 @@ try_read_config_file (const char *path)
     }
 
   fclose (f);
-  dprintf ("End of configuration\n");
+  debugprintf ("End of configuration\n");
   return 0;
 }
 

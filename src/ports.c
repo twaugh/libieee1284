@@ -364,7 +364,7 @@ deref_port (struct parport *p)
   struct parport_internal *priv = p->priv;
   if (!--priv->ref)
     {
-      dprintf ("Destructor for port '%s'\n", p->name);
+      debugprintf ("Destructor for port '%s'\n", p->name);
       if (priv->fn)
 	free (priv->fn);
       if (p->name)

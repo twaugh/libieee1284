@@ -34,7 +34,7 @@ ieee1284_close (struct parport *port)
   struct parport_internal *priv = port->priv;
   if (!priv->opened)
     {
-      dprintf (needs_open_port, "ieee1284_close");
+      debugprintf (needs_open_port, "ieee1284_close");
       return E1284_INVALIDPORT;
     }
   if (priv->fn->cleanup)
@@ -52,13 +52,13 @@ ieee1284_claim (struct parport *port)
 
   if (!priv->opened)
     {
-      dprintf (needs_open_port, "ieee1284_claim");
+      debugprintf (needs_open_port, "ieee1284_claim");
       return E1284_INVALIDPORT;
     }
 
   if (priv->claimed)
     {
-      dprintf ("ieee1284_claim called for a port already claimed\n");
+      debugprintf ("ieee1284_claim called for a port already claimed\n");
       return E1284_INVALIDPORT;
     }
 
@@ -79,7 +79,7 @@ ieee1284_get_irq_fd (struct parport *port)
 
   if (!priv->opened)
     {
-      dprintf (needs_open_port, "ieee1284_get_irq_fd");
+      debugprintf (needs_open_port, "ieee1284_get_irq_fd");
       return E1284_INVALIDPORT;
     }
 
@@ -98,7 +98,7 @@ ieee1284_clear_irq (struct parport *port, unsigned int *count)
     {
       if (!priv->claimed)
 	{
-	  dprintf (needs_claimed_port, "ieee1284_clear_irq");
+	  debugprintf (needs_claimed_port, "ieee1284_clear_irq");
 	  return E1284_INVALIDPORT;
 	}
 
@@ -125,7 +125,7 @@ ieee1284_read_data (struct parport *port)
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_read_data");
+      debugprintf (needs_claimed_port, "ieee1284_read_data");
       return E1284_INVALIDPORT;
     }
 
@@ -142,7 +142,7 @@ ieee1284_write_data (struct parport *port, unsigned char st)
   if (priv->claimed)
     priv->fn->write_data (priv, st);
   else
-    dprintf (needs_claimed_port, "ieee1284_write_data");
+    debugprintf (needs_claimed_port, "ieee1284_write_data");
 }
 
 int
@@ -155,7 +155,7 @@ ieee1284_wait_data (struct parport *port,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_wait_data");
+      debugprintf (needs_claimed_port, "ieee1284_wait_data");
       return E1284_INVALIDPORT;
     }
 
@@ -170,7 +170,7 @@ ieee1284_data_dir (struct parport *port, int reverse)
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_data_dir");
+      debugprintf (needs_claimed_port, "ieee1284_data_dir");
       return E1284_INVALIDPORT;
     }
 
@@ -187,7 +187,7 @@ ieee1284_read_status (struct parport *port)
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_read_status");
+      debugprintf (needs_claimed_port, "ieee1284_read_status");
       return E1284_INVALIDPORT;
     }
 
@@ -204,7 +204,7 @@ ieee1284_wait_status (struct parport *port,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_wait_status");
+      debugprintf (needs_claimed_port, "ieee1284_wait_status");
       return E1284_INVALIDPORT;
     }
 
@@ -218,7 +218,7 @@ ieee1284_read_control (struct parport *port)
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_read_control");
+      debugprintf (needs_claimed_port, "ieee1284_read_control");
       return E1284_INVALIDPORT;
     }
 
@@ -232,7 +232,7 @@ ieee1284_write_control (struct parport *port, unsigned char ct)
   if (priv->claimed)
     priv->fn->write_control (priv, ct);
   else
-    dprintf (needs_claimed_port, "ieee1284_write_control");
+    debugprintf (needs_claimed_port, "ieee1284_write_control");
 }
 
 void
@@ -244,7 +244,7 @@ ieee1284_frob_control (struct parport *port, unsigned char mask,
   if (priv->claimed)
     priv->fn->frob_control (priv, mask, val);
   else
-    dprintf (needs_claimed_port, "ieee1284_frob_control");
+    debugprintf (needs_claimed_port, "ieee1284_frob_control");
 }
 
 int
@@ -257,7 +257,7 @@ ieee1284_do_nack_handshake (struct parport *port,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_do_nack_handshake");
+      debugprintf (needs_claimed_port, "ieee1284_do_nack_handshake");
       return E1284_INVALIDPORT;
     }
 
@@ -271,7 +271,7 @@ ieee1284_negotiate (struct parport *port, int mode)
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_negotiate");
+      debugprintf (needs_claimed_port, "ieee1284_negotiate");
       return E1284_INVALIDPORT;
     }
 
@@ -285,7 +285,7 @@ ieee1284_terminate (struct parport *port)
   if (priv->claimed)
     priv->fn->terminate (priv);
   else
-    dprintf (needs_claimed_port, "ieee1284_terminate");
+    debugprintf (needs_claimed_port, "ieee1284_terminate");
 }
 
 int
@@ -295,7 +295,7 @@ ieee1284_ecp_fwd_to_rev (struct parport *port)
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_ecp_fwd_to_rev");
+      debugprintf (needs_claimed_port, "ieee1284_ecp_fwd_to_rev");
       return E1284_INVALIDPORT;
     }
 
@@ -309,7 +309,7 @@ ieee1284_ecp_rev_to_fwd (struct parport *port)
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_ecp_rev_to_fwd");
+      debugprintf (needs_claimed_port, "ieee1284_ecp_rev_to_fwd");
       return E1284_INVALIDPORT;
     }
 
@@ -324,7 +324,7 @@ ieee1284_nibble_read (struct parport *port, int flags,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_nibble_read");
+      debugprintf (needs_claimed_port, "ieee1284_nibble_read");
       return E1284_INVALIDPORT;
     }
 
@@ -339,7 +339,7 @@ ieee1284_compat_write (struct parport *port, int flags,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_compat_write");
+      debugprintf (needs_claimed_port, "ieee1284_compat_write");
       return E1284_INVALIDPORT;
     }
 
@@ -354,7 +354,7 @@ ieee1284_byte_read (struct parport *port, int flags,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_byte_read");
+      debugprintf (needs_claimed_port, "ieee1284_byte_read");
       return E1284_INVALIDPORT;
     }
 
@@ -369,7 +369,7 @@ ieee1284_epp_read_data (struct parport *port, int flags, char *buffer,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_epp_read_data");
+      debugprintf (needs_claimed_port, "ieee1284_epp_read_data");
       return E1284_INVALIDPORT;
     }
 
@@ -384,7 +384,7 @@ ieee1284_epp_write_data (struct parport *port, int flags,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_epp_write_data");
+      debugprintf (needs_claimed_port, "ieee1284_epp_write_data");
       return E1284_INVALIDPORT;
     }
 
@@ -399,7 +399,7 @@ ieee1284_epp_read_addr (struct parport *port, int flags, char *buffer,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_epp_read_addr");
+      debugprintf (needs_claimed_port, "ieee1284_epp_read_addr");
       return E1284_INVALIDPORT;
     }
 
@@ -414,7 +414,7 @@ ieee1284_epp_write_addr (struct parport *port, int flags,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_epp_write_addr");
+      debugprintf (needs_claimed_port, "ieee1284_epp_write_addr");
       return E1284_INVALIDPORT;
     }
 
@@ -429,7 +429,7 @@ ieee1284_ecp_read_data (struct parport *port, int flags, char *buffer,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_ecp_read_data");
+      debugprintf (needs_claimed_port, "ieee1284_ecp_read_data");
       return E1284_INVALIDPORT;
     }
 
@@ -444,7 +444,7 @@ ieee1284_ecp_write_data (struct parport *port, int flags,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_ecp_write_data");
+      debugprintf (needs_claimed_port, "ieee1284_ecp_write_data");
       return E1284_INVALIDPORT;
     }
 
@@ -459,7 +459,7 @@ ieee1284_ecp_read_addr (struct parport *port, int flags,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_ecp_read_addr");
+      debugprintf (needs_claimed_port, "ieee1284_ecp_read_addr");
       return E1284_INVALIDPORT;
     }
 
@@ -474,7 +474,7 @@ ieee1284_ecp_write_addr (struct parport *port, int flags,
 
   if (!priv->claimed)
     {
-      dprintf (needs_claimed_port, "ieee1284_ecp_write_addr");
+      debugprintf (needs_claimed_port, "ieee1284_ecp_write_addr");
       return E1284_INVALIDPORT;
     }
 
