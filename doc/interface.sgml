@@ -1798,5 +1798,64 @@
 	</variablelist>
       </refsect1>
     </refentry>
+
+    <refentry id="timeout">
+      <refmeta>
+	<refentrytitle>ieee1284_set_timeout</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_set_timeout</refname>
+	<refpurpose>modify inactivity timeout</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>struct timeval
+	    *<function>ieee1284_set_timeout</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	    struct timeval *<parameter>timeout</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>This function sets a new value for the inactivity
+	 timeout (used for block transfer functions), and returns the
+	 old value.</para>
+
+	<para>The <parameter>port</parameter> must be claimed.</para>
+
+	<para>The <parameter>timeout</parameter> parameter may be
+	 <constant>NULL</constant>, in which case the old value is
+	 left unchanged.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<para>This function returns a pointer to a <structname>struct
+	 timeval</structname> representing the old value.  This uses
+	 the same storage as the <parameter>port</parameter>
+	 structure, and so is not valid after closing the port.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Notes</title>
+
+	<para>Note that this is an inactivity time-out, not an
+	 absolute time-out.  During a data transfer, if the peripheral
+	 is inactive for the length of time specified then the host
+	 gives up.</para>
+
+	<para>It is also advisory; no guarantee is made that the
+	 transfer will ever complete.</para>
+      </refsect1>
+    </refentry>
   </reference>
 </book>
