@@ -13,17 +13,45 @@ libieee1284_la_LDFLAGS = -version-info 3:1:0 \
 include_HEADERS = include/ieee1284.h
 INCLUDES = -I$(top_srcdir)/include
 
-man3_MANS = doc/ieee1284_claim.3 doc/ieee1284_close.3 doc/ieee1284_control.3 \
-	doc/ieee1284_data.3 doc/ieee1284_ecp_fwd_to_rev.3 \
-	doc/ieee1284_find_ports.3 doc/ieee1284_free_ports.3 \
-	doc/ieee1284_get_deviceid.3 doc/ieee1284_get_irq_fd.3 \
-	doc/ieee1284_negotiation.3 doc/ieee1284_open.3 doc/ieee1284_release.3 \
-	doc/ieee1284_set_timeout.3 doc/ieee1284_status.3 \
-	doc/ieee1284_transfer.3 doc/libieee1284.3 doc/parport.3 \
-	doc/parport_list.3
+man3_MANS = doc/libieee1284.3 \
+	doc/parport.3 \
+	doc/parport_list.3 \
+	doc/ieee1284_find_ports.3 \
+	doc/ieee1284_free_ports.3 \
+	doc/ieee1284_get_deviceid.3 \
+	doc/ieee1284_open.3 \
+	doc/ieee1284_close.3 \
+	doc/ieee1284_claim.3 \
+	doc/ieee1284_release.3 \
+	doc/ieee1284_data.3 \
+	doc/ieee1284_read_data.3 \
+	doc/ieee1284_write_data.3 \
+	doc/ieee1284_data_dir.3 \
+	doc/ieee1284_wait_data.3 \
+	doc/ieee1284_status.3 \
+	doc/ieee1284_read_status.3 \
+	doc/ieee1284_wait_status.3 \
+	doc/ieee1284_control.3 \
+	doc/ieee1284_read_control.3 \
+	doc/ieee1284_write_control.3 \
+	doc/ieee1284_frob_control.3 \
+	doc/ieee1284_do_nack_handshake.3 \
+	doc/ieee1284_negotiation.3 \
+	doc/ieee1284_negotiate.3 doc/ieee1284_terminate.3 \
+	doc/ieee1284_ecp_fwd_to_rev.3 doc/ieee1284_ecp_rev_to_fwd.3 \
+	doc/ieee1284_transfer.3 \
+	doc/ieee1284_nibble_read.3 \
+	doc/ieee1284_compat_write.3 \
+	doc/ieee1284_byte_read.3 \
+	doc/ieee1284_epp_read_data.3 doc/ieee1284_epp_write_data.3 \
+	doc/ieee1284_epp_read_addr.3 doc/ieee1284_epp_write_addr.3 \
+	doc/ieee1284_ecp_read_data.3 doc/ieee1284_ecp_write_data.3 \
+	doc/ieee1284_ecp_read_addr.3 doc/ieee1284_ecp_write_addr.3 \
+	doc/ieee1284_get_irq_fd.3 \
+	doc/ieee1284_set_timeout.3
 
-$(man3_MANS): $(top_srcdir)/doc/interface.sgml
-	docbook2man -o doc $<
+$(man3_MANS): $(top_srcdir)/doc/interface.xml
+	xmlto man -o doc $<
 
 noinst_PROGRAMS = test
 test_SOURCES = tests/test.c
@@ -32,7 +60,10 @@ test_LDADD = libieee1284.la
 # Automake bug?
 # CLEANFILES = tests/.libs/test
 
-EXTRA_DIST = libieee1284.spec doc/interface.sgml doc/interface.txt
+EXTRA_DIST = libieee1284.spec doc/interface.xml doc/interface.txt \
+		$(man3_MANS)
 
-DISTCLEANFILES = include/stamp-h include/stamp-h[0-9]* $(man3_MANS) \
+DISTCLEANFILES = include/stamp-h include/stamp-h[0-9]* \
 	doc/manpage.links doc/manpage.refs
+
+MAINTAINERCLEANFILES = $(man3_MANS)

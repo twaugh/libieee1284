@@ -1,5 +1,6 @@
-<!-- -*- sgml -*- -->
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN"[
+<?xml version='1.0' ?> <!-- -*- xml -*- -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+ "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 <!ENTITY libieee1284 "libieee1284">
 <!ENTITY e1284ok "<errorcode>E1284_OK</errorcode>">
 <!ENTITY e1284nomem "<errorcode>E1284_NOMEM</errorcode>">
@@ -126,23 +127,23 @@
     <title>See Also</title>
 
     <para>
-    <xref linkend="parport">,
-    <xref linkend="parport-list">,
-    <xref linkend="find-ports">,
-    <xref linkend="free-ports">,
-    <xref linkend="get-deviceid">,
-    <xref linkend="open">,
-    <xref linkend="close">,
-    <xref linkend="claim">,
-    <xref linkend="release">,
-    <xref linkend="data-pin-access">,
-    <xref linkend="status-pin-access">,
-    <xref linkend="control-line-access">,
-    <xref linkend="negotiation">,
-    <xref linkend="fwd-rev">,
-    <xref linkend="transfer">,
-    <xref linkend="irq">,
-    <xref linkend="timeout">
+    <xref linkend="parport"/>,
+    <xref linkend="parport-list"/>,
+    <xref linkend="find-ports"/>,
+    <xref linkend="free-ports"/>,
+    <xref linkend="get-deviceid"/>,
+    <xref linkend="open"/>,
+    <xref linkend="close"/>,
+    <xref linkend="claim"/>,
+    <xref linkend="release"/>,
+    <xref linkend="data-pin-access"/>,
+    <xref linkend="status-pin-access"/>,
+    <xref linkend="control-line-access"/>,
+    <xref linkend="negotiation"/>,
+    <xref linkend="fwd-rev"/>,
+    <xref linkend="transfer"/>,
+    <xref linkend="irq"/>,
+    <xref linkend="timeout"/>
 
     </para>
 

@@ -7,7 +7,7 @@ Group: System Environment/Libraries
 URL: http://cyberelk.net/tim/libieee1284/
 Source0: ftp://cyberelk.net/tim/data/%{name}/devel/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
-BuildRequires: docbook-dtd41-sgml docbook-utils-pdf >= 0.6.9-9
+BuildRequires: xmlto
 
 %description
 The libieee1284 library is for communicating with parallel port devices.
@@ -28,36 +28,11 @@ developing applications that use libieee1284.
 %configure
 make CFLAGS="$RPM_OPT_FLAGS"
 # Also make the documentation in PDF format
-cd doc
-docbook2pdf interface.sgml
+xmlto pdf -o doc doc/interface.xml
 
 %install
 rm -rf %{buildroot}
 %makeinstall
-MAN3=%{buildroot}%{_mandir}/man3
-for fn in read_control write_control frob_control do_nack_handshake
-do
-	ln -s ieee1284_control.3 ${MAN3}/ieee1284_${fn}.3
-done
-ln -s ieee1284_ecp_fwd_to_rev.3 ${MAN3}/ieee1284_ecp_rev_to_fwd.3
-for fn in negotiate terminate
-do
-	ln -s ieee1284_negotiation.3 ${MAN3}/ieee1284_${fn}.3
-done
-for fn in read wait
-do
-	ln -s ieee1284_status.3 ${MAN3}/ieee1284_${fn}_status.3
-done
-for fn in nibble_read compat_write byte_read epp_read_data \
-	epp_write_data epp_read_addr epp_write_addr ecp_read_data \
-	ecp_write_data ecp_read_addr ecp_write_addr
-do
-	ln -s ieee1284_transfer.3 ${MAN3}/ieee1284_${fn}.3
-done
-for fn in read_data write_data data_dir
-do
-	ln -s ieee1284_data.3 ${MAN3}/ieee1284_${fn}.3
-done
 
 %clean
 rm -rf %{buildroot}
@@ -81,6 +56,10 @@ rm -rf %{buildroot}
 %postun -p /sbin/ldconfig
 
 %changelog
+* Fri Apr 26 2002 Tim Waugh <twaugh@redhat.com>
+- No need to create man page symlinks any more.
+- Build requires xmlto now, not docbook-utils.
+
 * Wed Apr 24 2002 Tim Waugh <twaugh@redhat.com>
 - The tarball builds its own man pages now; just adjust the symlinks.
 - Run ldconfig.

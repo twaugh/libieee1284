@@ -1,5 +1,12 @@
 2002-04-26  Tim Waugh  <twaugh@redhat.com>
 
+	* interface.sgml: Renamed to..
+	* interface.xml: ..this.  XMLified.
+	* Makefile.am: Track name change.  Use xmlto instead of docbook2man.
+	Distribute the generated man pages in the tarball.
+	* libieee1284.spec.in: No need to create man page symlinks any more.
+	Use xmlto to create PDF file.
+
 	* Makefile.am: No need to run docbook2man twice now that docbook-utils
 	can resolve references on its own now.
 
