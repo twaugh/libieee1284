@@ -13,6 +13,10 @@ libieee1284_la_LDFLAGS = -version-info 3:4:0 \
 include_HEADERS = include/ieee1284.h
 INCLUDES = -I$(top_srcdir)/include
 
+bin_PROGRAMS = libieee1284_test
+libieee1284_test_SOURCES = tests/test.c
+libieee1284_test_LDADD = libieee1284.la
+
 man3_MANS = doc/libieee1284.3 \
 	doc/parport.3 \
 	doc/parport_list.3 \
@@ -47,10 +51,6 @@ man3_MANS = doc/libieee1284.3 \
 
 $(man3_MANS): $(top_srcdir)/doc/interface.xml
 	xmlto man -o doc $<
-
-noinst_PROGRAMS = test
-test_SOURCES = tests/test.c
-test_LDADD = libieee1284.la
 
 EXTRA_DIST = libieee1284.spec doc/interface.xml doc/interface.txt \
 		$(man3_MANS) solaris_io/LICENSE solaris_io/README \
