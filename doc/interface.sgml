@@ -631,9 +631,8 @@
 	  <varlistentry>
 	    <term>&e1284notavail;</term>
 	    <listitem>
-	      <para>One or more of the flags supplied to
-	       <function>ieee1284_find_ports</function> is not
-	       supported by this type of port.</para>
+	      <para>One or more of the supplied flags is not supported
+	       by this type of port.</para>
 	    </listitem>
 	  </varlistentry>
 
