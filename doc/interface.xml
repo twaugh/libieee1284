@@ -1222,9 +1222,8 @@
 
 	<para>The nAck pin is often able to trigger interrupts on the
 	 host machine.  With operating system help these interrupts
-	 may be visible to the application via the
-	 <structfield>selectable_fd</structfield> member of the
-	 <structname>parport</structname> structure.</para>
+	 may be visible to the application via the file descriptor
+	 returned by <function>ieee1284_get_irq_fd</function>.</para>
 
 	<para>Under Linux, the conditions are that the parallel port
 	 driver knows which interrupt line to use and is using it, and

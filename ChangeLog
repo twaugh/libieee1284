@@ -1,3 +1,8 @@
+2003-05-03  Tim Waugh  <twaugh@redhat.com>
+
+	* doc/interface.xml: Fix reference to selectable_fd, which was
+	replaced by ieee124_get_irq_fd().
+
 2003-02-26  Tim Waugh  <twaugh@redhat.com>
 
 	* configue.in, Makefile.am: Version 0.2.7 (stable).
