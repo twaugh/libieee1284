@@ -80,3 +80,6 @@ DISTCLEANFILES = include/stamp-h include/stamp-h[0-9]* \
 	doc/manpage.links doc/manpage.refs
 
 MAINTAINERCLEANFILES = $(man3_MANS)
+
+tag:
+	cvs tag -c `echo V@VERSION@ | tr . _`
