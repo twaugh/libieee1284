@@ -191,14 +191,17 @@ static char *get_token (FILE *f)
 
 static void disallow (FILE *f)
 {
-  char *token;
+  char *token = NULL;
   int i;
 
   for (i = 0; i < 2; i++)
     {
+      if (token)
+	free (token);
+
       token = get_token (f);
       if (!token)
-	return;
+	break;
 
       if (!strcmp (token, "ppdev"))
 	{
@@ -213,6 +216,9 @@ static void disallow (FILE *f)
 	    dprintf ("Ignoring: disallow\n");
 	}
     }
+
+  if (token)
+    free (token);
 }
 
 static int try_read_config_file (const char *path)
