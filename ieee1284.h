@@ -45,10 +45,6 @@ struct parport {
    * that includes DMA, etc. */
   int modes;
 
-  /* -1, or else a file descriptor that can be used by select() for
-   * waiting for nAck. */
-  int selectable_fd;
-
   /* The base address of the port, if that has any meaning, or zero. */
   unsigned long base_addr;
 

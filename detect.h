@@ -105,7 +105,6 @@ struct parport_internal
   int opened;
   int claimed;
   unsigned char ctr;
-  int *selectable_fd;
 
   /* IEEE 1284 stuff */
   int current_mode;
