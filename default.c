@@ -127,6 +127,25 @@ int default_negotiate (struct parport_internal *port, int mode)
 
 void default_terminate (struct parport_internal *port)
 {
+  const struct parport_access_methods *fn = port->fn;
+  struct timeval tv;
+
+  fn->write_control (port, C1284_NINIT | C1284_NAUTOFD | C1284_NSTROBE);
+
+  lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+  if (fn->wait_status (port, S1284_NACK | S1284_SELECT, 
+		       S1284_SELECT, &tv) != E1284_OK)
+    return;
+	
+  fn->write_control (port, C1284_NINIT | C1284_NSTROBE);
+
+  lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+  if (fn->wait_status (port, S1284_NACK, S1284_NACK, 
+		       &tv) != E1284_OK)
+    return;
+
+  fn->write_control (port, C1284_NINIT | C1284_NAUTOFD | C1284_NSTROBE);
+
   return;
 }
 
@@ -143,13 +162,103 @@ int default_ecp_rev_to_fwd (struct parport_internal *port)
 ssize_t default_nibble_read (struct parport_internal *port,
 			     char *buffer, size_t len)
 {
-  return E1284_NOTIMPL;
+  const struct parport_access_methods *fn = port->fn;
+  size_t count = 0;
+  int datain;
+  int low, high;
+  struct timeval tv;
+
+  /* start of reading data from the scanner */
+  while (count < len)
+    {
+      fn->write_control (port, C1284_NSTROBE | C1284_NINIT | C1284_NSELECTIN);
+
+      lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+      if (fn->wait_status (port, S1284_NACK, 0, &tv) 
+	  != E1284_OK)
+	goto error;
+
+      low = fn->read_status (port) >> 3;
+      low = (low & 0x07) + ((low & 0x10) >> 1);
+
+      fn->write_control (port, C1284_NSTROBE | C1284_NINIT | C1284_NSELECTIN
+			 | C1284_NAUTOFD);
+
+      lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+      if (fn->wait_status (port, S1284_NACK, S1284_NACK, &tv) 
+	  != E1284_OK)
+	goto error;
+
+      fn->write_control (port, C1284_NSTROBE | C1284_NINIT | C1284_NSELECTIN);
+
+      lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+      if (fn->wait_status (port, S1284_NACK, 0, &tv) 
+	  != E1284_OK)
+	goto error;
+
+      high = fn->read_status (port) >> 3;
+      high = (high & 0x07) | ((high & 0x10) >> 1);
+
+      fn->write_control (port, C1284_NSTROBE | C1284_NINIT | C1284_NSELECTIN
+			 | C1284_NAUTOFD);
+
+      lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+      if (fn->wait_status (port, S1284_NACK, S1284_NACK, &tv) 
+	  != E1284_OK)
+	goto error;
+
+      datain = (high << 4) + low;
+
+      buffer[count] = datain & 0xff;
+      count++;
+    }
+
+  return len; 
+
+ error:
+  fn->terminate (port);
+  return count;
 }
 
 ssize_t default_compat_write (struct parport_internal *port,
 			      const char *buffer, size_t len)
 {
-  return E1284_NOTIMPL;
+  const struct parport_access_methods *fn = port->fn;
+  size_t count = 0;
+  struct timeval tv;
+
+  while (count < len)
+    {		
+      lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+      if (fn->wait_status (port, S1284_BUSY, 0, &tv) != E1284_OK)
+	goto error;
+
+      /* Tsetup: 750ns min. */
+      delay (TIMEVAL_STROBE_DELAY);
+
+      /* Get the data byte ready */
+      fn->write_data (port, buffer[count]);
+
+      /* Pulse nStrobe low */
+      fn->write_control (port, C1284_NINIT | C1284_NAUTOFD);
+
+      /* Tstrobe: 750ns - 500us */
+      delay (TIMEVAL_STROBE_DELAY);
+
+      /* And raise it */
+      fn->write_control (port, C1284_NINIT | C1284_NAUTOFD | C1284_NSTROBE);
+
+      /* Thold: 750ns min. */
+      delay (TIMEVAL_STROBE_DELAY);
+
+      count++;
+    }
+		
+  return len;
+
+ error:
+  fn->terminate (port);
+  return count;  
 }
 
 ssize_t default_byte_read (struct parport_internal *port,

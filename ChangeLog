@@ -1,0 +1,8 @@
+2001-10-16  Simon Krix  <kinsei@dingoblue.net.au>
+
+	* default.c (default_terminate): Implemented.
+	(default_nibble_read): Implemented.
+	(default_compat_write): Implemented.
+
+	* delay.c (lookup_delay): Fix timings.
+

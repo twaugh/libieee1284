@@ -30,13 +30,13 @@ void lookup_delay (int which, struct timeval *tv)
   switch (which)
     {
     case IO_POLL_DELAY:
-      tv->tv_usec = 250000;
+      tv->tv_usec = 1;
       break;
     case TIMEVAL_SIGNAL_TIMEOUT:
       tv->tv_usec = 100000;
       break;
     case TIMEVAL_STROBE_DELAY:
-      tv->tv_usec = 100;
+      tv->tv_usec = 1;
       break;
     default:
       printf ("Couldn't lookup delay %d\n", which);
