@@ -1,3 +1,7 @@
+2002-09-19  Tim Waugh  <twaugh@redhat.com>
+
+	* configure.in, Makefile.am: Version 0.2.3 (stable).
+
 2002-09-17  Tim Waugh  <twaugh@redhat.com>
 
 	* Makefile.am: Ship src/par_nt.h, README.* (oops).
