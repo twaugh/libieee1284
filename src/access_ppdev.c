@@ -430,8 +430,11 @@ static int
 negotiate (struct parport_internal *port, int mode)
 {
   int m = which_mode (mode, 0);
+  int ret;
+
   dprintf ("==> negotiate (to %#02x)\n", mode);
-  int ret = ioctl (port->fd, PPNEGOT, &m);
+
+  ret = ioctl (port->fd, PPNEGOT, &m);
   if (!ret)
     port->current_mode = mode;
 
