@@ -33,7 +33,26 @@
   </bookinfo>
 
   <preface>
-    <title>Overview</title>
+  <title>Introduction</title>
+
+  <refentry>
+  <refmeta>
+    <refentrytitle>&libieee1284;</refentrytitle>
+    <manvolnum>3</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>&libieee1284;</refname>
+    <refpurpose>IEEE1284 communications library</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <synopsis>
+    #include &lt;ieee1284.h&gt;
+    cc files... -lieee1284</synopsis>
+  </refsynopsisdiv>
+
+  <refsect1><title>Overview</title>
 
     <para>The &libieee1284; library is a library for accessing
      parallel port devices.  It is currently under development, and
@@ -53,28 +72,42 @@
 
     <para>The normal sequence of events will be that the application
     <orderedlist>
-    <listitem><para>calls <function>ieee1284_find_ports</function> to get a
-     list of available ports</para></listitem>
-    <listitem><para>then <function>ieee1284_get_deviceid</function>
-     to look for a device on each port that it is interested in</para>
-     </listitem>
-    <listitem><para>and then <function>ieee1284_open</function> to open each
-     port it finds a device it can control on.</para></listitem>
-    <listitem><para>The list of ports returned from
-     <function>ieee1284_find_ports</function> can now be disposed of using
-     <function>ieee1284_free_ports</function>.</para></listitem>
-    <listitem><para>Then when it wants to control the device, it will call
-     <function>ieee1284_claim</function> to prevent other drivers from
-     using the port</para></listitem>
-    <listitem><para>then perhaps do some data transfers</para></listitem>
-    <listitem><para>and then <function>ieee1284_release</function> when it is
-     finished that that particular command.  This claim-control-release
-     sequence will be repeated each time it wants to tell the device to do
-     something.</para></listitem>
-    <listitem><para>Finally when the application is finished with the
-     device it will call <function>ieee1284_close</function>.</para></listitem>
-    </orderedlist>
-    </para>
+      <listitem>
+        <para>calls <function>ieee1284_find_ports</function> to get a
+         list of available ports</para>
+      </listitem>
+      <listitem>
+        <para>then <function>ieee1284_get_deviceid</function>
+       to look for a device on each port that it is interested in</para>
+       </listitem>
+      <listitem>
+        <para>and then <function>ieee1284_open</function> to open each
+       port it finds a device it can control on.</para>
+      </listitem>
+      <listitem>
+        <para>The list of ports returned from
+       <function>ieee1284_find_ports</function> can now be disposed of using
+       <function>ieee1284_free_ports</function>.</para>
+      </listitem>
+      <listitem>
+        <para>Then when it wants to control the device, it will call
+       <function>ieee1284_claim</function> to prevent other drivers from
+       using the port</para>
+      </listitem>
+      <listitem>
+        <para>then perhaps do some data transfers</para>
+      </listitem>
+      <listitem>
+        <para>and then <function>ieee1284_release</function> when it is
+       finished that that particular command.  This claim-control-release
+       sequence will be repeated each time it wants to tell the device to do
+       something.</para>
+      </listitem>
+      <listitem>
+        <para>Finally when the application is finished with the
+       device it will call <function>ieee1284_close</function>.</para>
+      </listitem>
+    </orderedlist></para>
 
     <para>Usually a port needs to be claimed before it can be used.
      This is to prevent multiple drivers from trampling on each other
@@ -83,6 +116,33 @@
      implicit open-claim-release-close sequence.  The reason for
      this is that it may be possible to collect a Device ID from the
      operating system, without bothering the device with it.</para>
+  </refsect1>
+  <refsect1>
+    <title>See Also</title>
+
+    <para>
+    <xref linkend="parport">,
+    <xref linkend="parport-list">,
+    <xref linkend="find-ports">,
+    <xref linkend="free-ports">,
+    <xref linkend="get-deviceid">,
+    <xref linkend="open">,
+    <xref linkend="close">,
+    <xref linkend="claim">,
+    <xref linkend="release">,
+    <xref linkend="data-pin-access">,
+    <xref linkend="status-pin-access">,
+    <xref linkend="control-line-access">,
+    <xref linkend="negotiation">,
+    <xref linkend="fwd-rev">,
+    <xref linkend="transfer">,
+    <xref linkend="irq">,
+    <xref linkend="timeout">
+
+    </para>
+
+  </refsect1>
+  </refentry>
   </preface>
 
   <reference>
