@@ -1,3 +1,8 @@
+2002-01-05  Kevin Easton  <s3159795@student.anu.edu.au>
+
+	* ports.c (add_port): Set p->base_addr and p->hibase_addr.
+	(populate_from_parport): Fix parsing.
+
 2002-01-05  Tim Waugh  <twaugh@redhat.com>
 
 	* ports.c (deref_port): Don't call the cleanup method; this is

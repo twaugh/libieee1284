@@ -56,6 +56,9 @@ add_port (struct parport_list *list, int flags,
       return E1284_NOMEM;
     }
 
+  p->base_addr = base;
+  p->hibase_addr = 0;
+
   priv = malloc (sizeof *priv);
   if (!priv)
     {
@@ -145,15 +148,13 @@ populate_from_parport (struct parport_list *list, int flags)
 		  p = strstr (contents, "base:");
 		  if (p)
 		    {
-		      p += strspn (p, " \t");
-		      base = strtoul (p, NULL, 0);
+		      base = strtoul (p + strlen("base:"), NULL, 0);
 		    }
 
 		  p = strstr (contents, "irq:");
 		  if (p)
 		    {
-		      p += strspn (p, " \t");
-		      interrupt = strtol (p, NULL, 0);
+		      interrupt = strtol (p + strlen("irq:"), NULL, 0);
 		    }
 		}
 	    }
