@@ -36,7 +36,7 @@
 static int
 add_port (struct parport_list *list, int flags,
 	  const char *name, const char *device, unsigned long base,
-	  int interrupt)
+	  unsigned long hibase, int interrupt)
 {
   struct parport *p;
   struct parport_internal *priv;
@@ -57,7 +57,7 @@ add_port (struct parport_list *list, int flags,
     }
 
   p->base_addr = base;
-  p->hibase_addr = 0;
+  p->hibase_addr = hibase;
 
   priv = malloc (sizeof *priv);
   if (!priv)
@@ -117,7 +117,7 @@ populate_from_parport (struct parport_list *list, int flags)
 	{
 	  char device[50];
 	  char hardware[50];
-	  unsigned long base = 0;
+	  unsigned long base = 0, hibase = 0;
 	  int interrupt = -1;
 	  int fd;
 
@@ -149,6 +149,7 @@ populate_from_parport (struct parport_list *list, int flags)
 		  if (p)
 		    {
 		      base = strtoul (p + strlen("base:"), NULL, 0);
+		      /* FIXME: read hibase too */
 		    }
 
 		  p = strstr (contents, "irq:");
@@ -159,7 +160,7 @@ populate_from_parport (struct parport_list *list, int flags)
 		}
 	    }
 
-	  add_port (list, flags, de->d_name, device, base, interrupt);
+	  add_port (list, flags, de->d_name, device, base, hibase, interrupt);
 	}
 
       de = readdir (parport);
@@ -185,7 +186,7 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
 	  strcmp (de->d_name, "default"))
 	{
 	  char device[50];
-	  unsigned long base = 0;
+	  unsigned long base = 0, hibase = 0;
 	  int interrupt = -1;
 	  size_t len = strlen (de->d_name) - 1;
 	  char filename[50];
@@ -214,10 +215,15 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
 	  if (fd >= 0)
 	    {
 	      char contents[20];
+	      char *endptr;
 	      ssize_t got = read (fd, contents, sizeof contents - 1);
 	      close (fd);
 	      if (got > 0)
-		base = strtoul (contents, NULL, 0);
+	        {
+		  base = strtoul (contents, &endptr, 0);
+		  if (contents != endptr)
+		    hibase = strtoul (endptr, NULL, 0);
+		}
 	    }
       
 	  /* Interrupt */
@@ -232,7 +238,7 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
 		interrupt = strtol (contents, NULL, 0);
 	    }
       
-	  add_port (list, flags, de->d_name, device, base, interrupt);
+	  add_port (list, flags, de->d_name, device, base, hibase, interrupt);
 	}
 
       de = readdir (parport);
@@ -245,9 +251,9 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
 static int
 populate_by_guessing (struct parport_list *list, int flags)
 {
-  add_port (list, flags, "0x378", "/dev/port", 0x378, -1);
-  add_port (list, flags, "0x278", "/dev/port", 0x278 ,-1);
-  add_port (list, flags, "0x3bc", "/dev/port", 0x3bc, -1);
+  add_port (list, flags, "0x378", "/dev/port", 0x378, 0, -1);
+  add_port (list, flags, "0x278", "/dev/port", 0x278, 0, -1);
+  add_port (list, flags, "0x3bc", "/dev/port", 0x3bc, 0, -1);
   return 0;
 }
 
@@ -298,6 +304,7 @@ deref_port (struct parport *p)
   struct parport_internal *priv = p->priv;
   if (!--priv->ref)
     {
+      dprintf ("Destructor for port '%s'\n", p->name);
       if (priv->fn)
 	free (priv->fn);
       if (p->name)
