@@ -1,5 +1,9 @@
 2002-08-08  Tim Waugh  <twaugh@redhat.com>
 
+	* src/debug.c: Include sys/types.h for C99.
+	* src/detect.c (check_proc_type): Use S_ISDIR instead of S_IFDIR
+	for C99.
+
 	* src/access_ppdev.c (negotiate): Fix compile error.
 
 2002-08-07  Tim Waugh  <twaugh@redhat.com>
