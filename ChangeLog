@@ -1,3 +1,8 @@
+2001-11-29  Tim Waugh  <twaugh@redhat.com>
+
+	* deviceid.c (get_fresh): Return E1284_NOID if there was no ID to
+	read.
+
 2001-11-22  Tim Waugh  <twaugh@redhat.com>
 
 	* default.c (LOG_ERROR): We now have dprintf, so this is not

@@ -31,6 +31,7 @@ enum E1284 {
   E1284_NOMEM              = -6, /* No memory left */
   E1284_INIT               = -7, /* Error initialising port */
   E1284_SYS                = -8, /* Error interfacing system */
+  E1284_NOID               = -9, /* No IEEE 1284 ID available */
 };
 
 /* A parallel port. */

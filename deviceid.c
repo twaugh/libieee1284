@@ -196,8 +196,8 @@ get_fresh (struct parport *port, int daisy,
   got = ieee1284_nibble_read (port, buffer, 2);
   if (got < 2)
     {
-      dprintf ("<== E1284_NOTAVAIL (no data)\n");
-      return E1284_NOTAVAIL;
+      dprintf ("<== E1284_NOID (no data)\n");
+      return E1284_NOID;
     }
 
   idlen = buffer[0] * 256 + buffer[1];
