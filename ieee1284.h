@@ -19,6 +19,8 @@
 
 #include <sys/types.h> /* for size_t */
 
+extern "C" {
+
 /* Errors.  When a function returns a negative number, it's one of
  * these errors. */
 enum E1284 {
@@ -253,3 +255,5 @@ extern ssize_t ieee1284_ecp_write_addr (struct parport *port, int flags,
 					const char *buffer, size_t len);
 extern struct timeval *ieee1284_set_timeout (struct parport *port,
 					     struct timeval *timeout);
+
+} /* extern "C" */
