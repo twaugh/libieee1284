@@ -1,3 +1,8 @@
+2002-01-05  Tim Waugh  <twaugh@redhat.com>
+
+	* access_io.c (init): Don't invert the return value of ioperm.
+	Spotted by Simon Krix.
+
 2002-01-05  Kevin Easton  <s3159795@student.anu.edu.au>
 
 	* ports.c (add_port): Set p->base_addr and p->hibase_addr.

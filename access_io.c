@@ -80,7 +80,7 @@ init (struct parport_internal *port, int flags, int *capabilities)
   switch (port->type)
     {
     case IO_CAPABLE:
-      if (ioperm (port->base, 3, 1) || !ioperm (0x80, 1, 1))
+      if (ioperm (port->base, 3, 1) || ioperm (0x80, 1, 1))
 	return E1284_INIT;
       break;
 
