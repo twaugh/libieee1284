@@ -1,1 +1,2 @@
 - Buffers should be void*, not char*
+- The interface should enforce open/claimed conditions using types
