@@ -475,19 +475,21 @@ negotiate (struct parport_internal *port, int mode)
 
   ret = ioctl (port->fd, PPNEGOT, &m);
   if (!ret)
+  {
     port->current_mode = mode;
+  } else {
+    if (errno == EIO)
+      {
+	dprintf ("<== E1284_NEGFAILED\n");
+	return E1284_NEGFAILED;
+      }
 
-  if (ret == -EIO)
-    {
-      dprintf ("<== E1284_NEGFAILED\n");
-      return E1284_NEGFAILED;
-    }
-
-  if (ret == -ENXIO)
-    {
-      dprintf ("<== E1284_REJECTED\n");
-      return E1284_REJECTED;
-    }
+    if (errno == ENXIO)
+      {
+	dprintf ("<== E1284_REJECTED\n");
+	return E1284_REJECTED;
+      }
+  }
 
   m = translate_error_code (ret);
   dprintf ("<== %d\n", m);

@@ -1586,6 +1586,13 @@
 	  </varlistentry>
 
 	  <varlistentry>
+	    <term>&e1284sys;</term>
+	    <listitem>
+	      <para>A system error occured during negotiation.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
