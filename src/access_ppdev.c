@@ -17,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
@@ -429,14 +430,21 @@ static int
 negotiate (struct parport_internal *port, int mode)
 {
   int m = which_mode (mode, 0);
+  dprintf ("==> negotiate\n");
   int ret = ioctl (port->fd, PPNEGOT, &m);
   if (!ret)
     port->current_mode = mode;
-  if (ret == -EIO)
+  if (ret == -EIO) {
+    dprintf ("<== E1284_NEGFAILED\n");
     return E1284_NEGFAILED;
-  if (ret == -ENXIO)
+  }
+  if (ret == -ENXIO) {
+    dprintf ("<== E1284_REJECTED\n");
     return E1284_REJECTED;
-  return translate_error_code (ret);
+  }
+  m = translate_error_code (ret);
+  dprintf ("<== %d\n", m);
+  return m;
 }
 
 static void

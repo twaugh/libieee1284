@@ -1,5 +1,7 @@
 2002-08-07  Tim Waugh  <twaugh@redhat.com>
 
+	* src/access_ppdev.c (negotiate): Add some calls to dprintf.
+
 	* src/access_ppdev.c (negotiate): Return E1284_NEGFAILED and
 	E1284_REJECTED when appropriate, instead of E1284_SYS.
 
