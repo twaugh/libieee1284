@@ -139,6 +139,14 @@
       </refsect1>
 
       <refsect1>
+	<title>Trouble-shooting</title>
+
+	<para>You can enable debugging output from the library by
+	  setting the environment variable
+	  <envar>LIBIEEE1284_DEBUG</envar> to any value.</para>
+      </refsect1>
+
+      <refsect1>
 	<title>See Also</title>
 
 	<para><xref linkend="parport"/>,
