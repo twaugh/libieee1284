@@ -1,5 +1,7 @@
 2002-04-09  Tim Waugh  <twaugh@redhat.com>
 
+	* doc/interface.sgml, Makefile.am: This is API 3.
+
 	* default.c (default_nibble_read, default_compat_write,
 	default_byte_read): Accept new flags parameter.
 	* default.h: Likewise.

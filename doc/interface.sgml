@@ -16,7 +16,7 @@
 <book id="index">
   <bookinfo>
     <title>Public interface of &libieee1284;</title>
-    <subtitle>API 2</subtitle>
+    <subtitle>API 3</subtitle>
 
     <author>
       <firstname>Tim</firstname>
@@ -27,7 +27,7 @@
     </author>
 
     <copyright>
-      <year>2001</year>
+      <year>2001-2002</year>
       <holder>Tim Waugh</holder>
     </copyright>
   </bookinfo>
