@@ -5,7 +5,8 @@ This library is intended to be used by applications that need to
 communicate with (or at least identify) devices that are attached via
 a parallel port.
 
-It currently works on Linux, OpenBSD (i386 only), Solaris/x86, and Cygwin.
+It currently works on Linux, OpenBSD (i386 only), FreeBSD/i386,
+Solaris/x86, and Cygwin.
 
 For Linux, there are some wrinkles in communicating with devices on 
 parallel ports:
