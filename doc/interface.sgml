@@ -186,8 +186,7 @@
 	    <funcdef>int
 	    <function>ieee1284_find_ports</function></funcdef>
 	    <paramdef>struct parport_list
-	    *<parameter>list</parameter>, const char
-	    *<parameter>config_file</parameter>, int
+	    *<parameter>list</parameter>, int
 	    <parameter>flags</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
@@ -204,10 +203,6 @@
 	<para>The <parameter>list</parameter> is a pointer to a
 	 <structname>parport_list</structname> structure that will be
 	 filled in on success.</para>
-
-	<para>The <parameter>config_file</parameter> parameter must be
-         <constant>NULL</constant>; it is there for when &libieee1284;
-         has a configuration file format defined.</para>
 
 	<para>There are no <parameter>flags</parameter> defined; use
 	 zero for this parameter.</para>
