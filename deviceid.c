@@ -30,6 +30,7 @@
 #include <unistd.h>
 
 #include "config.h"
+#include "debug.h"
 #include "ieee1284.h"
 #include "detect.h"
 #include "parport.h"

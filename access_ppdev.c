@@ -26,6 +26,7 @@
 
 #include "access.h"
 #include "config.h"
+#include "debug.h"
 #include "default.h"
 #include "delay.h"
 #include "ieee1284.h"

@@ -23,6 +23,7 @@
 #include <sys/types.h>
 
 #include "access.h"
+#include "debug.h"
 #include "delay.h"
 #include "detect.h"
 #include "ieee1284.h"

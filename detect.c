@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #include "config.h"
+#include "debug.h"
 #include "detect.h"
 
 int capabilities;

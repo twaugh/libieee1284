@@ -1,5 +1,10 @@
 2001-11-18  Tim Waugh  <twaugh@redhat.com>
 
+	* detect.c, deviceid.c, access_ppdev.c, state.c: Include debug.h.
+	* delay.c: Include stdio.h.
+
+2001-11-18  Tim Waugh  <twaugh@redhat.com>
+
 	* configure.in: Version 0.1.1 (devel).
 
 2001-11-18  Tim Waugh  <twaugh@redhat.com>
