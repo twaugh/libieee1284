@@ -441,6 +441,9 @@ terminate (struct parport_internal *port)
   int m = IEEE1284_MODE_COMPAT;
   if (!ioctl (port->fd, PPNEGOT, &m))
     port->current_mode = IEEE1284_MODE_COMPAT;
+
+  /* Seems to be needed before negotiation. */
+  delay (IO_POLL_DELAY);
 }
 
 static ssize_t

@@ -1,3 +1,8 @@
+2002-07-31  Tim Waugh  <twaugh@redhat.com>
+
+	* src/access_ppdev.c (terminate): Seems to need a slight delay
+	afterwards before a sensible Device ID can be obtained.
+
 2002-07-21  Matthew Duggan  <stauff1@users.sourceforge.net>
 
 	* README.OpenBSD: Notes on use in OpenBSD
