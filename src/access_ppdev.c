@@ -42,6 +42,7 @@ struct ppdev_priv
 {
   struct timeval inactivity_timer;
   int nonblock;
+  int current_flags;
 };
 
 static void
@@ -84,6 +85,7 @@ init (struct parport_internal *port, int flags, int *capabilities)
     return E1284_NOMEM;
 
   ((struct ppdev_priv *)port->access_priv)->nonblock = 0;
+  ((struct ppdev_priv *)port->access_priv)->current_flags = 0;
   port->fd = open (port->device, O_RDWR | O_NOCTTY);
   if (port->fd < 0)
     {
@@ -343,7 +345,7 @@ which_mode (int mode, int flags)
     case M1284_EPP:
       if (flags & F1284_SWE)
 	m = IEEE1284_MODE_EPPSWE;
-      else if (flags)
+      else if (flags & ~F1284_FASTEPP)
 	return E1284_NOTIMPL;
       else m = IEEE1284_MODE_EPP;
       break;
@@ -366,7 +368,9 @@ translate_error_code (ssize_t e)
 static int
 set_mode (struct parport_internal *port, int mode, int flags, int addr)
 {
+  struct ppdev_priv *priv = port->access_priv;
   int m = which_mode (mode, flags);
+  int f = 0;
   int ret = E1284_OK;
 
   if (m < 0)
@@ -378,6 +382,17 @@ set_mode (struct parport_internal *port, int mode, int flags, int addr)
       ret = translate_error_code (ioctl (port->fd, PPSETMODE, &m));
       if (!ret)
 	port->current_mode = m;
+    }
+
+  if (mode == M1284_EPP && (flags & F1284_FASTEPP))
+    f |= PP_FASTREAD | PP_FASTWRITE;
+
+  if (priv->current_flags != f
+      && mode == M1284_EPP) /* flags are only relevant for EPP right now */
+    {
+      ret = translate_error_code (ioctl (port->fd, PPSETFLAGS, &f));
+      if (!ret)
+	priv->current_flags = f;
     }
 
   return ret;
