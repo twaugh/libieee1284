@@ -231,7 +231,7 @@ static ssize_t get_from_proc_parport (struct parport *port, int daisy,
   if (daisy > -1)
     sprintf (name, "/proc/parport/%s/autoprobe%d", port->name, daisy);
   else
-    sprintf (name, "/proc/parport/%s/autoprobe", port->name, daisy);
+    sprintf (name, "/proc/parport/%s/autoprobe", port->name);
 
   fd = open (name, O_RDONLY | O_NOCTTY);
   free (name);
