@@ -1,3 +1,9 @@
+2005-03-04  Tim Waugh  <twaugh@redhat.com>
+
+	* configure.in: Patch from Robin Elfrink <elfrink@introweb.nl> to
+	allow building on Debian GNU/kFreeBSD
+	(http://www.debian.org/ports/kfreebsd-gnu/).
+
 2005-01-21  Tim Waugh  <twaugh@redhat.com>
 
 	* configure.in, Makefile.am: Version 0.2.10pre1 (pre-test).
