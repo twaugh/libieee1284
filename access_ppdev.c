@@ -309,6 +309,10 @@ static int
 which_mode (int mode, int flags)
 {
   int m;
+
+  if (mode & (M1284_FLAG_DEVICEID | M1284_FLAG_EXT_LINK))
+    return mode;
+
   switch (mode)
     {
     case M1284_NIBBLE:
