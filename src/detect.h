@@ -42,7 +42,7 @@ struct parport_internal;
 
 struct parport_access_methods
 {
-  int (*init) (struct parport_internal *port, int flags, int *capabilities);
+  int (*init) (struct parport *pport, int flags, int *capabilities);
   void (*cleanup) (struct parport_internal *port);
 
   int (*claim) (struct parport_internal *port);
@@ -128,6 +128,7 @@ struct parport_internal
 {
   int type;
   char *device;
+  char *udevice;
   unsigned long base;
   unsigned long base_hi;
   int interrupt;

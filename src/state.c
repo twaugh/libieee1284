@@ -51,7 +51,7 @@ init_port (struct parport *port, int flags, int *caps)
     {
       priv->type = PPDEV_CAPABLE;
       memcpy (priv->fn, &ppdev_access_methods, sizeof *priv->fn);
-      ret = priv->fn->init (priv, flags, caps);
+      ret = priv->fn->init (port, flags, caps);
       debugprintf ("Got %d from ppdev init\n", ret);
     }
 
@@ -59,7 +59,7 @@ init_port (struct parport *port, int flags, int *caps)
     {
       priv->type = IO_CAPABLE;
       memcpy (priv->fn, &io_access_methods, sizeof *priv->fn);
-      ret = priv->fn->init (priv, flags, caps);
+      ret = priv->fn->init (port, flags, caps);
       debugprintf ("Got %d from IO init\n", ret);
     }
 
@@ -67,7 +67,7 @@ init_port (struct parport *port, int flags, int *caps)
     {
       priv->type = DEV_PORT_CAPABLE;
       memcpy (priv->fn, &io_access_methods, sizeof *priv->fn);
-      ret = priv->fn->init (priv, flags, caps);
+      ret = priv->fn->init (port, flags, caps);
       debugprintf ("Got %d from /dev/port init\n", ret);
     }
 
@@ -75,7 +75,7 @@ init_port (struct parport *port, int flags, int *caps)
     {
       priv->type = LPT_CAPABLE;
       memcpy (priv->fn, &lpt_access_methods, sizeof *priv->fn);
-      ret = priv->fn->init (priv, flags, caps);
+      ret = priv->fn->init (port, flags, caps);
       debugprintf ("Got %d from LPT init\n", ret);
       /* No bi-dir support in NT :( */
       if (caps != NULL) *caps = CAP1284_COMPAT | CAP1284_NIBBLE;

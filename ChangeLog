@@ -1,3 +1,9 @@
+2005-03-11  Tim Waugh  <twaugh@redhat.com>
+
+	* src/access_io.c, src/access_lpt.c, src/access_ppdev.c,
+	  src/detect.c, src/detect.h, src/ports.c, src/state.c: Modifications
+	to support udev-054.  Patch from Julien BLACHE <jblache@debian.org>.
+
 2005-03-04  Tim Waugh  <twaugh@redhat.com>
 
 	* configure.in: Patch from Robin Elfrink <elfrink@introweb.nl> to

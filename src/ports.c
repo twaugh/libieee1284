@@ -66,8 +66,8 @@ sort_ports (struct parport_list *list)
 
 static int
 add_port (struct parport_list *list, int flags,
-	  const char *name, const char *device, unsigned long base,
-	  unsigned long hibase, int interrupt)
+	  const char *name, const char *device, const char *udevice,
+	  unsigned long base, unsigned long hibase, int interrupt)
 {
   struct parport *p;
   struct parport_internal *priv;
@@ -88,7 +88,14 @@ add_port (struct parport_list *list, int flags,
       return E1284_NOMEM;
     }
 
-  p->filename = strdup (device);
+  p->filename = strdup(device);
+  if (!p->filename)
+    {
+      free ((char *) (p->name));
+      free (p);
+      return E1284_NOMEM;
+    }
+
   p->base_addr = base;
   p->hibase_addr = hibase;
 
@@ -96,6 +103,7 @@ add_port (struct parport_list *list, int flags,
   if (!priv)
     {
       free ((char *) (p->name));
+      free ((char *) (p->filename));
       free (p);
       return E1284_NOMEM;
     }
@@ -105,6 +113,7 @@ add_port (struct parport_list *list, int flags,
   if (!priv->fn)
     {
       free ((char *) (p->name));
+      free ((char *) (p->filename));
       free (p);
       free (priv);
       return E1284_NOMEM;
@@ -112,14 +121,21 @@ add_port (struct parport_list *list, int flags,
   memset (priv->fn, 0, sizeof *priv->fn);
 
   p->priv = priv;
-  priv->device = strdup (device);
-  if (!priv->device)
+  priv->device = (char *) (p->filename);
+
+  if (udevice)
     {
-      free ((char *) (p->name));
-      free (p);
-      free (priv->fn);
-      free (priv);
-      return E1284_NOMEM;
+      priv->udevice = strdup (udevice);
+
+      if (!priv->udevice)
+	{
+	  free ((char *) (p->name));
+	  free ((char *) (p->filename));
+	  free (p);
+	  free (priv->fn);
+	  free (priv);
+	  return E1284_NOMEM;
+	}
     }
 
   priv->base = base;
@@ -155,6 +171,7 @@ populate_from_parport (struct parport_list *list, int flags)
       if (strcmp (de->d_name, ".") && strcmp (de->d_name, ".."))
 	{
 	  char device[50];
+	  char udevice[50];
 	  char hardware[50];
 	  unsigned long base = 0, hibase = 0;
 	  int interrupt = -1;
@@ -162,7 +179,10 @@ populate_from_parport (struct parport_list *list, int flags)
 
 	  /* Device */
 	  if (capabilities & PPDEV_CAPABLE)
-	    sprintf (device, "/dev/parport%s", de->d_name);
+	    {
+	      sprintf (device, "/dev/parport%s", de->d_name);
+	      sprintf (udevice, "/dev/parports/%s", de->d_name);
+	    }
 	  else
 	    {
 	      if (capabilities & IO_CAPABLE)
@@ -199,7 +219,7 @@ populate_from_parport (struct parport_list *list, int flags)
 		}
 	    }
 
-	  add_port (list, flags, de->d_name, device, base, hibase, interrupt);
+	  add_port (list, flags, de->d_name, device, udevice, base, hibase, interrupt);
 	}
 
       de = readdir (parport);
@@ -229,6 +249,7 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
 	  strcmp (de->d_name, "default"))
 	{
 	  char device[50];
+	  char udevice[50];
 	  unsigned long base = 0, hibase = 0;
 	  int interrupt = -1;
 	  size_t len = strlen (de->d_name) - 1;
@@ -243,7 +264,10 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
 
 	  /* Device */
 	  if (*p && capabilities & PPDEV_CAPABLE)
-	    sprintf (device, "/dev/parport%s", p);
+	    {
+	      sprintf (device, "/dev/parport%s", p);
+	      sprintf (udevice, "/dev/parports/%s", p);
+	    }
 	  else
 	    {
 	      if (capabilities & IO_CAPABLE)
@@ -281,7 +305,7 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
 		interrupt = strtol (contents, NULL, 0);
 	    }
       
-	  add_port (list, flags, de->d_name, device, base, hibase, interrupt);
+	  add_port (list, flags, de->d_name, device, udevice, base, hibase, interrupt);
 	}
 
       de = readdir (parport);
@@ -309,7 +333,7 @@ populate_nt_ports (struct parport_list *list, int flags)
     if (hf == INVALID_HANDLE_VALUE) continue;
     CloseHandle(hf);
     /* Friendly name is LPT1, LPT2, etc */
-    add_port (list, flags, vdmname+8, vdmname, 0, 0, -1);
+    add_port (list, flags, vdmname+8, vdmname, NULL, 0, 0, -1);
   }
 
 #endif
@@ -321,17 +345,17 @@ static int
 populate_by_guessing (struct parport_list *list, int flags)
 {
 #if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386)
-  add_port (list, flags, "0x378", "/dev/port", 0x378, 0, -1);
-  add_port (list, flags, "0x278", "/dev/port", 0x278, 0, -1);
-  add_port (list, flags, "0x3bc", "/dev/port", 0x3bc, 0, -1);
+  add_port (list, flags, "0x378", "/dev/port", NULL, 0x378, 0, -1);
+  add_port (list, flags, "0x278", "/dev/port", NULL, 0x278, 0, -1);
+  add_port (list, flags, "0x3bc", "/dev/port", NULL, 0x3bc, 0, -1);
 #elif defined(HAVE_FBSD_I386)
-  add_port (list, flags, "0x378", "/dev/io", 0x378, 0, -1);
-  add_port (list, flags, "0x278", "/dev/io", 0x278, 0, -1);
-  add_port (list, flags, "0x3bc", "/dev/io", 0x3bc, 0, -1);
+  add_port (list, flags, "0x378", "/dev/io", NULL, 0x378, 0, -1);
+  add_port (list, flags, "0x278", "/dev/io", NULL, 0x278, 0, -1);
+  add_port (list, flags, "0x3bc", "/dev/io", NULL, 0x3bc, 0, -1);
 #elif defined(HAVE_SOLARIS)
-  add_port (list, flags, "0x378", "/devices/pseudo/iop@0:iop", 0x378, 0, -1);
-  add_port (list, flags, "0x278", "/devices/pseudo/iop@0:iop", 0x278, 0, -1);
-  add_port (list, flags, "0x3bc", "/devices/pseudo/iop@0:iop", 0x3bc, 0, -1);
+  add_port (list, flags, "0x378", "/devices/pseudo/iop@0:iop", NULL, 0x378, 0, -1);
+  add_port (list, flags, "0x278", "/devices/pseudo/iop@0:iop", NULL, 0x278, 0, -1);
+  add_port (list, flags, "0x3bc", "/devices/pseudo/iop@0:iop", NULL, 0x3bc, 0, -1);
 #endif
   return 0;
 }
@@ -396,8 +420,8 @@ deref_port (struct parport *p)
 	free ((char *) (p->name));
       if (priv->device)
 	free (priv->device);
-      if (p->filename)
-	free ((char *) (p->filename));
+      if (priv->udevice)
+	free (priv->udevice);
       free (priv);
       free (p);
     }

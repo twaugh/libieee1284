@@ -60,8 +60,10 @@
 
 
 static int
-init (struct parport_internal *port, int flags, int *capabilities)
+init (struct parport *pport, int flags, int *capabilities)
 { 
+  struct parport_internal *port = pport->priv;
+
   /* Note: We can only ever provide exclusive access on NT. */
   if (flags & ~F1284_EXCL) /* silently ignore F1284_EXCL - dbjh */
     return E1284_NOTAVAIL;

@@ -93,13 +93,28 @@ check_dev_node (const char *type)
   char name[50]; /* only callers are in detect_environment */
   int fd;
   int i;
+#ifdef HAVE_LINUX
+  int is_parport;
+#endif
 
   for (i = 0; i < 8; i++) {
     sprintf (name, "/dev/%s%d", type, i);
     fd = open (name, O_RDONLY | O_NOCTTY);
+
+#ifdef HAVE_LINUX
+    is_parport = !strncmp (type, "parport", 7);
+
+    if ((fd < 0) && is_parport) {
+      /* Try with udev/devfs naming */
+      debugprintf("%s isn't accessible, retrying with udev/devfs naming...\n", name);
+      sprintf (name, "/dev/%ss/%d", type, i);
+      fd = open (name, O_RDONLY | O_NOCTTY);
+    }
+#endif
+
     if (fd >= 0) {
 #ifdef HAVE_LINUX
-      if (!strcmp (type, "parport"))
+      if (is_parport)
 	{
 	  /* Try to claim the device.  This will
 	   * force the low-level port driver to get loaded. */
@@ -111,6 +126,8 @@ check_dev_node (const char *type)
       close (fd);
       debugprintf ("%s is accessible\n", name);
       return 1;
+    } else {
+      debugprintf("%s isn't accessible\n", name);
     }
   }
 

@@ -81,8 +81,10 @@ find_capabilities (int fd, int *c)
 }
 
 static int
-init (struct parport_internal *port, int flags, int *capabilities)
+init (struct parport *pport, int flags, int *capabilities)
 {
+  struct parport_internal *port = pport->priv;
+
   if (flags & ~F1284_EXCL)
     return E1284_NOTAVAIL;
 
@@ -93,10 +95,26 @@ init (struct parport_internal *port, int flags, int *capabilities)
   ((struct ppdev_priv *)port->access_priv)->nonblock = 0;
   ((struct ppdev_priv *)port->access_priv)->current_flags = 0;
   port->fd = open (port->device, O_RDWR | O_NOCTTY);
+
+  /* Retry with udev/devfs naming, if available */
   if (port->fd < 0)
     {
-      free (port->access_priv);
-      return E1284_INIT;
+      if (port->udevice)
+	port->fd = open (port->udevice, O_RDWR | O_NOCTTY);
+
+      if (port->fd < 0)
+	{
+	  free (port->access_priv);
+	  return E1284_INIT;
+	}
+      else
+	{
+	  pport->filename = port->udevice;
+	}
+    }
+  else
+    {
+      pport->filename = port->device;
     }
 
   port->current_mode = M1284_COMPAT;

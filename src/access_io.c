@@ -182,8 +182,9 @@ port_outb (struct parport_internal *port, unsigned char val,
 }
 
 static int
-init (struct parport_internal *port, int flags, int *capabilities)
+init (struct parport *pport, int flags, int *capabilities)
 {
+  struct parport_internal *port = pport->priv;
 #ifdef HAVE_SOLARIS
   struct iopbuf tmpbuf;
 #elif defined(HAVE_OBSD_I386)
