@@ -1,3 +1,12 @@
+2002-09-04  Matthew Duggan  <stauff1@users.sourceforge.net>
+
+	* src/detect.h: Added Phase enumerated type, and variable in
+	parport_internal to hold phase (for ECPSWE)
+	* src/default.c: Implement default_ecp_fwd_to_rev, 
+	default_ecp_rev_to_fwd, default_ecp_read_data, default_ecp_write_data,
+	default_epp_read_data (untested), and default_byte_read.
+	Fix bug in termination (revert to M1284_COMPAT)
+
 2002-09-04  Kevin Easton  <keaston@users.sourceforge.net>
 
 	* src/delay.c, src/delay.h: Changed lookup_delay into a macro that

@@ -98,6 +98,21 @@ struct parport_access_methods
 				  struct timeval *timeout);
 };
 
+enum ieee1284_phase {
+  PH1284_FWD_DATA,
+  PH1284_FWD_IDLE,
+  PH1284_TERMINATE,
+  PH1284_NEGOTIATION,
+  PH1284_HBUSY_DNA,
+  PH1284_REV_IDLE,
+  PH1284_HBUSY_DAVAIL,
+  PH1284_REV_DATA,
+  PH1284_ECP_SETUP,
+  PH1284_ECP_FWD_TO_REV,
+  PH1284_ECP_REV_TO_FWD,
+  PH1284_ECP_DIR_UNKNOWN,
+};
+
 struct parport_internal
 {
   int type;
@@ -113,6 +128,8 @@ struct parport_internal
   /* IEEE 1284 stuff */
   int current_mode;
   int current_channel;
+  /* For ECPSWE */
+  enum ieee1284_phase current_phase;
 
   /* Reference count */
   int ref;

@@ -171,6 +171,7 @@ default_negotiate (struct parport_internal *port, int mode)
       }
 
       port->current_channel=0;
+      port->current_phase = PH1284_FWD_IDLE;
     }
 
   dprintf ("<== E1284_OK\n");
@@ -188,7 +189,16 @@ default_terminate (struct parport_internal *port)
   const struct parport_access_methods *fn = port->fn;
   struct timeval tv;
 
+  /* Termination may only be accomplished from the forward phase */
+  if (port->current_phase == PH1284_REV_IDLE) 
+    /* even if this fails we're trucking on */
+    fn->ecp_rev_to_fwd(port);
+
   fn->write_control (port, C1284_NINIT | C1284_NAUTOFD | C1284_NSTROBE);
+
+  /* Even if this fails we are now implicitly back in compat mode because we 
+   * have dropped nSelectIn */
+  port->current_mode = M1284_COMPAT;
 
   lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
   if (fn->wait_status (port, S1284_NACK, 0, &tv) != E1284_OK)
@@ -209,15 +219,64 @@ default_terminate (struct parport_internal *port)
 int
 default_ecp_fwd_to_rev (struct parport_internal *port)
 {
-  dprintf (no_default, "ecp_fwd_to_rev");
-  return E1284_NOTIMPL;
+  const struct parport_access_methods *fn = port->fn;
+  int retval;
+  struct timeval tv;
+
+  dprintf ("==> default_ecp_fwd_to_rev\n");
+
+  /* Event 38: Set nAutoFd low */
+  fn->frob_control (port, C1284_NAUTOFD, 0);
+
+  /* This will always work. If it won't then this method isn't available */
+  fn->data_dir (port, 1);
+  udelay (5);
+
+  /* Event 39: Set nInit low to initiate bus reversal */
+  fn->frob_control (port, C1284_NINIT, 0);
+
+  /* Event 40: PError goes low */
+  lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+  retval = fn->wait_status (port, S1284_PERROR, 0, &tv);
+
+  if (retval) {
+    dprintf ("ECP direction: failed to reverse\n");
+    port->current_phase = PH1284_ECP_DIR_UNKNOWN;
+  } else {
+    port->current_phase = PH1284_REV_IDLE;
+  }
+
+  dprintf ("<== %d default_ecp_fwd_to_rev\n", retval);
+  return retval;
 }
 
 int
 default_ecp_rev_to_fwd (struct parport_internal *port)
 {
-  dprintf (no_default, "ecp_rev_to_fwd");
-  return E1284_NOTIMPL;
+  const struct parport_access_methods *fn = port->fn;
+  int retval;
+  struct timeval tv;
+
+  dprintf ("==> default_ecp_rev_to_fwd\n");
+
+  /* Event 47: Set nInit high */
+  fn->frob_control (port, C1284_NINIT | C1284_NAUTOFD, 
+	            C1284_NINIT | C1284_NAUTOFD);
+
+  /* Event 49: PError goes high */
+  lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+  retval = fn->wait_status (port, S1284_PERROR, S1284_PERROR, &tv);
+
+  if (!retval) {
+    fn->data_dir (port, 0);
+    port->current_phase = PH1284_FWD_IDLE;
+  } else {
+    dprintf ("ECP direction: failed to switch forward\n");
+    port->current_phase = PH1284_ECP_DIR_UNKNOWN;
+  }
+
+  dprintf ("<== %d default_ecp_rev_to_fwd\n", retval);
+  return retval;
 }
 
 ssize_t
@@ -345,16 +404,116 @@ ssize_t
 default_byte_read (struct parport_internal *port, int flags,
 		   char *buffer, size_t len)
 {
-  dprintf (no_default, "byte_read");
-  return E1284_NOTIMPL;
+
+  const struct parport_access_methods *fn = port->fn;
+  unsigned char *buf = buffer;
+  ssize_t count = 0;
+  struct timeval tv;
+
+  /* FIXME: Untested as yet, copied from ieee1284_op.c,
+   * inverted appropriate signals  */
+
+  dprintf ("==> default_byte_read\n");
+
+  for (count = 0; count < len; count++) {
+    unsigned char byte;
+
+    /* Data available? */
+    if (fn->read_status (port) & S1284_PERROR) {
+      /* Go to reverse idle phase. */
+      fn->frob_control (port, C1284_NAUTOFD, C1284_NAUTOFD);
+      break;
+    }
+
+    /* Event 14: Place data bus in high impedance state. */
+    fn->data_dir (port, 1);
+
+    /* Event 7: Set nAutoFd low. */
+    fn->frob_control (port, C1284_NAUTOFD, 0);
+
+    /* Event 9: nAck goes low. */
+    lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+    if (fn->wait_status (port, S1284_NACK, 0, &tv)) {
+      /* Timeout -- no more data? */
+      fn->frob_control (port, C1284_NAUTOFD, C1284_NAUTOFD);
+      dprintf ("Byte timeout at event 9\n");
+      break;
+    }
+
+    byte = fn->read_data (port);
+    *buf++ = byte;
+
+    /* Event 10: Set nAutoFd high */
+    fn->frob_control (port, C1284_NAUTOFD, C1284_NAUTOFD);
+
+    /* Event 11: nAck goes high. */
+    lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+    if (fn->wait_status (port, S1284_NACK, S1284_NACK, &tv)) {
+      /* Timeout -- no more data? */
+      dprintf ("Byte timeout at event 11\n");
+      break;
+    }
+
+    /* Event 16: Set nStrobe low. */
+    fn->frob_control (port, C1284_NSTROBE, 0);
+    udelay (5);
+
+    /* Event 17: Set nStrobe high. */
+    fn->frob_control (port, C1284_NSTROBE, C1284_NSTROBE);
+  }
+
+  dprintf ("<== %d default_byte_read\n", count);
+
+  return count;
+
 }
 
 ssize_t
 default_epp_read_data (struct parport_internal *port, int flags,
 		       char *buffer, size_t len)
 {
-  dprintf (no_default, "epp_read_data");
-  return E1284_NOTIMPL;
+  const struct parport_access_methods *fn = port->fn;
+  unsigned char *buf = buffer;
+  ssize_t count = 0;
+  struct timeval tv;
+
+  /* FIXME: Untested as yet, copied from ieee1284_op.c, 
+   * inverted appropriate signals  */
+
+  dprintf ("==> default_epp_read_data\n");
+
+  /* set EPP idle state (just to make sure) with strobe high */
+  fn->frob_control (port, C1284_NSTROBE | C1284_NAUTOFD | 
+	                  C1284_NSELECTIN | C1284_NINIT,
+	                  C1284_NSTROBE | C1284_NINIT);
+  fn->data_dir (port, 1);
+
+  for (; len > 0; len--, buf++) {
+    /* Event 67: set nAutoFd (nDStrb) low */
+    fn->frob_control (port, C1284_NAUTOFD, 0);
+    /* Event 58: wait for Busy to go high */
+    lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+    if (fn->wait_status (port, S1284_BUSY, S1284_BUSY, &tv)) {
+      break;
+    }
+
+    *buf = fn->read_data (port);
+
+    /* Event 63: set nAutoFd (nDStrb) high */
+    fn->frob_control (port, C1284_NAUTOFD, C1284_NAUTOFD);
+
+    /* Event 60: wait for Busy to go low */
+    lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+    if (fn->wait_status (port, S1284_BUSY, 0, &tv)) {
+      break;
+    }
+
+    count++;
+  }
+  fn->data_dir (port, 0);
+
+  dprintf ("<== default_epp_read_data\n");
+  return count;
 }
 
 static int poll_port (struct parport_internal *port, unsigned char mask,
@@ -443,14 +602,191 @@ ssize_t
 default_ecp_read_data (struct parport_internal *port, int flags,
 		       char *buffer, size_t len)
 {
-  return E1284_NOTIMPL;
+  /* FIXME: RLE Not tested yet because it's not reported as being available
+   * by the upper layers */
+
+  const struct parport_access_methods *fn = port->fn;
+  
+  unsigned char *buf = buffer;
+  int rle_count = 0; /* shut gcc up */
+  int rle = 0;
+  ssize_t count = 0;
+  struct timeval tv;
+
+  dprintf ("==> default_ecp_read_data\n");
+
+  if (port->current_phase != PH1284_REV_IDLE)
+    if (fn->ecp_fwd_to_rev(port))
+      return 0;
+    
+  port->current_phase = PH1284_REV_DATA;
+
+  /* Event 46: Set HostAck (nAutoFd) low to start accepting data. */
+  fn->frob_control (port, C1284_NAUTOFD | C1284_NSTROBE | C1284_NINIT, 
+		  C1284_NSTROBE);
+
+  while (count < len) {
+    unsigned char byte;
+    int command; 
+
+    /* Event 43: Peripheral sets nAck low. It can take as long as it wants.. */
+    /* FIXME: Should we impose some sensible limit here? */
+    lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+    while(fn->wait_status (port, S1284_NACK, 0, &tv)) { } 
+
+    /* Is this a command? */
+    if (rle)
+      /* The last byte was a run-length count, so this can't be as well. */
+      command = 0;
+    else
+      /* note: test reversed from kernel because BUSY pin is inverted */
+      command = (fn->read_status (port) & S1284_BUSY) ? 0 : 1;
+
+
+    /* Read the data. */
+    byte = fn->read_data (port);
+
+    /* If this is a channel command, rather than an RLE
+     * command or a normal data byte, don't accept it. */
+    if (command) {
+      if (byte & 0x80) {
+	dprintf ("Stopping short at channel command (%02x)\n", byte);
+	port->current_phase != PH1284_REV_IDLE;
+	return count;
+      }
+      else if (!(flags & F1284_RLE))
+	dprintf ("Device illegally using RLE; accepting anyway\n");
+
+      rle_count = byte + 1;
+
+      /* Are we allowed to read that many bytes? */
+      if (rle_count > (len - count)) {
+	dprintf ("Leaving %d RLE bytes for next time\n", 
+	    rle_count);
+	break;
+      }
+
+      rle = 1;
+    }
+
+    /* Event 44: Set HostAck high, acknowledging handshake. */
+    fn->frob_control (port, C1284_NAUTOFD, C1284_NAUTOFD);
+
+    /* Event 45: The peripheral has 35ms to set nAck high. */
+    lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+    if (fn->wait_status (port, S1284_NACK, S1284_NACK, &tv)) {
+      /* It's gone wrong.  Return what data we have to the caller. */
+      dprintf ("ECP read timed out at 45\n");
+
+      if (command)
+	dprintf ("Command ignored (%02x)\n", byte);
+
+      break;
+    }
+
+    /* Event 46: Set HostAck low and accept the data. */
+    fn->frob_control (port, C1284_NAUTOFD, 0);
+
+    /* If we just read a run-length count, fetch the data. */
+    if (command)
+      continue;
+    /* If this is the byte after a run-length count, decompress. */
+    if (rle) {
+      rle = 0;
+      memset (buf, byte, rle_count);
+      buf += rle_count;
+      count += rle_count;
+      dprintf ("Decompressed to %d bytes\n", rle_count);
+    } else {
+      /* Normal data byte. */
+      *buf = byte;
+      buf++, count++;
+    }
+  }
+
+  port->current_phase = PH1284_REV_IDLE;
+
+  dprintf ("<== default_ecp_read_data\n");
+
+  return count;
 }
+
 
 ssize_t
 default_ecp_write_data (struct parport_internal *port, int flags,
 			const char *buffer, size_t len)
 {
-  return E1284_NOTIMPL;
+
+  const struct parport_access_methods *fn = port->fn;
+  const unsigned char *buf = buffer;
+  size_t written;
+  int retry;
+  struct timeval tv;
+
+  dprintf ("==> default_ecp_write_data\n");
+
+  if (port->current_phase != PH1284_FWD_IDLE)
+    if (fn->ecp_rev_to_fwd(port))
+      return 0;
+
+  port->current_phase = PH1284_FWD_DATA;
+
+  /* HostAck high (data, not command) */
+  fn->frob_control (port, C1284_NAUTOFD | C1284_NSTROBE | C1284_NINIT, 
+	           C1284_NAUTOFD | C1284_NINIT);
+
+  for (written = 0; written < len; written++, buf++) {
+    unsigned char byte;
+
+    byte = *buf;
+try_again:
+    fn->write_data (port, byte);
+    /* Event 35: Set NSTROBE low */
+    fn->frob_control (port, C1284_NSTROBE, 0);
+    udelay (5);
+    lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+    for (retry = 0; retry < 100; retry++) {
+      /* Event 36: peripheral sets BUSY high */
+      if (!fn->wait_status (port, S1284_BUSY, S1284_BUSY, &tv))
+	goto success;
+    }
+
+    /* Time for Host Transfer Recovery (page 41 of IEEE1284) */
+    dprintf ("ECP transfer stalled!\n");
+
+    fn->frob_control (port, C1284_NINIT, C1284_NINIT);
+    udelay (50);
+    if (fn->read_status (port) & S1284_PERROR) {
+      /* It's buggered. */
+      fn->frob_control (port, C1284_NINIT, 0);
+      break;
+    }
+
+    fn->frob_control (port, C1284_NINIT, 0);
+    udelay (50);
+    if (!(fn->read_status (port) & S1284_PERROR))
+      break;
+
+    dprintf ("Host transfer recovered\n");
+
+    /* FIXME: Check for timeout here ? */
+    goto try_again;
+success:
+    /* Event 37: HostClk (nStrobe) high */
+    fn->frob_control (port, C1284_NSTROBE, C1284_NSTROBE);
+    udelay (5);
+    lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+    if (fn->wait_status (port, S1284_BUSY, 0, &tv))
+      /* Peripheral hasn't accepted the data. */
+      break;
+  }
+
+  dprintf ("<== default_ecp_write_data\n");
+
+  port->current_phase = PH1284_FWD_IDLE;
+
+  return written;
+
 }
 
 ssize_t
