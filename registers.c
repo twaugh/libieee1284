@@ -27,13 +27,13 @@
 #include "parport.h"
 #include "ppdev.h"
 
-unsigned char ieee1284_read_data (struct parport *port)
+int ieee1284_read_data (struct parport *port)
 {
   struct parport_internal *priv = port->priv;
   unsigned char reg;
 
   if (!priv->claimed)
-    return 0xff;
+    return -1;
 
   switch (priv->type)
     {
@@ -50,7 +50,7 @@ unsigned char ieee1284_read_data (struct parport *port)
       return INB (priv->base);
     }
 
-  return 0xff;
+  return -1;
 }
 
 void ieee1284_write_data (struct parport *port, unsigned char reg)
@@ -86,13 +86,13 @@ void ieee1284_data_dir (struct parport *port, int reverse)
     ioctl (priv->fd, PPDATADIR, &reverse);
 }
 
-unsigned char ieee1284_read_status (struct parport *port)
+int ieee1284_read_status (struct parport *port)
 {
   struct parport_internal *priv = port->priv;
   unsigned char reg;
 
   if (!priv->claimed)
-    return 0xff;
+    return -1;
 
   switch (priv->type)
     {
@@ -109,16 +109,16 @@ unsigned char ieee1284_read_status (struct parport *port)
       return INB (priv->base + 1);
     }
 
-  return 0xff;
+  return -1;
 }
 
-unsigned char ieee1284_read_control (struct parport *port)
+int ieee1284_read_control (struct parport *port)
 {
   struct parport_internal *priv = port->priv;
   unsigned char reg;
 
   if (!priv->claimed)
-    return 0xff;
+    return -1;
 
   switch (priv->type)
     {
@@ -135,7 +135,7 @@ unsigned char ieee1284_read_control (struct parport *port)
       return INB (priv->base + 2);
     }
 
-  return 0xff;
+  return -1;
 }
 
 void ieee1284_write_control (struct parport *port, unsigned char reg)

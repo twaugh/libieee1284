@@ -57,7 +57,7 @@ static int add_port (struct parport_list *list,
   priv = malloc (sizeof *priv);
   if (!priv)
     {
-      free (p->name);
+      free ((char *) (p->name));
       free (p);
       return -1;
     }
@@ -67,7 +67,7 @@ static int add_port (struct parport_list *list,
   if (!priv->device)
     {
       free (priv);
-      free (p->name);
+      free ((char *) (p->name));
       free (p);
       return -1;
     }
@@ -209,7 +209,8 @@ static int populate_by_guessing (struct parport_list *list)
 }
 
 // Find out what ports there are.
-int ieee1284_find_ports (struct parport_list *list, int flags)
+int ieee1284_find_ports (struct parport_list *list,
+			 const char *config_file, int flags)
 {
   detect_environment (0);
   list->portc = 0;
@@ -240,7 +241,7 @@ void ieee1284_free_ports (struct parport_list *list)
       struct parport *p = list->portv[i];
       struct parport_internal *priv = p->priv;
       if (p->name)
-	free (p->name);
+	free ((char *) (p->name));
       if (priv->device)
 	free (priv->device);
       free (priv);
