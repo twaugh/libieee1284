@@ -4,6 +4,10 @@
 
 2001-11-15  Tim Waugh  <twaugh@redhat.com>
 
+	* deviceid.c (get_fresh): Fix signed/unsigned comparison.
+	(get_from_proc_parport): Likewise.
+	(get_from_sys_dev_parport): Likewise.
+
 	* ports.c (ieee1284_find_ports): Return E1284_NOTIMPL if a
 	configuration file is specified, since we don't have a format
 	defined yet.
