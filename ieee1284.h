@@ -108,7 +108,7 @@ extern void ieee1284_release (struct parport *port);
 //
 
 extern int ieee1284_read_data (struct parport *port);
-extern void ieee1284_write_data (struct parport *port, unsigned char st);
+extern void ieee1284_write_data (struct parport *port, unsigned char dt);
 extern void ieee1284_data_dir (struct parport *port, int reverse);
 
 // The status pin functions operate in terms of these bits:

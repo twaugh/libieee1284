@@ -1,5 +1,7 @@
 2001-11-13  Tim Waugh  <twaugh@redhat.com>
 
+	* ieee1284.h: s/st/dt/ in ieee1284_write_data prototype.
+
 	* deviceid.c (get_fresh): Honour buffer length properly.
 	Don't terminate with 0 unless the entire ID fits in the buffer.
 	(get_from_proc_parport): Likewise.
