@@ -1,5 +1,9 @@
 2002-08-30  Tim Waugh  <twaugh@redhat.com>
 
+	* src/default.c (default_epp_write_data): Don't deassert nWrite
+	when finished.  There's no need to go to idle mode here, and it
+	just slows things down.
+
 	* src/conf.c: Don't look in $HOME for config file.  Tokenise on
 	braces and equals signs.
 	* doc/interface.xml: Updated.

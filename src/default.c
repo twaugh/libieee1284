@@ -421,9 +421,6 @@ default_epp_write_data (struct parport_internal *port, int flags,
       ret++;
     }
 
-  /* Event 61: set nStrobe (nWrite) high */
-  fn->frob_control (port, C1284_NSTROBE, C1284_NSTROBE);
-
   dprintf ("<== %d\n", ret);
   return ret;
 }
