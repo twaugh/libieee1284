@@ -1,3 +1,7 @@
+2001-10-16  Tim Waugh  <twaugh@redhat.com>
+
+	* ieee1284.h: Clarify block I/O return value meaning.
+
 2001-10-16  Simon Krix  <kinsei@dingoblue.net.au>
 
 	* default.c (default_terminate): Implemented.

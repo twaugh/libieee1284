@@ -198,6 +198,8 @@ extern int ieee1284_ecp_fwd_to_rev (struct parport *port);
 extern int ieee1284_ecp_rev_to_fwd (struct parport *port);
 
 // Block I/O
+// The return value is the number of bytes successfully transferred,
+// or an error code (only if no transfer took place).
 extern ssize_t ieee1284_nibble_read (struct parport *port, char *buffer,
 				     size_t len);
 extern ssize_t ieee1284_compat_write (struct parport *port,
