@@ -17,6 +17,76 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+// The virtualized interface.  This allows different implementations
+// of each function, without the runtime hit of having to decide which
+// implementation to use every time the function is called.
+
+#ifndef _DETECT_H_
+#define _DETECT_H_
+
+#include <stdlib.h>
+#include <sys/time.h>
+
+struct parport_internal;
+
+struct parport_access_methods
+{
+  int (*init) (struct parport_internal *port);
+  void (*cleanup) (struct parport_internal *port);
+
+  unsigned char (*inb) (struct parport_internal *port, unsigned long addr);
+  void (*outb) (struct parport_internal *port, unsigned char val,
+		unsigned long addr);
+
+  int (*read_data) (struct parport_internal *port);
+  void (*write_data) (struct parport_internal *port, unsigned char st);
+  void (*data_dir) (struct parport_internal *port, int reverse);
+
+  int (*read_status) (struct parport_internal *port);
+  int (*wait_status) (struct parport_internal *port,
+		      unsigned char mask, unsigned char val,
+		      struct timeval *timeout);
+
+  int (*read_control) (struct parport_internal *port);
+  void (*write_control) (struct parport_internal *port,
+			 unsigned char ct);
+  void (*frob_control) (struct parport_internal *port,
+			unsigned char mask, unsigned char val);
+
+  int (*do_nack_handshake) (struct parport_internal *port,
+			    unsigned char ct_before,
+			    unsigned char ct_after,
+			    struct timeval *timeout);
+
+  int (*negotiate) (struct parport_internal *port, int mode);
+  void (*terminate) (struct parport_internal *port);
+
+  int (*ecp_fwd_to_rev) (struct parport_internal *port);
+  int (*ecp_rev_to_fwd) (struct parport_internal *port);
+
+  ssize_t (*nibble_read) (struct parport_internal *port,
+			  char *buffer, size_t len);
+  ssize_t (*compat_write) (struct parport_internal *port,
+			   const char *buffer, size_t len);
+  ssize_t (*byte_read) (struct parport_internal *port,
+			char *buffer, size_t len);
+  ssize_t (*epp_read_data) (struct parport_internal *port,
+			    char *buffer, size_t len);
+  ssize_t (*epp_write_data) (struct parport_internal *port,
+			     const char *buffer, size_t len);
+  ssize_t (*epp_read_addr) (struct parport_internal *port,
+			    char *buffer, size_t len);
+  ssize_t (*epp_write_addr) (struct parport_internal *port,
+			     const char *buffer, size_t len);
+  ssize_t (*ecp_read_data) (struct parport_internal *port,
+			    char *buffer, size_t len);
+  ssize_t (*ecp_write_data) (struct parport_internal *port,
+			     const char *buffer, size_t len);
+  ssize_t (*ecp_read_addr) (struct parport_internal *port,
+			    char *buffer, size_t len);
+  ssize_t (*ecp_write_addr) (struct parport_internal *port,
+			     const char *buffer, size_t len);
+};
 
 struct parport_internal
 {
@@ -24,9 +94,18 @@ struct parport_internal
   char *device;
   unsigned long base;
   unsigned long base_hi;
+  int interrupt;
   int fd;
   int claimed;
   int flags;
+  unsigned char ctr;
+  int *selectable_fd;
+
+  // IEEE 1284 stuff
+  int current_mode;
+  int current_channel;
+
+  const struct parport_access_methods *fn;
 };
 
 #define IO_CAPABLE			(1<<0)
@@ -39,13 +118,4 @@ extern int capabilities;
 
 extern int detect_environment (int forbidden);
 
-struct raw_routines_struct
-{
-  unsigned char (*inb) (unsigned long);
-  void (*outb) (unsigned char, unsigned long);
-};
-extern struct raw_routines_struct raw_routines;
-#define INB(x) raw_routines.inb(x)
-#define OUTB(x,y) raw_routines.outb(x,y)
-
-extern void use_dev_port (int on);
+#endif /* _DETECT_H_ */

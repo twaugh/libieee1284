@@ -34,7 +34,8 @@
 #define MAX_PORTS 20
 
 static int add_port (struct parport_list *list,
-		     const char *name, const char *device, unsigned long base)
+		     const char *name, const char *device, unsigned long base,
+		     int interrupt)
 {
   struct parport *p;
   struct parport_internal *priv;
@@ -53,6 +54,8 @@ static int add_port (struct parport_list *list,
       free (p);
       return -1;
     }
+
+  p->selectable_fd = -1;
 
   priv = malloc (sizeof *priv);
   if (!priv)
@@ -74,9 +77,13 @@ static int add_port (struct parport_list *list,
 
   priv->base = base;
   priv->base_hi = 0;
+  if (interrupt < -1)
+    interrupt = -1;
+  priv->interrupt = interrupt;
   priv->fd = -1;
   priv->type = 0;
   priv->claimed = -1;
+  priv->selectable_fd = &p->selectable_fd;
 
   list->portv[list->portc++] = p;
   return 0;
@@ -97,6 +104,7 @@ static int populate_from_parport (struct parport_list *list)
 	  char device[50];
 	  char hardware[50];
 	  unsigned long base = 0;
+	  int interrupt = -1;
 	  int fd;
 
 	  // Device
@@ -110,7 +118,7 @@ static int populate_from_parport (struct parport_list *list)
 		strcpy (device, "/dev/port");
 	    }
 
-	  // Base
+	  // Base and interrupt
 	  sprintf (hardware, "/proc/parport/%s/hardware", de->d_name);
 	  fd = open (hardware, O_RDONLY | O_NOCTTY);
 	  if (fd >= 0)
@@ -121,6 +129,7 @@ static int populate_from_parport (struct parport_list *list)
 	      if (got > 0)
 		{
 		  char *p;
+
 		  contents[got - 1] = '\0';
 		  p = strstr (contents, "base:");
 		  if (p)
@@ -128,10 +137,17 @@ static int populate_from_parport (struct parport_list *list)
 		      p += strspn (p, " \t");
 		      base = strtoul (p, NULL, 0);
 		    }
+
+		  p = strstr (contents, "irq:");
+		  if (p)
+		    {
+		      p += strspn (p, " \t");
+		      interrupt = strtol (p, NULL, 0);
+		    }
 		}
 	    }
 
-	  add_port (list, de->d_name, device, base);
+	  add_port (list, de->d_name, device, base, interrupt);
 	}
 
       de = readdir (parport);
@@ -157,8 +173,9 @@ static int populate_from_sys_dev_parport (struct parport_list *list)
 	{
 	  char device[50];
 	  unsigned long base = 0;
+	  int interrupt = -1;
 	  size_t len = strlen (de->d_name) - 1;
-	  char baseaddr[50];
+	  char filename[50];
 	  int fd;
 	  char *p;
 
@@ -179,8 +196,8 @@ static int populate_from_sys_dev_parport (struct parport_list *list)
 	    }
 
 	  // Base
-	  sprintf (baseaddr, "/proc/sys/dev/parport/%s/base-addr", de->d_name);
-	  fd = open (baseaddr, O_RDONLY | O_NOCTTY);
+	  sprintf (filename, "/proc/sys/dev/parport/%s/base-addr", de->d_name);
+	  fd = open (filename, O_RDONLY | O_NOCTTY);
 	  if (fd >= 0)
 	    {
 	      char contents[20];
@@ -190,7 +207,19 @@ static int populate_from_sys_dev_parport (struct parport_list *list)
 		base = strtoul (contents, NULL, 0);
 	    }
       
-	  add_port (list, de->d_name, device, base);
+	  // Interrupt
+	  sprintf (filename, "/proc/sys/dev/parport/%s/irq", de->d_name);
+	  fd = open (filename, O_RDONLY | O_NOCTTY);
+	  if (fd >= 0)
+	    {
+	      char contents[20];
+	      ssize_t got = read (fd, contents, sizeof contents - 1);
+	      close (fd);
+	      if (got > 0)
+		interrupt = strtol (contents, NULL, 0);
+	    }
+      
+	  add_port (list, de->d_name, device, base, interrupt);
 	}
 
       de = readdir (parport);
@@ -202,9 +231,9 @@ static int populate_from_sys_dev_parport (struct parport_list *list)
 
 static int populate_by_guessing (struct parport_list *list)
 {
-  add_port (list, "0x378", "/dev/port", 0x378);
-  add_port (list, "0x278", "/dev/port", 0x278);
-  add_port (list, "0x3bc", "/dev/port", 0x3bc);
+  add_port (list, "0x378", "/dev/port", 0x378, -1);
+  add_port (list, "0x278", "/dev/port", 0x278 ,-1);
+  add_port (list, "0x3bc", "/dev/port", 0x3bc, -1);
   return 0;
 }
 
@@ -240,6 +269,8 @@ void ieee1284_free_ports (struct parport_list *list)
     {
       struct parport *p = list->portv[i];
       struct parport_internal *priv = p->priv;
+      if (priv->fn)
+	priv->fn->cleanup (priv);
       if (p->name)
 	free ((char *) (p->name));
       if (priv->device)

@@ -38,6 +38,7 @@
 #define ETRYNEXT	100
 #define ENODEVID	101
 
+#if 0
 static void reset (unsigned long base)
 {
   unsigned long ctr = base + 2;
@@ -165,52 +166,34 @@ static ssize_t get_using_io (struct parport *port, int daisy,
   terminate (priv->base);
   return len;
 }
+#endif
 
-static ssize_t get_using_ppdev (struct parport *port, int daisy,
-				char *buffer, size_t len)
+static ssize_t get_fresh (struct parport *port, int daisy,
+			  char *buffer, size_t len)
 {
-  struct parport_internal *priv = port->priv;
-  int compat = IEEE1284_MODE_COMPAT;
-  int mode = IEEE1284_MODE_NIBBLE;
-  int fd = priv->fd;
   ssize_t got;
   size_t idlen;
 
   if (daisy > -1)
-    // No implementation yet.
+    // No implementation yet for IEEE 1284.3 devices.
     return -ETRYNEXT;
 
-  if (fd < 0)
-    return -ETRYNEXT;
+  ieee1284_terminate (port);
+  if (ieee1284_negotiate (port,
+			  M1284_NIBBLE | M1284_FLAG_DEVICEID) != E1284_OK)
+    return -ENODEVID;
 
-  if (ioctl (fd, PPNEGOT, &compat))
-    {
-      close (fd);
-      return -ENODEVID;
-    }
-
-  mode |= IEEE1284_DEVICEID;
-  if (ioctl (fd, PPNEGOT, &mode))
-    {
-      close (fd);
-      return -ENODEVID;
-    }
-
-  got = read (fd, buffer, 2);
+  got = ieee1284_nibble_read (port, buffer, 2);
   if (got < 2)
-    {
-      close (fd);
-      return -ENODEVID;
-    }
+    return -ENODEVID;
 
   idlen = buffer[0] * 256 + buffer[1];
   if (idlen >= len - 2)
     idlen--;
-  got += read (fd, buffer + 2, idlen);
+  got += ieee1284_nibble_read (port, buffer + 2, idlen);
   buffer[got] = '\0';
 
-  ioctl (fd, PPNEGOT, &compat);
-
+  ieee1284_terminate (port);
   return got;
 }
 
@@ -310,7 +293,6 @@ static ssize_t get_from_sys_dev_parport (struct parport *port, int daisy,
 ssize_t ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
 			       char *buffer, size_t len)
 {
-  struct parport_internal *priv = port->priv;
   int ret = -1;
 
   detect_environment (0);
@@ -332,6 +314,7 @@ ssize_t ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
   if (ieee1284_claim (port))
     return -1;
 
+#if 0
   switch (priv->type)
     {
     case PPDEV_CAPABLE:
@@ -366,6 +349,9 @@ ssize_t ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
 	}
       break;
     }
+#else
+  ret = get_fresh (port, daisy, buffer, len);
+#endif
 
   ieee1284_release (port);
   return ret;

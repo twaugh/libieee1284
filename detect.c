@@ -29,62 +29,6 @@
 
 int capabilities;
 
-static unsigned char raw_inb (unsigned long port)
-{
-  return inb (port);
-}
-
-static void raw_outb (unsigned char val, unsigned long port)
-{
-  outb_p (val, port);
-}
-
-static int dev_port_fd = -1;
-static unsigned char port_inb (unsigned long port)
-{
-  unsigned char byte = 0xff;
-  if (dev_port_fd == -1)
-    {
-      dev_port_fd = open ("/dev/port", O_RDWR | O_NOCTTY);
-      if (dev_port_fd < 0)
-	return byte;
-    }
-
-  if (lseek (dev_port_fd, port, SEEK_SET) != (off_t)-1)
-    read (dev_port_fd, &byte, 1);
-
-  return byte;
-}
-
-static void port_outb (unsigned char val, unsigned long port)
-{
-  if (dev_port_fd == -1)
-    {
-      dev_port_fd = open ("/dev/port", O_RDWR | O_NOCTTY);
-      if (dev_port_fd < 0)
-	return;
-    }
-
-  if (lseek (dev_port_fd, port, SEEK_SET) != (off_t)-1)
-    write (dev_port_fd, &val, 1);
-}
-
-struct raw_routines_struct raw_routines = { raw_inb, raw_outb };
-
-void use_dev_port (int on)
-{
-  if (on)
-    {
-      raw_routines.inb = port_inb;
-      raw_routines.outb = port_outb;
-    }
-  else
-    {
-      raw_routines.inb = raw_inb;
-      raw_routines.outb = raw_outb;
-    }
-}
-
 // Look for parport entries in /proc.
 // Linux 2.2.x has /proc/parport/.
 // Linux 2.4.x has /proc/sys/dev/parport/.

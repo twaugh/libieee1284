@@ -19,6 +19,19 @@
 
 #include <sys/types.h> // for size_t
 
+// Errors.  When a function returns a negative number, it's one of
+// these errors.
+enum E1284 {
+  E1284_OK                 = 0,  // Everything went fine
+  E1284_NOTIMPL            = -1, // Not implemented in libieee1284
+  E1284_NOTAVAIL           = -2, // Not available on this system
+  E1284_TIMEDOUT           = -3, // Operation timed out
+  E1284_REJECTED           = -4, // IEEE 1284 negotiation rejected
+  E1284_NEGFAILED          = -5, // Negotiation went wrong
+  E1284_NOMEM              = -6, // No memory left
+  E1284_INIT               = -7, // Error initialising port
+};
+
 // A parallel port.
 struct parport {
   // An arbitrary name for the port
@@ -30,7 +43,7 @@ struct parport {
   int modes;
 
   // -1, or else a file descriptor that can be used by select() for
-  // waiting for nFault.
+  // waiting for nAck.
   int selectable_fd;
 
   // The base address of the port, if that has any meaning, or zero.
@@ -71,7 +84,10 @@ extern void ieee1284_free_ports (struct parport_list *list);
 // communications.
 //
 
-#define F1284_FRESH	(1<<0) // Guarantee a fresh Device ID
+enum ieee1284_devid_flags
+{
+  F1284_FRESH = (1<<0), // Guarantee a fresh Device ID
+};
 
 extern ssize_t ieee1284_get_deviceid (struct parport *port, int daisy,
 				      int flags, char *buffer, size_t len);
@@ -96,13 +112,16 @@ extern void ieee1284_write_data (struct parport *port, unsigned char st);
 extern void ieee1284_data_dir (struct parport *port, int reverse);
 
 // The status pin functions operate in terms of these bits:
-static const int STATUS_NFAULT          =0x08;
-static const int STATUS_SELECT          =0x10;
-static const int STATUS_PERROR          =0x20;
-static const int STATUS_NACK            =0x40;
-static const int STATUS_BUSY            =0x80;
+enum ieee1284_status_bits
+{
+  S1284_NFAULT = 0x08,
+  S1284_SELECT = 0x10,
+  S1284_PERROR = 0x20,
+  S1284_NACK   = 0x40,
+  S1284_BUSY   = 0x80,
 // To convert those values into PC-style register values, use this:
-#define STATUS_INVERTED (STATUS_BUSY)
+  S1284_INVERTED = S1284_BUSY,
+};
 
 extern int ieee1284_read_status (struct parport *port);
 
@@ -115,14 +134,17 @@ extern int ieee1284_wait_status (struct parport *port,
 				 struct timeval *timeout);
 
 // The control pin functions operate in terms of these bits:
-static const int CONTROL_NSTROBE        =0x01;
-static const int CONTROL_NAUTOFD        =0x02;
-static const int CONTROL_NINIT          =0x04;
-static const int CONTROL_NSELECTIN      =0x08;
+enum ieee1284_control_bits
+{
+  C1284_NSTROBE   = 0x01,
+  C1284_NAUTOFD   = 0x02,
+  C1284_NINIT     = 0x04,
+  C1284_NSELECTIN = 0x08,
 // To convert those values into PC-style register values, use this:
-#define CONTROL_INVERTED (CONTROL_NSTROBE|	\
-                          CONTROL_NAUTOFD|	\
-                          CONTROL_NSELECTIN)
+  C1284_INVERTED = (C1284_NSTROBE|
+		    C1284_NAUTOFD|
+		    C1284_NSELECTIN),
+};
 
 extern int ieee1284_read_control (struct parport *port);
 // ieee1284_read_control may be unreliable
@@ -133,25 +155,41 @@ extern void ieee1284_write_control (struct parport *port, unsigned char ct);
 
 extern void ieee1284_frob_control (struct parport *port, unsigned char mask,
 				   unsigned char val);
-// frob is "out ((in & ~mask) | val)"
+// frob is "out ((in & ~mask) ^ val)"
 
 // This function may or may not be available, depending on PPWCTLONIRQ
 // availability.  Its operation is:
 // If operation unavailable, return -1.  Otherwise:
 // Set control pins to ct_before.
-// Wait for nFault interrupt.  If timeout elapses, return 1.
+// Wait for nAck interrupt.  If timeout elapses, return 1.
 // Otherwise, set control pins to ct_after and return 0.
 // timeout may be modified.
-extern int ieee1284_do_nfault_handshake (struct parport *port,
-                                         unsigned char ct_before,
-                                         unsigned char ct_after,
-                                         struct timeval *timeout);
+extern int ieee1284_do_nack_handshake (struct parport *port,
+				       unsigned char ct_before,
+				       unsigned char ct_after,
+				       struct timeval *timeout);
 
 //
 // IEEE 1284 operations
 //
 
 // Negotiation/termination
+enum ieee1284_modes
+{
+  M1284_NIBBLE =  0,
+  M1284_BYTE   = (1<<0),
+  M1284_COMPAT = (1<<8),
+  M1284_BECP   = (1<<9),
+  M1284_ECP    = (1<<4),
+  M1284_ECPRLE = ((1<<4) | (1<<5)),
+  M1284_ECPSWE = (1<<10), /* Software emulated */
+  M1284_EPP    = (1<<6),
+  M1284_EPPSL  = (1<<11), /* EPP 1.7 */
+  M1284_EPPSWE = (1<<12), /* Software emulated */
+  M1284_FLAG_DEVICEID = (1<<2),
+  M1284_FLAG_EXT_LINK = (1<<14), /* Uses bits in 0x7f */
+};
+
 extern int ieee1284_negotiate (struct parport *port, int mode);
 extern void ieee1284_terminate (struct parport *port);
 
@@ -178,5 +216,5 @@ extern ssize_t ieee1284_ecp_read_data (struct parport *port, char *buffer,
 				       size_t len);
 extern ssize_t ieee1284_ecp_write_data (struct parport *port,
 					const char *buffer, size_t len);
-extern ssize_t ieee1284_ecp_read_data (struct parport *port, char *buffer,
-				       size_t len);
+extern ssize_t ieee1284_ecp_write_addr (struct parport *port,
+					const char *buffer, size_t len);

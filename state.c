@@ -24,7 +24,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "access.h"
 #include "config.h"
+#include "delay.h"
 #include "detect.h"
 #include "ieee1284.h"
 
@@ -36,25 +38,29 @@ static int init_port (struct parport *port)
   struct parport_internal *priv = port->priv;
   if ((capabilities & PPDEV_CAPABLE) && priv->device)
     {
-      priv->fd = open (priv->device, O_RDWR | O_NOCTTY);
-      if (priv->fd > -1) {
-	priv->type = PPDEV_CAPABLE;
+      priv->type = PPDEV_CAPABLE;
+      priv->fn = &ppdev_access_methods;
+      if (!priv->fn->init (priv))
 	return 0;
-      }
     }
 
   if (capabilities & IO_CAPABLE)
     {
-      if (!ioperm (priv->base, 3, 1) && !ioperm (0x80, 1, 1))
-	{
-	  priv->type = IO_CAPABLE;
-	  return 0;
-	}
+      priv->type = IO_CAPABLE;
+      priv->fn = &io_access_methods;
+      if (!priv->fn->init (priv))
+	return 0;
     }
 
   if (capabilities & DEV_PORT_CAPABLE)
-    priv->type = DEV_PORT_CAPABLE;
-  else return -1;
+    {
+      priv->type = DEV_PORT_CAPABLE;
+      priv->fn = &io_access_methods;
+      if (!priv->fn->init (priv))
+	return 0;
+    }
+
+  return -1;
 }
 
 int ieee1284_claim (struct parport *port)
@@ -68,14 +74,16 @@ int ieee1284_claim (struct parport *port)
     {
     case 0: // no way to talk to port.  Shouldn't get here.
       return -1;
-    case IO_CAPABLE:
-    case DEV_PORT_CAPABLE:
+
+    case PPDEV_CAPABLE:
+      if (!ioctl (priv->fd, PPCLAIM))
+	priv->claimed = 1;
+      break;
+
+    default:
       priv->claimed = 1;
-      return 0;
     }
 
-  if (!ioctl (priv->fd, PPCLAIM))
-    priv->claimed = 1;
   return !priv->claimed;
 }
 
