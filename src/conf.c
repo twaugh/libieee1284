@@ -32,6 +32,7 @@ struct config_variables conf;
 static const char *const ieee1284conf = "ieee1284.conf";
 static const size_t max_line_len = 1000;
 static const char *ifs = " \t\n";
+static const char *tokenchar = "{}=";
 
 /* Get the next token.  Caller frees returned zero-terminated string. */
 static char *get_token (FILE *f)
@@ -125,6 +126,14 @@ static char *get_token (FILE *f)
 
 	  if (!quotes && strchr (ifs, ch))
 	    break;
+
+	  if (!quotes && strchr (tokenchar, ch))
+	    {
+	      if (end == at)
+		end++;
+
+	      break;
+	    }
 	}
 
       if (at == end)
@@ -255,6 +264,7 @@ void
 read_config_file (void)
 {
   static int config_read = 0;
+  size_t rclen;
   char *path;
 
   if (config_read)
@@ -262,12 +272,13 @@ read_config_file (void)
 
   conf.disallow_ppdev = 0;
 
+  rclen = strlen (ieee1284conf);
   path = malloc (1 + 5 + rclen);
   if (!path)
     return;
 
   memcpy (path, "/etc/", 5);
-  memcpy (path + 5, ieee1284conf, strlen (ieee1284conf) + 1);
+  memcpy (path + 5, ieee1284conf, rclen + 1);
   if (try_read_config_file (path))
     config_read = 1;
 

@@ -1,6 +1,7 @@
 2002-08-30  Tim Waugh  <twaugh@redhat.com>
 
-	* src/conf.c: Don't look in $HOME for config file.
+	* src/conf.c: Don't look in $HOME for config file.  Tokenise on
+	braces and equals signs.
 	* doc/interface.xml: Updated.
 
 2002-08-29  Tim Waugh  <twaugh@redhat.com>
