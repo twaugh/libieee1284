@@ -1,5 +1,8 @@
 2002-09-09  Tim Waugh  <twaugh@redhat.com>
 
+	* src/access_ppdev.c, src/conf.c, src/debug.c: Just formatting
+	changes.
+
 	* src/blockio.c: Removed.
 
 2002-09-07  Matthew Duggan  <stauff1@users.sourceforge.net>

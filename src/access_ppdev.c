@@ -421,7 +421,8 @@ set_mode (struct parport_internal *port, int mode, int flags, int addr)
   return ret;
 }
 
-static int do_nonblock (struct parport_internal *port, int flags)
+static int
+do_nonblock (struct parport_internal *port, int flags)
 {
   struct ppdev_priv *priv = port->access_priv;
   if ((flags & F1284_NONBLOCK) && !priv->nonblock)

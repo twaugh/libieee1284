@@ -39,7 +39,8 @@ static int debugging_enabled = -1;
 
 static unsigned char soft_ctr = 0xff;
 
-static const char *timeofday (void)
+static const char *
+timeofday (void)
 {
   static char str[100];
   struct timeval tod;
@@ -56,7 +57,8 @@ static const char *timeofday (void)
   return str;
 }
 
-unsigned char debug_display_status (unsigned char st)
+unsigned char
+debug_display_status (unsigned char st)
 {
   static unsigned char last_status = 0xff;
 
@@ -79,7 +81,8 @@ unsigned char debug_display_status (unsigned char st)
   return st;
 }
 
-unsigned char debug_display_control (unsigned char ct)
+unsigned char
+debug_display_control (unsigned char ct)
 {
   if (!debugging_enabled)
     goto out;
@@ -99,7 +102,8 @@ unsigned char debug_display_control (unsigned char ct)
   return ct;
 }
 
-void debug_frob_control (unsigned char mask, unsigned char val)
+void
+debug_frob_control (unsigned char mask, unsigned char val)
 {
   if (debugging_enabled)
     {
@@ -108,7 +112,8 @@ void debug_frob_control (unsigned char mask, unsigned char val)
     }
 }
 
-void dprintf (const char *fmt, ...)
+void
+dprintf (const char *fmt, ...)
 {
   if (!debugging_enabled)
     return;

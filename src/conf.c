@@ -35,7 +35,8 @@ static const char *ifs = " \t\n";
 static const char *tokenchar = "{}=";
 
 /* Get the next token.  Caller frees returned zero-terminated string. */
-static char *get_token (FILE *f)
+static char *
+get_token (FILE *f)
 {
   static char *current_line = NULL;
   static size_t current_line_len = 0;
@@ -198,7 +199,8 @@ static char *get_token (FILE *f)
   return this_token;
 }
 
-static char *disallow (FILE *f)
+static char *
+disallow (FILE *f)
 {
   char *token = NULL;
   int i;
@@ -224,7 +226,8 @@ static char *disallow (FILE *f)
   return get_token (f);
 }
 
-static int try_read_config_file (const char *path)
+static int
+try_read_config_file (const char *path)
 {
   FILE *f = fopen (path, "r");
   char *token;
