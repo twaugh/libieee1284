@@ -75,6 +75,12 @@ default_negotiate (struct parport_internal *port, int mode)
 
   dprintf ("==> default_negotiate (to %#02x)\n", mode);
 
+  if (mode == port->current_mode)
+    {
+      dprintf ("<== E1284_OK (nothing to do!)\n");
+      return E1284_OK;
+    }
+
   switch (mode)
     {
     case M1284_ECPSWE:

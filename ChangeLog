@@ -1,5 +1,8 @@
 2002-08-07  Tim Waugh  <twaugh@redhat.com>
 
+	* src/default.c (default_negotiate): Don't attempt a negotiation
+	to a mode we are already in.
+
 	* src/access_ppdev.c (negotiate): Add some calls to dprintf.
 
 	* src/access_ppdev.c (negotiate): Return E1284_NEGFAILED and
