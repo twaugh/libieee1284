@@ -928,6 +928,12 @@
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
+
+	<para>Whereas <function>ieee1284_read_data</function> may
+         return &e1284notavail; on its first invocation on the port,
+         if it does not do so then it cannot until
+         <function>ieee1284_close</function> is called for that
+         port.</para>
       </refsect1>
     </refentry>
 
