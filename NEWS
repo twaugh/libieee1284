@@ -1,5 +1,21 @@
-2001-06-03
+libieee1284 news
+----------------
 
-Alpha release (0.0.0).  It seems to work on Linux 2.4.  Need feedback
-on the interface to make sure it isn't stupid.
+0.1.2 (devel)
 
+	This release includes a better interface, and more support for
+	status and control pin traces.
+
+0.1.1 (devel)
+
+	A fix for a major bug in one of the pin-level functions.
+
+0.1.0 (devel)
+
+	Enough features have been implemented that the library should
+	be slightly useful now.
+
+0.0.0 (alpha)
+
+	It seems to work on Linux 2.4.  Need feedback
+	on the interface to make sure it isn't stupid.
