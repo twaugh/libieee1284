@@ -24,7 +24,6 @@ man3_MANS = doc/ieee1284_claim.3 doc/ieee1284_close.3 doc/ieee1284_control.3 \
 
 $(man3_MANS): $(top_srcdir)/doc/interface.sgml
 	docbook2man -o doc $<
-	docbook2man -o doc $<
 
 noinst_PROGRAMS = test
 test_SOURCES = tests/test.c
