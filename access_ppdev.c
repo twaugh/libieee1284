@@ -59,7 +59,6 @@ init (struct parport_internal *port, int flags, int *capabilities)
     /* Our implementation of do_nack_handshake relies on interrupts
      * being available.  They aren't, so use the default one instead. */
     port->fn->do_nack_handshake = default_do_nack_handshake;
-  else *(port->selectable_fd) = port->fd;
 
   return E1284_OK;
 }
@@ -431,6 +430,7 @@ const struct parport_access_methods ppdev_access_methods =
 
   read_data,
   write_data,
+  default_wait_data,
   data_dir,
 
   read_status,

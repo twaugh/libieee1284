@@ -29,6 +29,33 @@
 #include "ieee1284.h"
 
 int
+default_wait_data (struct parport_internal *port, unsigned char mask,
+		   unsigned char val, struct timeval *timeout)
+{
+  /* Simple-minded polling.  TODO: Use David Paschal's method for this. */
+  struct timeval deadline, now;
+  gettimeofday (&deadline, NULL);
+  deadline.tv_sec += timeout->tv_sec;
+  deadline.tv_usec += timeout->tv_usec;
+  deadline.tv_sec += deadline.tv_usec / 1000000;
+  deadline.tv_usec %= 1000000;
+
+  do
+    {
+      if ((port->fn->read_data (port) & mask) == val)
+	return E1284_OK;
+
+      delay (IO_POLL_DELAY);
+      gettimeofday (&now, NULL);
+    }
+  while (now.tv_sec < deadline.tv_sec ||
+	 (now.tv_sec == deadline.tv_sec &&
+	  now.tv_usec < deadline.tv_usec));
+
+  return E1284_TIMEDOUT;
+}
+
+int
 default_do_nack_handshake (struct parport_internal *port,
 			   unsigned char ct_before,
 			   unsigned char ct_after,

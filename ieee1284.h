@@ -121,6 +121,8 @@ extern int ieee1284_get_irq_fd (struct parport *port);
 
 extern int ieee1284_read_data (struct parport *port);
 extern void ieee1284_write_data (struct parport *port, unsigned char dt);
+extern int ieee1284_wait_data (struct parport *port, unsigned char mask,
+			       unsigned char val, struct timeval *timeout);
 extern void ieee1284_data_dir (struct parport *port, int reverse);
 
 /* The status pin functions operate in terms of these bits: */

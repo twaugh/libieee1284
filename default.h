@@ -19,6 +19,9 @@
 
 #include "detect.h"
 
+extern int default_wait_data (struct parport_internal *port,
+			      unsigned char mask, unsigned char val,
+			      struct timeval *timeout);
 extern int default_do_nack_handshake (struct parport_internal *port,
 				      unsigned char ct_before,
 				      unsigned char ct_after,

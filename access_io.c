@@ -235,6 +235,7 @@ const struct parport_access_methods io_access_methods =
 
   read_data,
   write_data,
+  default_wait_data,
   data_dir,
 
   read_status,

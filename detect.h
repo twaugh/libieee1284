@@ -46,6 +46,8 @@ struct parport_access_methods
 
   int (*read_data) (struct parport_internal *port);
   void (*write_data) (struct parport_internal *port, unsigned char st);
+  int (*wait_data) (struct parport_internal *port, unsigned char mask,
+		    unsigned char val, struct timeval *timeout);
   void (*data_dir) (struct parport_internal *port, int reverse);
 
   int (*read_status) (struct parport_internal *port);

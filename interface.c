@@ -22,7 +22,7 @@
 
 /* ieee1284_open is in state.c */
 
-void
+int
 ieee1284_close (struct parport *port)
 {
   struct parport_internal *priv = port->priv;
@@ -30,6 +30,7 @@ ieee1284_close (struct parport *port)
     priv->fn->cleanup (priv);
   priv->opened = 0;
   deref_port (port);
+  return E1284_OK;
 }
 
 int

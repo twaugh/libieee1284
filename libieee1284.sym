@@ -8,6 +8,7 @@ ieee1284_release
 ieee1284_get_irq_fd
 ieee1284_read_data
 ieee1284_write_data
+ieee1284_wait_data
 ieee1284_data_dir
 ieee1284_read_status
 ieee1284_wait_status
