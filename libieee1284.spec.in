@@ -28,7 +28,7 @@ developing applications that use libieee1284.
 %configure
 make CFLAGS="$RPM_OPT_FLAGS"
 # Also make the documentation in PDF format
-xmlto pdf -o doc doc/interface.xml
+make doc/interface.pdf
 
 %install
 rm -rf %{buildroot}
@@ -57,6 +57,9 @@ rm -rf %{buildroot}
 %postun -p /sbin/ldconfig
 
 %changelog
+* Wed Feb 26 2003 Tim Waugh <twaugh@redhat.com>
+- Use the Makefile rule to build the PDF.
+
 * Sat Aug 24 2002 Tim Waugh <twaugh@redhat.com>
 - Ship test program.
 
