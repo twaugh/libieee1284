@@ -1,6 +1,12 @@
 libieee1284 news
 ----------------
 
+0.1.4 (devel)
+
+	Some minor bugs were fixed in the direct access code, and a silly
+	bug preventing C++ applications from linking with the library has
+	been fixed.
+
 0.1.3 (devel)
 
 	Several major bugs were fixed.
