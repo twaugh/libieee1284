@@ -41,7 +41,7 @@ void ieee1284_display_status (struct parport_internal *port)
 
   st = fn->read_status (port);
 
-  dprintf ("STATUS: %cnFault %cnSelectIn %cnFault %cnAck %cBusy\n",
+  dprintf ("STATUS: %cnFault %cSelect %cPError %cnAck %cBusy\n",
 	   st & S1284_NFAULT ? ' ' : '!',
 	   st & S1284_SELECT ? ' ' : '!',
 	   st & S1284_PERROR ? ' ' : '!',
