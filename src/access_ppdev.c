@@ -383,6 +383,8 @@ which_mode (int mode, int flags)
 static ssize_t
 translate_error_code (ssize_t e)
 {
+  if (e == -EAGAIN)
+    return E1284_TIMEDOUT;
   if (e < 0)
     return E1284_SYS;
   return e;
