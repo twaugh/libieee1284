@@ -15,12 +15,12 @@ INCLUDES = -I$(top_srcdir)/include
 
 iop_SOURCES=solaris_io/iop.c
 ioprtest_SOURCES=solaris_io/ioprtest.c
-nobase_drvdata_DATA=solaris_io/iop.conf
 
 if SOLARIS_IO
 iop_CFLAGS=-D_KERNEL # -DDEBUG
 drvexecdir=/platform/i86pc/kernel/drv
 drvdatadir=/platform/i86pc/kernel/drv
+nobase_drvdata_DATA=solaris_io/iop.conf
 nobase_drvexec_PROGRAMS=iop
 noinst_PROGRAMS=ioprtest
 iop_LINK=$(LD) -r -o $@

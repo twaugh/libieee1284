@@ -2,6 +2,11 @@
 
 	* configure.in, Makefile.am: Version 0.2.4 (stable).
 
+2002-10-12  Tim Waugh  <twaugh@redhat.com>
+
+	* Makefile.am: Move iop.conf declaration inside SOLARIS_IO
+	conditional, to prevent installation failures on other platforms.
+
 2002-10-12  Julien BLACHE  <jblache@debian.org>
 
 	* src/access_io.c, src/detect.h: Prevent conflicts with inb/outb
