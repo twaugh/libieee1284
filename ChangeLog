@@ -1,8 +1,12 @@
+2002-11-20  Tim Waugh  <twaugh@redhat.com>
+
+	* include/ieee1284.h: Guard macro.
+
 2002-11-05  Matthew Duggan <stauff1@users.sourceforge.net>
 
        * src/access_ppdev.c (negotiate): Check errno after ioctl fails, 
        not return value.
-       * doc/interface.xml: negotiate can also return E1285_SYS in rare cases.
+       * doc/interface.xml: negotiate can also return E1284_SYS in rare cases.
 
 2002-11-05  Tim Waugh  <twaugh@redhat.com>
 

@@ -17,6 +17,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef HAVE_IEEE1284_H
+#define HAVE_IEEE1284_H
+
 #include <sys/types.h> /* for size_t */
 #include <sys/time.h> /* for struct timeval */
 
@@ -260,3 +263,5 @@ extern struct timeval *ieee1284_set_timeout (struct parport *port,
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+#endif /* HAVE_IEEE1284_H */
