@@ -1,5 +1,8 @@
 2002-01-05  Tim Waugh  <twaugh@redhat.com>
 
+	* access_ppdev.c (set_mode): Translate the error code returned by
+	ioctl.
+
 	* access_ppdev.c (which_mode): New function.
 	(set_mode): Use it.
 	(negotiate): New function.

@@ -357,7 +357,7 @@ set_mode (struct parport_internal *port, int mode, int flags, int addr)
   m |= addr ? IEEE1284_ADDR : IEEE1284_DATA;
   if (port->current_mode != m)
     {
-      ret = ioctl (port->fd, PPSETMODE, &m);
+      ret = translate_error_code (ioctl (port->fd, PPSETMODE, &m));
       if (!ret)
 	port->current_mode = m;
     }
