@@ -4,7 +4,7 @@
 	inverted pins.
 	* access_io.c (raw_frob_control): Likewise.
 
-	* state.c: Debugging.
+	* state.c: Debugging.  Return proper error code from ieee1284_claim.
 	* detect.c: Debugging.
 	* deviceid.c: Debugging.
 	* default.c (default_negotiate): Debugging.
