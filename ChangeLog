@@ -1,3 +1,10 @@
+2002-01-07  Tim Waugh  <twaugh@redhat.com>
+
+	* detect.c (check_dev_node): Claim and release parport device nodes
+	in order to get the low-level port driver loaded.
+	(detect_environment): Try to open an lp device node in order to get
+	the low-level port driver loaded.
+
 2002-01-06  Ken Easton  <s3159795@student.anu.edu.au>
 
 	* configure.in: Don't check for a C++ compiler, since we don't need

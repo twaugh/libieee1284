@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/io.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -27,6 +28,7 @@
 #include "config.h"
 #include "debug.h"
 #include "detect.h"
+#include "ppdev.h"
 
 int capabilities;
 
@@ -68,6 +70,14 @@ check_dev_node (const char *type)
     sprintf (name, "/dev/%s%d", type, i);
     fd = open (name, O_RDONLY | O_NOCTTY);
     if (fd >= 0) {
+      if (!strcmp (type, "parport"))
+	{
+	  /* Make sure that we can actually claim the device.  This will
+	   * force the low-level port driver to get loaded. */
+	  ioctl (fd, PPCLAIM);
+	  ioctl (fd, PPRELEASE);
+	}
+
       close (fd);
       dprintf ("%s is accessible\n", name);
       return 1;
@@ -125,13 +135,8 @@ detect_environment (int forbidden)
     check_dev_port ();
 
   /* Find out what kind of /proc structure we have. */
-  if (!check_proc_type ()) {
-    /* Maybe the low-level port driver wasn't loaded. */
-    if ((!FORBIDDEN (DEV_LP_CAPABLE)) && check_dev_node ("lp"))
-      capabilities |= DEV_LP_CAPABLE;
-
-    check_proc_type ();
-  }
+  check_dev_node ("lp"); /* causes low-level port driver to be loaded */
+  check_proc_type ();
 
   return 0;
 }
