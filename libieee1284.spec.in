@@ -72,6 +72,7 @@ rm -rf %{buildroot}
 
 %files devel
 %defattr(-,root,root)
+%doc doc/interface.pdf
 %{_includedir}/ieee1284.h
 %{_libdir}/*.a
 %{_libdir}/*.so
@@ -79,5 +80,8 @@ rm -rf %{buildroot}
 %{_mandir}/*/*
 
 %changelog
+* Mon Jan  7 2002 Tim Waugh <twaugh@redhat.com>
+- Ship the PDF file with the devel package.
+
 * Thu Nov 15 2001 Tim Waugh <twaugh@redhat.com>
 - Initial specfile.
