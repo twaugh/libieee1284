@@ -29,7 +29,7 @@
 
 struct config_variables conf;
 
-static const char *const ieee1284rc = "ieee1284rc";
+static const char *const ieee1284conf = "ieee1284.conf";
 static const size_t max_line_len = 1000;
 static const char *ifs = " \t\n";
 
@@ -255,8 +255,6 @@ void
 read_config_file (void)
 {
   static int config_read = 0;
-  size_t rclen;
-  const char *home;
   char *path;
 
   if (config_read)
@@ -264,33 +262,12 @@ read_config_file (void)
 
   conf.disallow_ppdev = 0;
 
-  rclen = strlen (ieee1284rc);
-  home = getenv ("HOME");
-  if (home)
-    {
-      size_t homelen = strlen (home);
-      path = malloc (1 + homelen + 2 + rclen);
-      if (!path)
-	  return;
-
-      memcpy (path, home, homelen);
-      memcpy (path + homelen, "/.", 2);
-      memcpy (path + homelen + 2, ieee1284rc, rclen + 1);
-      if (!try_read_config_file (path))
-	/* Success. */
-	config_read = 1;
-
-      free (path);
-      if (config_read)
-	return;
-    }
-
   path = malloc (1 + 5 + rclen);
   if (!path)
     return;
 
   memcpy (path, "/etc/", 5);
-  memcpy (path + 5, ieee1284rc, rclen + 1);
+  memcpy (path + 5, ieee1284conf, strlen (ieee1284conf) + 1);
   if (try_read_config_file (path))
     config_read = 1;
 

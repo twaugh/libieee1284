@@ -142,9 +142,7 @@
 	<title>Configuration</title>
 
 	<para>When <function>ieee1284_find_ports</function> is first
-	  called, the library will look for a configuration file.
-	  First it will look for <filename>~/.ieee1284rc</filename>,
-	  and if that doesn't exist it will try
+	  called, the library will look for a configuration file,
 	  <filename>/etc/ieee1284rc</filename>.</para>
 
 	<para>Comments begin with a '#' character and extend to the
@@ -174,15 +172,7 @@
 	  <varlistentry>
 	    <term><filename>/etc/ieee1284rc</filename></term>
 	    <listitem>
-	      <para>System-wide configuration file.</para>
-	    </listitem>
-	  </varlistentry>
-
-	  <varlistentry>
-	    <term><filename>~/.ieee1284rc</filename></term>
-	    <listitem>
-	      <para>User configuration file.  If present, this is used
-	        instead of the system-wide configuration file.</para>
+	      <para>Configuration file.</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
