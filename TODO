@@ -1,0 +1,21 @@
+Currently implemented:
+
+- ieee1284_find_ports works for Linux parallel ports.
+
+- Most access methods are implemented for Linux ppdev, including
+  F1284_EXCL support.
+
+- Pin-level access methods are implemented for iopl() and /dev/port.
+  F1284_EXCL is not supported yet.
+
+Still to do:
+
+- Default implementation of ECP direction switching functions.
+
+- F1284_EXCL for iopl() and /dev/port.
+
+- Default implementations of the block transfer functions, in terms of
+  the pins.
+
+--
+Tim Waugh <tim@cyberelk.net>
