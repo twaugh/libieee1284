@@ -1,3 +1,7 @@
+2005-01-20  Tim Waugh  <twaugh@redhat.com>
+
+	* configure.in: Version 0.2.9 (stable).
+
 2004-08-10  Matthew Duggan <stauff1@users.sourceforge.net>
 	
 	* src/access_lpt.c: Make error message more useful.
