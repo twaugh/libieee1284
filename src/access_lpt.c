@@ -63,7 +63,11 @@ init (struct parport_internal *port, int flags, int *capabilities)
   }
 
   if (capabilities)
+  {
     *capabilities |= CAP1284_RAW;
+    /* Can't do bidir mode with this port */
+    *capabilities &= ~(CAP1284_ECPSWE | CAP1284_BYTE);
+  }
 
   /* Need to write this.
    * If we find an ECP port, we can adjust some of the access function
@@ -77,13 +81,6 @@ static void
 cleanup (struct parport_internal *port)
 {
   CloseHandle((HANDLE)(port->fd));
-}
-
-static int
-read_data (struct parport_internal *port)
-{
-  printf("This function shouldn't be used in NT - bidir not supported");
-  return 0;
 }
 
 static void
@@ -137,13 +134,6 @@ read_control (struct parport_internal *port)
   return port->ctr & rm;
 }
 
-static int
-data_dir (struct parport_internal *port, int reverse)
-{
-  raw_frob_control (port, 0x20, reverse ? 0x20 : 0x00);
-  return E1284_OK;
-}
-
 static void
 write_control (struct parport_internal *port, unsigned char reg)
 {
@@ -154,7 +144,6 @@ write_control (struct parport_internal *port, unsigned char reg)
   if (reg & 0x20)
     {
       printf ("use ieee1284_data_dir to change data line direction!\n");
-      data_dir (port, 1);
     }
 
   raw_frob_control (port, wm, reg & wm);
@@ -172,7 +161,6 @@ frob_control (struct parport_internal *port,
   if (mask & 0x20)
     {
       printf ("use ieee1284_data_dir to change data line direction!\n");
-      data_dir (port, val & 0x20);
     }
 
   mask &= wm;
@@ -222,10 +210,10 @@ const struct parport_access_methods lpt_access_methods =
   NULL, /* get_irq_fd */
   NULL, /* clear_irq */
 
-  read_data,
+  NULL, /* read_data */
   write_data,
   default_wait_data,
-  data_dir,
+  NULL, /* data_dir */
 
   read_status,
   wait_status,

@@ -120,6 +120,7 @@ ieee1284_release (struct parport *port)
 int
 ieee1284_read_data (struct parport *port)
 {
+  int ret = -E1284_NOTAVAIL;
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
@@ -128,7 +129,10 @@ ieee1284_read_data (struct parport *port)
       return E1284_INVALIDPORT;
     }
 
-  return priv->fn->read_data (priv);
+  if (priv->fn->read_data)
+    ret = priv->fn->read_data (priv);
+
+  return ret;
 }
 
 void
@@ -144,6 +148,7 @@ ieee1284_write_data (struct parport *port, unsigned char st)
 int
 ieee1284_data_dir (struct parport *port, int reverse)
 {
+  int ret = E1284_NOTAVAIL;
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
@@ -152,7 +157,10 @@ ieee1284_data_dir (struct parport *port, int reverse)
       return E1284_INVALIDPORT;
     }
 
-  return priv->fn->data_dir (priv, reverse);
+  if (priv->fn->data_dir)
+    ret = priv->fn->data_dir (priv, reverse);
+
+  return ret;
 }
 
 int
