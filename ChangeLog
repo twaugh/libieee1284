@@ -1,3 +1,7 @@
+2002-10-02  Matthew Duggan  <stauff1@users.sourceforge.net>
+
+	* src/interface.c (ieee1284_wait_data): Implement this.
+
 2002-09-30  Tim Waugh  <twaugh@redhat.com>
 
 	* solaris_io/Makefile.in: Move to..

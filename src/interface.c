@@ -146,6 +146,23 @@ ieee1284_write_data (struct parport *port, unsigned char st)
 }
 
 int
+ieee1284_wait_data (struct parport *port,
+		    unsigned char mask,
+		    unsigned char val,
+		    struct timeval *timeout)
+{
+  struct parport_internal *priv = port->priv;
+
+  if (!priv->claimed)
+    {
+      dprintf (needs_claimed_port, "ieee1284_wait_data");
+      return E1284_INVALIDPORT;
+    }
+
+  return priv->fn->wait_data (priv, mask, val, timeout);
+}
+
+int
 ieee1284_data_dir (struct parport *port, int reverse)
 {
   int ret = E1284_NOTAVAIL;
