@@ -1,3 +1,18 @@
+2004-08-09  Matthew Duggan <stauff1@users.sourceforge.net>
+
+	* TODO: Add some more TODOs
+	* README.MinGW: Notes on the new MinGW port.
+	* README.VC6: Notes on the new VC6 port.
+	* README.winNT: Note that EXCL is implicit in NT.
+
+	Applying patch from Daniel Horchner:
+	* Makefile.vc6 ieee1284.def include/config.h.vc6: Build files for VC6.
+	* configure.in: Add MinGW support
+	* include/ieee1284.h M src/access.h src/access_io.c src/access_lpt.c
+	  src/access_ppdev.c src/debug.c src/default.c src/delay.c
+	  src/detect.c src/detect.h src/deviceid.c src/io.h src/ports.c
+	  src/state.c: Patched for MinGW support and VC6 support.
+
 2004-03-25  Tim Waugh  <twaugh@redhat.com>
 
 	* configure.in: Version 0.2.9pre2 (pre-test).

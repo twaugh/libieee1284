@@ -22,11 +22,21 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#if !(defined __MINGW32__ || defined _MSC_VER)
 #include <sys/ioctl.h>
+#else
+#include <io.h> /* lseek(), read(), write(), open(), close() */
+#include <sys/timeb.h>
+#define O_NOCTTY 0
+#endif
 #include <sys/stat.h>
+#ifndef _MSC_VER
 #include <sys/time.h>
+#endif
 #include <sys/types.h>
+#ifdef __unix__
 #include <unistd.h>
+#endif
 
 #include "access.h"
 #include "debug.h"
@@ -116,13 +126,9 @@ set_bitmap(unsigned long *bitmap, short base, short extent, int new_value)
 static unsigned char
 raw_inb (struct parport_internal *port, unsigned long addr)
 {
-#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386) \
-	|| defined(HAVE_FBSD_I386)
-#ifdef HAVE_SYS_IO_H
-  return inb (addr);
-#else
-  return E1284_SYS; /* might not be the best error code to use */
-#endif /* HAVE_SYS_IO_H */
+#if (defined(HAVE_LINUX) && defined(HAVE_SYS_IO_H)) || defined(HAVE_CYGWIN_9X) \
+	|| defined(HAVE_OBSD_I386) || defined(HAVE_FBSD_I386)
+  return inb ((unsigned short)addr);
 
 #elif defined(HAVE_SOLARIS)
   struct iopbuf tmpbuf;
@@ -130,19 +136,22 @@ raw_inb (struct parport_internal *port, unsigned long addr)
   if(ioctl(port->fd, IOPREAD, &tmpbuf))
     debugprintf("IOP IOCTL failed on read\n");
   return tmpbuf.port_value;
+
+#else
+  return E1284_SYS; /* might not be the best error code to use */
 #endif
 }
 
 static void
 raw_outb (struct parport_internal *port, unsigned char val, unsigned long addr)
 {
-#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386) \
-	|| defined(HAVE_FBSD_I386)
-#if defined(HAVE_SYS_IO_H) && defined(__i386__)
-  outb_p (val, addr);
-#elif defined(HAVE_SYS_IO_H)
+#if (defined(HAVE_LINUX) && defined(HAVE_SYS_IO_H)) || defined(HAVE_CYGWIN_9X) \
+	|| defined(HAVE_OBSD_I386) || defined(HAVE_FBSD_I386)
+#if defined(__i386__) || defined(__x86_64__) || defined(_MSC_VER)
+  outb_p (val, (unsigned short)addr);
+#else
   outb (val, addr);
-#endif /* HAVE_SYS_IO_H */
+#endif
   
 #elif defined(HAVE_SOLARIS)
   struct iopbuf tmpbuf;
@@ -289,8 +298,8 @@ write_data (struct parport_internal *port, unsigned char reg)
 static int
 read_status (struct parport_internal *port)
 {
-  return debug_display_status (port->fn->do_inb (port, port->base + 1) ^
-			       S1284_INVERTED);
+  return debug_display_status ((unsigned char)
+    (port->fn->do_inb (port, port->base + 1) ^ S1284_INVERTED));
 }
 
 static void
@@ -314,13 +323,13 @@ read_control (struct parport_internal *port)
 			    C1284_NAUTOFD |
 			    C1284_NINIT |
 			    C1284_NSELECTIN);
-  return port->ctr & rm;
+  return (port->ctr ^ C1284_INVERTED) & rm;
 }
 
 static int
 data_dir (struct parport_internal *port, int reverse)
 {
-  raw_frob_control (port, 0x20, reverse ? 0x20 : 0x00);
+  raw_frob_control (port, 0x20, (unsigned char)(reverse ? 0x20 : 0x00));
   return E1284_OK;
 }
 
@@ -337,7 +346,7 @@ write_control (struct parport_internal *port, unsigned char reg)
       data_dir (port, 1);
     }
 
-  raw_frob_control (port, wm, reg & wm);
+  raw_frob_control (port, wm, (unsigned char)(reg & wm));
 }
 
 static void
@@ -366,24 +375,39 @@ wait_status (struct parport_internal *port,
 	     struct timeval *timeout)
 {
   /* Simple-minded polling.  TODO: Use David Paschal's method for this. */
+#if !(defined __MINGW32__ || defined _MSC_VER)
   struct timeval deadline, now;
   gettimeofday (&deadline, NULL);
   deadline.tv_sec += timeout->tv_sec;
   deadline.tv_usec += timeout->tv_usec;
   deadline.tv_sec += deadline.tv_usec / 1000000;
   deadline.tv_usec %= 1000000;
+#else
+  struct timeb tb;
+  int deadline, now;
+  ftime (&tb);
+  deadline = tb.time * 1000 + tb.millitm +
+             timeout->tv_sec * 1000 + timeout->tv_usec / 1000;
+#endif
 
   do
     {
-      if ((debug_display_status (read_status (port)) & mask) == val)
-	return E1284_OK;
+      if ((debug_display_status ((unsigned char)(read_status (port))) & mask) == val)
+        return E1284_OK;
 
       delay (IO_POLL_DELAY);
+#if !(defined __MINGW32__ || defined _MSC_VER)
       gettimeofday (&now, NULL);
     }
   while (now.tv_sec < deadline.tv_sec ||
-	 (now.tv_sec == deadline.tv_sec &&
+        (now.tv_sec == deadline.tv_sec &&
 	  now.tv_usec < deadline.tv_usec));
+#else
+      ftime (&tb);
+      now = tb.time * 1000 + tb.millitm;
+    }
+  while (now < deadline);
+#endif
 
   return E1284_TIMEDOUT;
 }

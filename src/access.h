@@ -18,8 +18,15 @@
  */
 
 #include <stdlib.h>
+#ifndef _MSC_VER
 #include <sys/time.h>
+#else
+#include <winsock2.h>
+#endif
 #include <sys/types.h>
+#if defined __MINGW32__ || defined _MSC_VER
+#include <sys/timeb.h>
+#endif
 
 #include "delay.h"
 
@@ -27,12 +34,31 @@ extern const struct parport_access_methods io_access_methods;
 extern const struct parport_access_methods ppdev_access_methods;
 extern const struct parport_access_methods lpt_access_methods;
 
+#ifdef _MSC_VER
+/* Visual C++ doesn't allow inline in C source code */
+#define inline __inline
+#endif
+
 static inline void
 delay (int which)
 {
   struct timeval tv;
   lookup_delay (which, &tv);
+#if !(defined __MINGW32__ || defined _MSC_VER)
   select (0, NULL, NULL, NULL, &tv);
+#else
+	{
+		struct timeb tb;
+		long int t0, t1;
+	
+		ftime(&tb);
+		t0 = tb.time * 1000 + tb.millitm;
+		do {
+			ftime(&tb);
+			t1 = tb.time * 1000 + tb.millitm;
+		} while (t1 - t0 < (tv.tv_sec * 1000 + tv.tv_usec / 1000));
+	}
+#endif
 }
 
 /*

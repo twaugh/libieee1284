@@ -22,10 +22,18 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#if !(defined __MINGW32__ || defined _MSC_VER)
 #include <sys/ioctl.h>
+#else
+#include <io.h> /* open(), close() */
+#define O_NOCTTY 0
+#define S_ISDIR(mode) ((mode) & _S_IFDIR ? 1 : 0)
+#endif
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifdef __unix__
 #include <unistd.h>
+#endif
 
 #include "debug.h"
 #include "detect.h"
@@ -42,7 +50,11 @@
 #include <sys/ddi.h>
 #include <sys/sunddi.h>
 #elif defined(HAVE_CYGWIN_NT)
+#ifdef __CYGWIN__
 #include <w32api/windows.h>
+#else
+#include <windows.h>
+#endif
 #endif
 
 
@@ -197,6 +209,7 @@ int
 detect_environment (int forbidden)
 {
 #define FORBIDDEN(bit) (forbidden & bit)
+  int dev_node_parport = 0;
   static int detected = 0;
   if (detected && !forbidden) return 0;
   detected = 1;
@@ -204,7 +217,9 @@ detect_environment (int forbidden)
   capabilities = 0;
 
   /* Find out what access mechanisms there are. */
-  if ((!FORBIDDEN(PPDEV_CAPABLE)) && check_dev_node ("parport"))
+  if (!FORBIDDEN(PPDEV_CAPABLE))
+    dev_node_parport = check_dev_node ("parport");
+  if (dev_node_parport)
     capabilities |= PPDEV_CAPABLE;
   if (!FORBIDDEN (IO_CAPABLE))
     check_io ();
@@ -214,7 +229,8 @@ detect_environment (int forbidden)
     check_lpt ();
 
   /* Find out what kind of /proc structure we have. */
-  check_dev_node ("lp"); /* causes low-level port driver to be loaded */
+  if (!dev_node_parport) /* Don't load lp if we'll use ppdev (claim will fail if F1284_EXCL). */
+    check_dev_node ("lp"); /* causes low-level port driver to be loaded */
   check_proc_type ();
 
   return 0;

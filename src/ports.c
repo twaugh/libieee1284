@@ -18,14 +18,16 @@
  */
 
 #include <ctype.h>
-#include <dirent.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#if defined __unix__ || defined __MINGW32__
+#include <dirent.h>
 #include <unistd.h>
+#endif
 
 #include "config.h"
 #include "conf.h"
@@ -34,7 +36,17 @@
 #include "detect.h"
 
 #ifdef HAVE_CYGWIN_NT
+#ifdef __CYGWIN__
 #include <w32api/windows.h>
+#else /* Not cygwin really */
+/* Don't include windows.h if it isn't necessary. That's why this is here and
+*  not in the #if defined __MINGW32__ || defined _MSC_VER below. - dbjh */
+#include <windows.h>
+#endif /* __CYGWIN__ */
+#endif /* HAVE_CYGWIN_NT */
+
+#if defined __MINGW32__ || defined _MSC_VER
+#define O_NOCTTY 0
 #endif
 
 #define MAX_PORTS 20
@@ -67,6 +79,7 @@ add_port (struct parport_list *list, int flags,
   p = malloc (sizeof *p);
   if (!p)
     return E1284_NOMEM;
+  memset (p, 0, sizeof *p);
 
   p->name = strdup (name);
   if (!p->name)
@@ -86,6 +99,7 @@ add_port (struct parport_list *list, int flags,
       free (p);
       return E1284_NOMEM;
     }
+  memset (priv, 0, sizeof *priv);
 
   priv->fn = malloc (sizeof *priv->fn);
   if (!priv->fn)
@@ -95,6 +109,7 @@ add_port (struct parport_list *list, int flags,
       free (priv);
       return E1284_NOMEM;
     }
+  memset (priv->fn, 0, sizeof *priv->fn);
 
   p->priv = priv;
   priv->device = strdup (device);
@@ -126,6 +141,9 @@ add_port (struct parport_list *list, int flags,
 static int
 populate_from_parport (struct parport_list *list, int flags)
 {
+#ifdef _MSC_VER
+  return E1284_SYS;
+#else
   struct dirent *de;
   DIR *parport = opendir ("/proc/parport");
   if (!parport)
@@ -189,11 +207,15 @@ populate_from_parport (struct parport_list *list, int flags)
 
   closedir (parport);
   return 0;
+#endif
 }
 
 static int
 populate_from_sys_dev_parport (struct parport_list *list, int flags)
 {
+#ifdef _MSC_VER
+  return E1284_SYS;
+#else
   struct dirent *de;
   DIR *parport = opendir ("/proc/sys/dev/parport");
   if (!parport)
@@ -267,6 +289,7 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
 
   closedir (parport);
   return 0;
+#endif
 }
 
 static int
@@ -374,7 +397,7 @@ deref_port (struct parport *p)
       if (priv->device)
 	free (priv->device);
       if (p->filename)
-	free (p->filename);
+	free ((char *) (p->filename));
       free (priv);
       free (p);
     }

@@ -1,0 +1,15 @@
+Notes on libieee1284 on MinGW
+-----------------------------
+
+The default access method in MinGW is to use the NTVDM access.  Please read
+README.winNT before you use this system, such that you know exactly how bad it
+is.  If you want 9x style port access in MinGW, you will need to uncomment the
+line in configure.in to enable it.  It is never enabled by default.  
+
+The MinGW port is the work of Daniel Horchner, and much appreciated.  He was
+also good enough to find a few bugs in my code while he was at it.
+
+Enjoy,
+
+- Matthew Duggan
+stauff1@users.sourceforge.net

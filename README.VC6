@@ -1,0 +1,14 @@
+Notes on libieee1284 on Visual C++
+----------------------------------
+
+The Makefile.vc6, ieee1284.def and include/config.h.vc6 should allow you to
+compile in Visual C++ 6.  These are included for compatibility, and are not
+intended to be the definitive source.  Compatibility might be broken some time
+in the future, but I hope not.
+
+The VC6 port is the work of Daniel Horchner (apologies for dropping his umlaut).
+
+Enjoy,
+
+- Matthew Duggan
+stauff1@users.sourceforge.net

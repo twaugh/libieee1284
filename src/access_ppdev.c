@@ -21,9 +21,13 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#if !(defined __MINGW32__ || defined _MSC_VER)
 #include <sys/ioctl.h>
+#endif
 #include <sys/stat.h>
+#ifdef __unix__
 #include <unistd.h>
+#endif
 
 #include "access.h"
 #include "config.h"

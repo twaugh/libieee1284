@@ -17,13 +17,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef _MSC_VER
 #include <sys/time.h>
+#endif
+#ifdef __unix__
 #include <unistd.h>
+#endif
+#if defined __MINGW32__ || defined _MSC_VER
+#include <sys/timeb.h>
+#endif
 
 #include "delay.h"
 
 void udelay(unsigned long usec)
 {
+#if !(defined __MINGW32__ || defined _MSC_VER)
 	struct timeval now, deadline;
 	
 	gettimeofday(&deadline, NULL);
@@ -36,5 +44,20 @@ void udelay(unsigned long usec)
 	} while ((now.tv_sec < deadline.tv_sec) || 
 		(now.tv_sec == deadline.tv_sec &&
 		now.tv_usec < deadline.tv_usec));
+#else
+	/* MinGW has no gettimeofday(). ftime() seems to be the best alternative as I
+	 * don't know of any standard Windows function with microsecond accuracy. I
+	 * should have a look at the Cygwin source code... - dbjh */
+	struct timeb tb;
+	long int now, deadline;
+	
+	ftime(&tb);
+	deadline = tb.time * 1000 + tb.millitm + usec / 1000;
+
+	do {
+		ftime(&tb);
+		now = tb.time * 1000 + tb.millitm;
+	} while (now < deadline);
+#endif
 }
 

@@ -33,6 +33,9 @@ machines.  If you are keen to write a driver and installation routine for NT
 which does essentially what PortTalk does and doesn't require the DDK for 
 compilation, please do!
 
+Also note that F1284_EXCL is implicit in every use of the port in NT, as this
+driver only provides one process with access at a time.
+
 Enjoy,
 
 - Matthew Duggan

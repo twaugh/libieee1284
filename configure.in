@@ -50,6 +50,10 @@ case "{$host}" in
         ;;
         esac
 ;;
+*-*-mingw*)
+dnl        AC_DEFINE(HAVE_CYGWIN_9X,1,enable win95 access)
+        AC_DEFINE(HAVE_CYGWIN_NT,1,enable w32api access)
+;;
 *)
         AC_MSG_ERROR(Sorry.  $host is not supported yet)
 ;;

@@ -1,5 +1,12 @@
 Still to do in the implementation:
 
+- Only build Python support based on a configure check
+
+- Only build xmlto documentation based on a configure check
+
+- Find a (portable if possible) way to accurately sleep with ms accuracy
+  (scheduling can cause problems here)
+
 - F1284_EXCL for iopl() and /dev/port (use /dev/lp0).  This needs
   configuration file support.
 

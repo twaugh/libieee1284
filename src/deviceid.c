@@ -22,11 +22,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if !(defined __MINGW32__ || defined _MSC_VER)
 #include <sys/ioctl.h>
+#else
+#include <io.h> /* read(), open(), close() */
+#define O_NOCTTY 0
+#endif
 #include <sys/stat.h>
+#ifndef _MSC_VER
 #include <sys/time.h>
+#endif
 #include <sys/types.h>
+#ifdef __unix__
 #include <unistd.h>
+#endif
 
 #include "config.h"
 #include "debug.h"
@@ -110,9 +119,9 @@ get_from_proc_parport (struct parport *port, int daisy,
 	return -ETRYNEXT;
 
       if ((size_t) (2 + got) < len)
-	buffer[2 + got] = '\0';
-      buffer[0] = got / (1<<8);
-      buffer[1] = got % (1<<8);
+        buffer[2 + got] = '\0';
+      buffer[0] = (unsigned char)(got / (1<<8));
+      buffer[1] = (unsigned char)(got % (1<<8));
 
       return got;
     }
@@ -168,8 +177,8 @@ get_from_sys_dev_parport (struct parport *port, int daisy,
 	return -ETRYNEXT;
 
       buffer[2 + got] = '\0';
-      buffer[0] = got / (1<<8);
-      buffer[1] = got % (1<<8);
+      buffer[0] = (unsigned char)(got / (1<<8));
+      buffer[1] = (unsigned char)(got % (1<<8));
 
       return got;
     }

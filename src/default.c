@@ -20,9 +20,16 @@
  */
 
 #include <string.h>
+#ifndef _MSC_VER
 #include <sys/time.h>
+#endif
 #include <sys/types.h>
+#ifdef __unix__
 #include <unistd.h>
+#endif
+#if defined __MINGW32__ || defined _MSC_VER
+#include <sys/timeb.h>
+#endif
 
 #include "access.h"
 #include "debug.h"
@@ -37,24 +44,39 @@ default_wait_data (struct parport_internal *port, unsigned char mask,
 		   unsigned char val, struct timeval *timeout)
 {
   /* Simple-minded polling.  TODO: Use David Paschal's method for this. */
+#if !(defined __MINGW32__ || defined _MSC_VER)
   struct timeval deadline, now;
   gettimeofday (&deadline, NULL);
   deadline.tv_sec += timeout->tv_sec;
   deadline.tv_usec += timeout->tv_usec;
   deadline.tv_sec += deadline.tv_usec / 1000000;
   deadline.tv_usec %= 1000000;
+#else
+  struct timeb tb;
+  int deadline, now;
+  ftime (&tb);
+  deadline = tb.time * 1000 + tb.millitm +
+             timeout->tv_sec * 1000 + timeout->tv_usec / 1000;
+#endif
 
   do
     {
       if ((port->fn->read_data (port) & mask) == val)
-	return E1284_OK;
+        return E1284_OK;
 
       delay (IO_POLL_DELAY);
+#if !(defined __MINGW32__ || defined _MSC_VER)
       gettimeofday (&now, NULL);
     }
   while (now.tv_sec < deadline.tv_sec ||
 	 (now.tv_sec == deadline.tv_sec &&
 	  now.tv_usec < deadline.tv_usec));
+#else
+      ftime (&tb);
+      now = tb.time * 1000 + tb.millitm;
+    }
+  while (now < deadline);
+#endif
 
   return E1284_TIMEDOUT;
 }
@@ -110,7 +132,7 @@ default_negotiate (struct parport_internal *port, int mode)
     m = 1<<7; /* Request extensibility link */
 
   /* Event 0: Write extensibility request to data lines. */
-  fn->write_data (port, m);
+  fn->write_data (port, (unsigned char)m);
   debugprintf ("IEEE 1284 mode %#02x\n", m);
 
   /* Event 1: nSelectIn=1, nAutoFd=0, nStrobe=1, nInit=1. */
@@ -408,7 +430,7 @@ default_byte_read (struct parport_internal *port, int flags,
 
   const struct parport_access_methods *fn = port->fn;
   unsigned char *buf = buffer;
-  ssize_t count = 0;
+  size_t count = 0;
   struct timeval tv;
 
   /* FIXME: Untested as yet, copied from ieee1284_op.c,
@@ -609,9 +631,9 @@ default_ecp_read_data (struct parport_internal *port, int flags,
   const struct parport_access_methods *fn = port->fn;
   
   unsigned char *buf = buffer;
-  int rle_count = 0; /* shut gcc up */
+  size_t rle_count = 0; /* shut gcc up */
   int rle = 0;
-  ssize_t count = 0;
+  size_t count = 0;
   struct timeval tv;
 
   debugprintf ("==> default_ecp_read_data\n");

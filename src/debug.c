@@ -26,7 +26,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef _MSC_VER
 #include <sys/time.h>
+#endif
 #include <sys/types.h>
 #include <time.h>
 
@@ -44,11 +46,13 @@ timeofday (void)
 {
   static char str[100];
   struct timeval tod;
+#if !(defined __MINGW32__ || defined _MSC_VER)
   if (gettimeofday (&tod, NULL))
     {
       str[0] = '\0';
     }
   else
+#endif
     {
       struct tm *tm = localtime (&tod.tv_sec);
       char *p = str + strftime (str, 50, "%H:%M:%S.", tm);
@@ -120,6 +124,7 @@ debugprintf (const char *fmt, ...)
 
   if (debugging_enabled == -1) {
     int dummy;
+    (void) dummy; /* warning remover for MinGW and VC++ */
 
     if (!getenv (ENVAR))
       {
@@ -127,12 +132,14 @@ debugprintf (const char *fmt, ...)
 	return;
       }
 
+#if !(defined __MINGW32__ || defined _MSC_VER)
     /* Is stderr open? */
     if (fcntl (fileno (stderr), F_GETFL, &dummy) == -1 && errno == EBADF)
       {
 	debugging_enabled = 0;
 	return;
       }
+#endif
 
     debugging_enabled = 1;
   }

@@ -1,0 +1,71 @@
+CC=cl.exe
+CFLAGS=/nologo /Iinclude /W3 /O2 /DHAVE_CONFIG_H
+LDFLAGS=/NOLOGO
+TARGETS=.libs\ieee1284.lib .libs\ieee1284.dll 
+
+
+OBJECTS=src/access_io.obj src/access_lpt.obj src/access_ppdev.obj src/conf.obj \
+        src/debug.obj src/default.obj src/delay.obj src/detect.obj \
+        src/deviceid.obj src/interface.obj src/ports.obj src/state.obj
+
+
+all: create_dir $(TARGETS) libieee1284_test.exe
+
+
+create_dir:
+	if not exist .libs mkdir .libs
+
+
+clean:
+	del /q src\*.obj
+	del /q tests\*.obj
+	del /q libieee1284_test.exe
+	rmdir /s /q .libs
+
+
+distclean: clean
+	del /q include\config.h
+	del /q config.log
+	del /q config.status
+
+
+.c.obj:
+	$(CC) $(CFLAGS) /c $< /Fo$@
+
+
+.libs\ieee1284.lib: $(OBJECTS)
+# .libs\ieee1284.lib is the static library. .libs\ieee1284dll.lib is the import
+#  library for the DLL.
+	lib.exe $(OBJECTS) $(LDFLAGS) /OUT:$@
+
+
+.libs\ieee1284.dll: $(OBJECTS)
+# I was thinking of using "/DEF:($*B).def". This doesn't work and M$'s
+#  documentation is terribly confusing.
+	link.exe $(OBJECTS) $(LDFLAGS) /DLL /DEF:ieee1284.def /IMPLIB:$*dll.lib /OUT:$@
+
+
+libieee1284_test.exe: tests/test.obj
+	link.exe $** $(LDFLAGS) .libs\ieee1284.lib /OUT:$@
+
+
+install:
+
+
+uninstall:
+
+
+# Dependencies
+
+src/access_io.obj: include/ieee1284.h include/config.h
+src/access_lpt.obj: include/ieee1284.h include/config.h
+src/access_ppdev.obj: include/ieee1284.h include/config.h
+src/conf.obj: include/ieee1284.h include/config.h
+src/debug.obj: include/ieee1284.h include/config.h
+src/default.obj: include/ieee1284.h include/config.h
+src/delay.obj: include/ieee1284.h include/config.h
+src/detect.obj: include/ieee1284.h include/config.h
+src/deviceid.obj: include/ieee1284.h include/config.h
+src/interface.obj: include/ieee1284.h include/config.h
+src/ports.obj: include/ieee1284.h include/config.h
+src/state.obj: include/ieee1284.h include/config.h

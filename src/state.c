@@ -19,10 +19,14 @@
 
 #include <fcntl.h>
 #include <string.h>
+#if !(defined __MINGW32__ || defined _MSC_VER)
 #include <sys/ioctl.h>
+#endif
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifdef __unix__
 #include <unistd.h>
+#endif
 
 #include "config.h"
 #include "access.h"

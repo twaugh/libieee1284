@@ -21,7 +21,17 @@
 #define HAVE_IEEE1284_H
 
 #include <sys/types.h> /* for size_t */
+#ifndef _MSC_VER
 #include <sys/time.h> /* for struct timeval */
+#else
+#include <winsock2.h> /* for struct timeval */
+#endif
+
+#if (defined __MINGW32__ || defined _MSC_VER) && !defined OWN_SSIZE_T
+#include <basetsd.h> /* for SSIZE_T */
+#define OWN_SSIZE_T
+typedef SSIZE_T ssize_t;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
