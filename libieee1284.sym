@@ -15,7 +15,7 @@ ieee1284_wait_status
 ieee1284_read_control
 ieee1284_write_control
 ieee1284_frob_control
-ieee1284_no_nack_handshake
+ieee1284_do_nack_handshake
 ieee1284_negotiate
 ieee1284_terminate
 ieee1284_ecp_fwd_to_rev
