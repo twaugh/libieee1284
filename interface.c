@@ -80,11 +80,11 @@ ieee1284_write_data (struct parport *port, unsigned char st)
   priv->fn->write_data (priv, st);
 }
 
-void
+int
 ieee1284_data_dir (struct parport *port, int reverse)
 {
   struct parport_internal *priv = port->priv;
-  priv->fn->data_dir (priv, reverse);
+  return priv->fn->data_dir (priv, reverse);
 }
 
 int

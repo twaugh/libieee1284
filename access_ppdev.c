@@ -152,10 +152,12 @@ read_control (struct parport_internal *port)
   return (reg ^ C1284_INVERTED) & rm;
 }
 
-static void
+static int
 data_dir (struct parport_internal *port, int reverse)
 {
-  ioctl (port->fd, PPDATADIR, &reverse);
+  if (ioctl (port->fd, PPDATADIR, &reverse))
+    return E1284_SYS;
+  return E1284_OK;
 }
 
 static void

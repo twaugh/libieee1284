@@ -1,5 +1,8 @@
 2001-11-29  Tim Waugh  <twaugh@redhat.com>
 
+	* interface.c, access_ppdev.c access_io.c, detect.h, ieee1284.h:
+	ieee1284_data_dir returns int.
+
 	* interface.c (ieee1284_set_timeout): New function.
 	* access_ppdev.c (set_timeout): New function.
 
