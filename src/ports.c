@@ -300,6 +300,10 @@ populate_by_guessing (struct parport_list *list, int flags)
   add_port (list, flags, "0x378", "/dev/port", 0x378, 0, -1);
   add_port (list, flags, "0x278", "/dev/port", 0x278, 0, -1);
   add_port (list, flags, "0x3bc", "/dev/port", 0x3bc, 0, -1);
+#elif defined(HAVE_FBSD_I386)
+  add_port (list, flags, "0x378", "/dev/io", 0x378, 0, -1);
+  add_port (list, flags, "0x278", "/dev/io", 0x278, 0, -1);
+  add_port (list, flags, "0x3bc", "/dev/io", 0x3bc, 0, -1);
 #elif defined(HAVE_SOLARIS)
   add_port (list, flags, "0x378", "/devices/pseudo/iop@0:iop", 0x378, 0, -1);
   add_port (list, flags, "0x278", "/devices/pseudo/iop@0:iop", 0x278, 0, -1);

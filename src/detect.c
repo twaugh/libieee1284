@@ -131,6 +131,14 @@ check_io (void)
     return 1;
   }
   free(iomap);
+  #elif defined(HAVE_FBSD_I386)
+  int fd;
+  if ((fd = open("/dev/io", O_RDONLY)) >= 0) {
+    capabilities |= IO_CAPABLE;
+    dprintf("We can use /dev/io\n");
+    close(fd);
+    return 1;
+  }
   #elif defined(HAVE_LINUX)
   if (ioperm (0x378 /* say */, 3, 1) == 0) {
     ioperm (0x378, 3, 0);

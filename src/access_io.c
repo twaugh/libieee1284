@@ -54,6 +54,12 @@ struct iopbuf {
 
 #include "io.h"
 
+#elif defined(HAVE_FBSD_I386)
+
+/* don't use machine/cpufunc.h here because it redefines inb and outb as 
+   macros, which breaks our port->fn->inb calls */
+#include "io.h"
+
 #elif defined(HAVE_OBSD_I386)
 
 #include "io.h"
@@ -108,7 +114,8 @@ set_bitmap(unsigned long *bitmap, short base, short extent, int new_value)
 static unsigned char
 raw_inb (struct parport_internal *port, unsigned long addr)
 {
-#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386)
+#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386) \
+	|| defined(HAVE_FBSD_I386)
   return inb (addr);
 #elif defined(HAVE_SOLARIS)
   struct iopbuf tmpbuf;
@@ -122,7 +129,8 @@ raw_inb (struct parport_internal *port, unsigned long addr)
 static void
 raw_outb (struct parport_internal *port, unsigned char val, unsigned long addr)
 {
-#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386)
+#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386) \
+	|| defined(HAVE_FBSD_I386)
   outb_p (val, addr);
 #elif defined(HAVE_SOLARIS)
   struct iopbuf tmpbuf;
@@ -173,6 +181,13 @@ init (struct parport_internal *port, int flags, int *capabilities)
 #ifdef HAVE_LINUX
       if (ioperm (port->base, 3, 1) || ioperm (0x80, 1, 1))
         return E1284_INIT;
+#elif defined(HAVE_FBSD_I386)
+	/* open the special io device which does the ioperm change for us */
+      if ((port->fd = open("/dev/io", O_RDONLY)) < 0)
+      {
+	dprintf("Open on /dev/io failed\n");
+        return E1284_INIT;
+      }
 #elif defined(HAVE_OBSD_I386)
       if ((iomap = malloc(1024 / 8)) == NULL)
 	return E1284_NOMEM;
@@ -236,6 +251,10 @@ cleanup (struct parport_internal *port)
 {
   if (port->type != IO_CAPABLE && port->fd >= 0)
     close (port->fd);
+#if defined(HAVE_FBSD_I386) || defined (HAVE_SOLARIS)
+  if (port->fd >= 0)
+    close(port->fd);
+#endif
 }
 
 static int

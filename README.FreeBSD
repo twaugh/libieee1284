@@ -1,0 +1,11 @@
+Notes on libieee1284 on FreeBSD/i386
+------------------------------------
+
+For direct port access on FreeBSD/i386, the library opens /dev/io.  If you want
+regular users to be able to access this (rather than just root) you'll need to 
+change the permissions on this file.
+
+Enjoy,
+
+- Matthew Duggan
+stauff1@users.sourceforge.net

@@ -1,3 +1,11 @@
+2002-09-15  Matthew Duggan  <stauff1@users.sourceforge.net>
+
+	* configure.in: Added check for FreeBSD/i386
+	* README.FreeBSD: Notes on FreeBSD use
+	* src/access_io.c: Open /dev/io for port access in FreeBSD
+	* src/detect.c (check_io): Check if /dev/io is available in FreeBSD 
+	* src/ports.c (populate_by_guessing): Guessing for FreeBSD
+
 2002-09-09  Tim Waugh  <twaugh@redhat.com>
 
 	* doc/interface.xml: Clarifications about E1284_INVALIDPORT, and
