@@ -1,3 +1,8 @@
+2001-11-01  Tim Waugh  <twaugh@redhat.com>
+
+	* libieee1284.sym: List exported symbols.
+	* Makefile.am: Only export listed symbols.
+
 2001-10-17  Tim Waugh  <twaugh@redhat.com>
 
 	* access.h, access_io.c, access_ppdev.c, default.c, default.h,
