@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -220,6 +220,7 @@ const struct parport_access_methods lpt_access_methods =
   NULL, /* raw_outb */
 
   NULL, /* get_irq_fd */
+  NULL, /* clear_irq */
 
   read_data,
   write_data,
@@ -265,6 +266,7 @@ const struct parport_access_methods lpt_access_methods =
   NULL, /* inb */
   NULL, /* outb */
 
+  NULL,
   NULL,
 
   NULL,

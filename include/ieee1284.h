@@ -123,6 +123,7 @@ extern void ieee1284_release (struct parport *port);
  * Interrupt notification
  */
 extern int ieee1284_get_irq_fd (struct parport *port);
+extern int ieee1284_clear_irq (struct parport *port, unsigned int *count);
 
 /*
  * Raw port access (PC-style port registers but within inversions)

@@ -88,6 +88,26 @@ ieee1284_get_irq_fd (struct parport *port)
   return ret;
 }
 
+int
+ieee1284_clear_irq (struct parport *port, unsigned int *count)
+{
+  int ret = E1284_NOTAVAIL;
+  struct parport_internal *priv = port->priv;
+
+  if (priv->fn->clear_irq)
+    {
+      if (!priv->claimed)
+	{
+	  dprintf (needs_claimed_port, "ieee1284_clear_irq");
+	  return E1284_INVALIDPORT;
+	}
+
+      ret = priv->fn->clear_irq (priv, count);
+    }
+
+  return ret;
+}
+
 void
 ieee1284_release (struct parport *port)
 {

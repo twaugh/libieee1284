@@ -154,6 +154,20 @@ get_irq_fd (struct parport_internal *port)
 }
 
 static int
+clear_irq (struct parport_internal *port, unsigned int *count)
+{
+  int c;
+
+  if (ioctl (port->fd, PPCLRIRQ, &c))
+    return E1284_SYS;
+
+  if (count)
+    *count = c;
+
+  return E1284_OK;
+}
+
+static int
 read_data (struct parport_internal *port)
 {
   unsigned char reg;
@@ -641,6 +655,7 @@ const struct parport_access_methods ppdev_access_methods =
   NULL, /* outb */
 
   get_irq_fd,
+  clear_irq,
 
   read_data,
   write_data,
@@ -694,6 +709,7 @@ const struct parport_access_methods ppdev_access_methods =
   NULL, /* inb */
   NULL, /* outb */
 
+  NULL,
   NULL,
 
   NULL,

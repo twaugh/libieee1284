@@ -124,6 +124,23 @@ void test_open (struct parport_list *pl)
 	    printf (" (ECR at %#lx)", port->hibase_addr);
 	  printf ("\n  ");
 	  show_capabilities (cap);
+	  if (cap & CAP1284_IRQ)
+	    {
+	      int fd = ieee1284_get_irq_fd (port);
+	      if (fd < 0)
+		printf ("Couldn't get IRQ fd: %d\n", fd);
+	      else
+		{
+		  int r = ieee1284_claim (port);
+		  if (r != E1284_OK)
+		    printf ("Couldn't claim port: %d\n", r);
+		  else
+		    r = ieee1284_clear_irq (port, NULL);
+		  if (r != E1284_OK)
+		    printf ("Couldn't clear IRQ: %d\n", r);
+		  ieee1284_release (port);
+		}
+	    }
 	  ieee1284_close (port);
 	}
     }

@@ -43,6 +43,7 @@ struct parport_access_methods
 		unsigned long addr);
 
   int (*get_irq_fd) (struct parport_internal *port);
+  int (*clear_irq) (struct parport_internal *port, unsigned int *count);
 
   int (*read_data) (struct parport_internal *port);
   void (*write_data) (struct parport_internal *port, unsigned char st);

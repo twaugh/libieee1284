@@ -1,3 +1,16 @@
+2002-09-05  Tim Waugh  <twaugh@redhat.com>
+
+	* include/ieee1284.h: Added ieee1284_clear_irq.
+	* src/detect.h (struct parport_access_methods): Added clear_irq
+	method declaration.
+	* src/interface.c (ieee1284_clear_irq): Implemented.
+	* src/access_io.c (io_access_methods): Updated.
+	* src/access_lpt.c (lpt_access_methods): Updated.
+	* src/access_ppdev.c (clear_irq): Implemented.
+	(ppdev_access_methods): Updated.
+	* libieee1284.sym: Added ieee1284_clear_irq.
+	* tests/test.c: Lightly test ieee1284_get_irq_fd/ieee1284_clear_irq.
+
 2002-09-04  Tim Waugh  <twaugh@redhat.com>
 
 	* doc/interface.xml (ieee1284_get_irq_fd): Clarify the conditions
