@@ -39,6 +39,19 @@
 #define MAX_PORTS 20
 
 static int
+compare_port (const void *a, const void *b)
+{
+  const struct parport * const*p1 = a, * const*p2 = b;
+  return strcmp ((*p1)->name, (*p2)->name);
+}
+
+static void
+sort_ports (struct parport_list *list)
+{
+  qsort (list->portv, list->portc, sizeof (struct parport *), compare_port);
+}
+
+static int
 add_port (struct parport_list *list, int flags,
 	  const char *name, const char *device, unsigned long base,
 	  unsigned long hibase, int interrupt)
@@ -104,6 +117,7 @@ add_port (struct parport_list *list, int flags,
   priv->ref = 1;
 
   list->portv[list->portc++] = p;
+  sort_ports (list);
   return 0;
 }
 
