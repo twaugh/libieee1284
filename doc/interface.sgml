@@ -89,22 +89,22 @@
 	<para>The structure has the following members:</para>
 
 	<programlisting><![CDATA[struct parport {
-  // An artibrary name for the port.
+  /* An artibrary name for the port. */
   const char *name;
 
-  // A set of bits indicating the capabilities of the port that we
-  // can use.  Whether hardware-assisted ECP is available; whether
-  // that includes DMA, etc.
+  /* A set of bits indicating the capabilities of the port that we
+   * can use.  Whether hardware-assisted ECP is available; whether
+   * that includes DMA, etc. */
   int modes;
 
-  // -1, or else a file descriptor that can be used by select() for
-  // wait for nAck.
+  /* -1, or else a file descriptor that can be used by select() for
+   * wait for nAck. */
   int selectable_fd;
 
-  // The base address of the port, if that has any meaning, or zero.
+  /* The base address of the port, if that has any meaning, or zero. */
   unsigned long base_addr;
 
-  // The ECR address of the port, if that has any meaning, or zero.
+  /* The ECR address of the port, if that has any meaning, or zero. */
   unsigned long hibase_addr;
 };]]></programlisting>
       </refsect1>
@@ -140,10 +140,10 @@
 	<para>The structure has the following members:</para>
 
 	<programlisting><![CDATA[struct parport_list {
-  // Number of elements in the vector.
+  /* Number of elements in the vector. */
   int portc;
 
-  // The ports.
+  /* The ports. */
   struct parport **portv;
 };]]></programlisting>
       </refsect1>
@@ -679,7 +679,7 @@
   S1284_PERROR = 0x20,
   S1284_NACK   = 0x40,
   S1284_BUSY   = 0x80,
-// To convert those values into PC-style register values, use this:
+  /* To convert those values into PC-style register values, use this: */
   S1284_INVERTED = S1284_BUSY,
 };]]></programlisting>
 
@@ -809,7 +809,7 @@
   C1284_NAUTOFD   = 0x02,
   C1284_NINIT     = 0x04,
   C1284_NSELECTIN = 0x08,
-// To convert those values into PC-style register values, use this:
+  /* To convert those values into PC-style register values, use this: */
   C1284_INVERTED = (C1284_NSTROBE|
                     C1284_NAUTOFD|
                     C1284_NSELECTIN),

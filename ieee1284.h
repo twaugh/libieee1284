@@ -17,106 +17,106 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <sys/types.h> // for size_t
+#include <sys/types.h> /* for size_t */
 
-// Errors.  When a function returns a negative number, it's one of
-// these errors.
+/* Errors.  When a function returns a negative number, it's one of
+ * these errors. */
 enum E1284 {
-  E1284_OK                 = 0,  // Everything went fine
-  E1284_NOTIMPL            = -1, // Not implemented in libieee1284
-  E1284_NOTAVAIL           = -2, // Not available on this system
-  E1284_TIMEDOUT           = -3, // Operation timed out
-  E1284_REJECTED           = -4, // IEEE 1284 negotiation rejected
-  E1284_NEGFAILED          = -5, // Negotiation went wrong
-  E1284_NOMEM              = -6, // No memory left
-  E1284_INIT               = -7, // Error initialising port
-  E1284_SYS                = -8, // Error interfacing system
+  E1284_OK                 = 0,  /* Everything went fine */
+  E1284_NOTIMPL            = -1, /* Not implemented in libieee1284 */
+  E1284_NOTAVAIL           = -2, /* Not available on this system */
+  E1284_TIMEDOUT           = -3, /* Operation timed out */
+  E1284_REJECTED           = -4, /* IEEE 1284 negotiation rejected */
+  E1284_NEGFAILED          = -5, /* Negotiation went wrong */
+  E1284_NOMEM              = -6, /* No memory left */
+  E1284_INIT               = -7, /* Error initialising port */
+  E1284_SYS                = -8, /* Error interfacing system */
 };
 
-// A parallel port.
+/* A parallel port. */
 struct parport {
-  // An arbitrary name for the port
+  /* An arbitrary name for the port */
   const char *name;
 
-  // A set of bits indicating the capabilities of the port that we
-  // can use.  Whether hardware-assisted ECP is available; whether
-  // that includes DMA, etc.
+  /* A set of bits indicating the capabilities of the port that we
+   *can use.  Whether hardware-assisted ECP is available; whether
+   * that includes DMA, etc. */
   int modes;
 
-  // -1, or else a file descriptor that can be used by select() for
-  // waiting for nAck.
+  /* -1, or else a file descriptor that can be used by select() for
+   * waiting for nAck. */
   int selectable_fd;
 
-  // The base address of the port, if that has any meaning, or zero.
+  /* The base address of the port, if that has any meaning, or zero. */
   unsigned long base_addr;
 
-  // The ECR address of the port, if that has any meaning, or zero.
+  /* The ECR address of the port, if that has any meaning, or zero. */
   unsigned long hibase_addr;
 
-  // For internal use only:
+  /* For internal use only: */
   void *priv;
 };
 
-// Some parallel ports.
+/* Some parallel ports. */
 struct parport_list {
   int portc;
   struct parport **portv;
 };
 
-// The first function to be called.  This gives the library a chance
-// to look around and see what's available, and gives the program a
-// chance to choose a port to use.
+/* The first function to be called.  This gives the library a chance
+ * to look around and see what's available, and gives the program a
+ * chance to choose a port to use. */
 enum ieee1284_global_flags
 {
-  F1284_EXCL = (1<<0), // Require exclusive access to the port
+  F1284_EXCL = (1<<0), /* Require exclusive access to the port */
 };
 extern int ieee1284_find_ports (struct parport_list *list,
                                 const char *config_file, int flags);
-// No flags defined yet.  config_file may be NULL, but otherwise tells
-// the library where its configuration file is. (No configuration
-// options defined yet, but to include base addresses, access
-// methods, timings and such.)
-// Returns 0, or an error code.  No errors defined yet.
+/* config_file may be NULL, but otherwise tells
+ * the library where its configuration file is. (No configuration
+ * options defined yet, but to include base addresses, access
+ * methods, timings and such.)
+ * Returns 0, or an error code. */
 
-// The last function to be called.  After calling this, only
-// ieee1284_find_ports may be used.
+/* The last function to be called.  After calling this, only
+ * ieee1284_find_ports may be used. */
 extern void ieee1284_free_ports (struct parport_list *list);
 
-//
-// Retrieving the Device ID of a device on a port.
-// This is a special operation since there are some shortcuts on some
-// operating systems (i.e. Linux) that allow us to elide any actual
-// communications.
-//
+/*
+ * Retrieving the Device ID of a device on a port.
+ * This is a special operation since there are some shortcuts on some
+ * operating systems (i.e. Linux) that allow us to elide any actual
+ * communications.
+ */
 
 enum ieee1284_devid_flags
 {
-  F1284_FRESH = (1<<1), // Guarantee a fresh Device ID
+  F1284_FRESH = (1<<1), /* Guarantee a fresh Device ID */
 };
 
 extern ssize_t ieee1284_get_deviceid (struct parport *port, int daisy,
 				      int flags, char *buffer, size_t len);
-// daisy is the daisy chain address (0-3), or -1 for normal IEEE 1284.
+/* daisy is the daisy chain address (0-3), or -1 for normal IEEE 1284. */
 
-//
-// Sharing hooks
-//
+/*
+ * Sharing hooks
+ */
 
 extern int ieee1284_claim (struct parport *port);
-// Must be called before any function below.  May fail?
+/* Must be called before any function below.  May fail. */
 
 extern void ieee1284_release (struct parport *port);
 
-//
-// Raw port access (PC-style port registers)
-// Functions returning int may fail.
-//
+/*
+ * Raw port access (PC-style port registers but within inversions)
+ * Functions returning int may fail.
+ */
 
 extern int ieee1284_read_data (struct parport *port);
 extern void ieee1284_write_data (struct parport *port, unsigned char dt);
 extern void ieee1284_data_dir (struct parport *port, int reverse);
 
-// The status pin functions operate in terms of these bits:
+/* The status pin functions operate in terms of these bits: */
 enum ieee1284_status_bits
 {
   S1284_NFAULT = 0x08,
@@ -124,61 +124,61 @@ enum ieee1284_status_bits
   S1284_PERROR = 0x20,
   S1284_NACK   = 0x40,
   S1284_BUSY   = 0x80,
-// To convert those values into PC-style register values, use this:
+  /* To convert those values into PC-style register values, use this: */
   S1284_INVERTED = S1284_BUSY,
 };
 
 extern int ieee1284_read_status (struct parport *port);
 
-// Wait until those status pins in mask have the values in val.
-// Return E1284_OK when condition met, E1284_TIMEDOUT on timeout.
-// timeout may be modified.
+/* Wait until those status pins in mask have the values in val.
+ * Return E1284_OK when condition met, E1284_TIMEDOUT on timeout.
+ * timeout may be modified. */
 extern int ieee1284_wait_status (struct parport *port,
                                  unsigned char mask,
 				 unsigned char val,
 				 struct timeval *timeout);
 
-// The control pin functions operate in terms of these bits:
+/* The control pin functions operate in terms of these bits: */
 enum ieee1284_control_bits
 {
   C1284_NSTROBE   = 0x01,
   C1284_NAUTOFD   = 0x02,
   C1284_NINIT     = 0x04,
   C1284_NSELECTIN = 0x08,
-// To convert those values into PC-style register values, use this:
+  /* To convert those values into PC-style register values, use this: */
   C1284_INVERTED = (C1284_NSTROBE|
 		    C1284_NAUTOFD|
 		    C1284_NSELECTIN),
 };
 
 extern int ieee1284_read_control (struct parport *port);
-// ieee1284_read_control may be unreliable
+/* ieee1284_read_control may be unreliable */
 
 extern void ieee1284_write_control (struct parport *port, unsigned char ct);
-// NOTE: This will not change the direction of the data lines; use
-// ieee1284_data_dir for that.
+/* NOTE: This will not change the direction of the data lines; use
+ * ieee1284_data_dir for that. */
 
 extern void ieee1284_frob_control (struct parport *port, unsigned char mask,
 				   unsigned char val);
-// frob is "out ((in & ~mask) ^ val)"
+/* frob is "out ((in & ~mask) ^ val)" */
 
-// This function may or may not be available, depending on PPWCTLONIRQ
-// availability.  Its operation is:
-// If operation unavailable, return E1284_NOTAVAIL.  Otherwise:
-// Set control pins to ct_before.
-// Wait for nAck interrupt.  If timeout elapses, return E1284_TIMEDOUT.
-// Otherwise, set control pins to ct_after and return 0.
-// timeout may be modified.
+/* This function may or may not be available, depending on PPWCTLONIRQ
+ * availability.  Its operation is:
+ * If operation unavailable, return E1284_NOTAVAIL.  Otherwise:
+ * Set control pins to ct_before.
+ * Wait for nAck interrupt.  If timeout elapses, return E1284_TIMEDOUT.
+ * Otherwise, set control pins to ct_after and return 0.
+ * timeout may be modified. */
 extern int ieee1284_do_nack_handshake (struct parport *port,
 				       unsigned char ct_before,
 				       unsigned char ct_after,
 				       struct timeval *timeout);
 
-//
-// IEEE 1284 operations
-//
+/*
+ * IEEE 1284 operations
+ */
 
-// Negotiation/termination
+/* Negotiation/termination */
 enum ieee1284_modes
 {
   M1284_NIBBLE =  0,
@@ -198,17 +198,17 @@ enum ieee1284_modes
 extern int ieee1284_negotiate (struct parport *port, int mode);
 extern void ieee1284_terminate (struct parport *port);
 
-// ECP direction switching
+/* ECP direction switching */
 extern int ieee1284_ecp_fwd_to_rev (struct parport *port);
 extern int ieee1284_ecp_rev_to_fwd (struct parport *port);
 
-// Block I/O
-// The return value is the number of bytes successfully transferred,
-// or an error code (only if no transfer took place).
+/* Block I/O
+ * The return value is the number of bytes successfully transferred,
+ * or an error code (only if no transfer took place). */
 enum ieee1284_transfer_flags
 {
-  F1284_SWE = (1<<2), // Don't use hardware assistance
-  F1284_RLE = (1<<3), // Use ECP RLE
+  F1284_SWE = (1<<2), /* Don't use hardware assistance */
+  F1284_RLE = (1<<3), /* Use ECP RLE */
 };
 extern ssize_t ieee1284_nibble_read (struct parport *port, char *buffer,
 				     size_t len);
