@@ -13,6 +13,19 @@ libieee1284_la_LDFLAGS = -version-info 4:1:1 \
 include_HEADERS = include/ieee1284.h
 INCLUDES = -I$(top_srcdir)/include
 
+iop_SOURCES=solaris_io/iop.c
+ioprtest_SOURCES=solaris_io/ioprtest.c
+nobase_drvdata_DATA=solaris_io/iop.conf
+
+if SOLARIS_IO
+iop_CFLAGS=-D_KERNEL # -DDEBUG
+iop_LDFLAGS=-r
+drvexecdir=/platform/i86pc/kernel/drv
+drvdatadir=/platform/i86pc/kernel/drv
+nobase_drvexec_PROGRAMS=iop
+noinst_PROGRAMS=ioprtest
+endif
+
 bin_PROGRAMS = libieee1284_test
 libieee1284_test_SOURCES = tests/test.c
 libieee1284_test_LDADD = libieee1284.la
@@ -54,8 +67,7 @@ $(man3_MANS): $(top_srcdir)/doc/interface.xml
 
 EXTRA_DIST = libieee1284.spec doc/interface.xml doc/interface.txt \
 		$(man3_MANS) solaris_io/LICENSE solaris_io/README \
-		solaris_io/INSTALL solaris_io/Makefile.in \
-		solaris_io/iop.c solaris_io/iop.conf \
+		solaris_io/INSTALL solaris_io/iop.conf \
 		README.FreeBSD README.OpenBSD README.Solaris \
 		README.win95 README.winNT
 
@@ -63,5 +75,3 @@ DISTCLEANFILES = include/stamp-h include/stamp-h[0-9]* \
 	doc/manpage.links doc/manpage.refs
 
 MAINTAINERCLEANFILES = $(man3_MANS)
-
-SUBDIRS = @SOLARIS_IO@

@@ -21,7 +21,7 @@ dnl Checks for header files.
 AC_CHECK_HEADERS(sys/io.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
-SOLARIS_IO=""
+solaris_io=false
 case "{$host}" in
 *-*-linux*)
         AC_DEFINE(HAVE_LINUX,1,enable ppdev access)
@@ -35,7 +35,7 @@ case "{$host}" in
 ;;
 *86-*-solaris*)
         AC_DEFINE(HAVE_SOLARIS,1,enable solaris iop access)
-	SOLARIS_IO="solaris_io"
+	solaris_io=true
 ;;
 *-*-cygwin*)
         dnl Strip version number from uname and make sure we're on NT not 9x
@@ -55,7 +55,7 @@ case "{$host}" in
 ;;
 esac
 
-AC_SUBST(SOLARIS_IO)
+AM_CONDITIONAL(SOLARIS_IO, test x$solaris_io = xtrue)
 
 dnl Checks for library functions.
 
