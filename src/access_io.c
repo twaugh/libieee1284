@@ -52,14 +52,63 @@ struct iopbuf {
 
 #elif defined(HAVE_CYGWIN_9X)
 
-#include "io_95.h"
+#include "io.h"
+
+#elif defined(HAVE_OBSD_I386)
+
+#include "io.h"
+/* for i386_get_ioperm and i386_set_ioperm */
+#include <machine/sysarch.h>
+
+/* 
+OpenBSD makes us modify our own bitmap, so this is copied from Linux
+kernel-source-2.4.18/arch/i386/kernel/ioport.c 
+
+Set EXTENT bits starting at BASE in BITMAP to new_value.
+0 = allowed
+1 = denied
+*/
+static void 
+set_bitmap(unsigned long *bitmap, short base, short extent, int new_value)
+{
+  int mask;
+  unsigned long *bitmap_base = bitmap + (base >> 5);
+  unsigned short low_index = base & 0x1f;
+  int length = low_index + extent;
+
+  if (low_index != 0) {
+    mask = (~0 << low_index);
+    if (length < 32)
+      mask &= ~(~0 << length);
+    if (new_value)
+      *bitmap_base++ |= mask;
+    else
+      *bitmap_base++ &= ~mask;
+    length -= 32;
+  }
+
+  mask = (new_value ? ~0 : 0);
+  while (length >= 32) {
+    *bitmap_base++ = mask;
+    length -= 32;
+  }
+
+  if (length > 0) {
+    mask = ~(~0 << length);
+    if (new_value)
+      *bitmap_base++ |= mask;
+    else
+      *bitmap_base++ &= ~mask;
+  }
+}
+
 #endif
 
 
 static unsigned char
 raw_inb (struct parport_internal *port, unsigned long addr)
 {
-#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X)
+#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386)
   return inb (addr);
 #elif defined(HAVE_SOLARIS)
   struct iopbuf tmpbuf;
@@ -73,7 +122,7 @@ raw_inb (struct parport_internal *port, unsigned long addr)
 static void
 raw_outb (struct parport_internal *port, unsigned char val, unsigned long addr)
 {
-#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X)
+#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386)
   outb_p (val, addr);
 #elif defined(HAVE_SOLARIS)
   struct iopbuf tmpbuf;
@@ -108,6 +157,8 @@ init (struct parport_internal *port, int flags, int *capabilities)
 {
 #ifdef HAVE_SOLARIS
   struct iopbuf tmpbuf;
+#elif defined(HAVE_OBSD_I386)
+  u_long *iomap;
 #endif
 
   if (flags)
@@ -122,6 +173,25 @@ init (struct parport_internal *port, int flags, int *capabilities)
 #ifdef HAVE_LINUX
       if (ioperm (port->base, 3, 1) || ioperm (0x80, 1, 1))
         return E1284_INIT;
+#elif defined(HAVE_OBSD_I386)
+      if ((iomap = malloc(1024 / 8)) == NULL)
+	return E1284_NOMEM;
+      if (i386_get_ioperm(iomap))
+	{
+	  free(iomap);
+          return E1284_INIT;
+	}
+      /* set access on port 80 and ports base...base+3 */
+      set_bitmap(iomap, port->base, 3, 0);
+      set_bitmap(iomap, 0x80, 1, 0);
+
+      if (i386_set_ioperm(iomap))
+	{
+	  free(iomap);
+          return E1284_INIT;
+	}
+
+      free(iomap);
 #elif defined(HAVE_SOLARIS)
       if((port->fd=open("/devices/pseudo/iop@0:iop", O_RDWR)) < 0)
       {

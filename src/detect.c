@@ -33,6 +33,9 @@
 #ifdef HAVE_LINUX
 #include <sys/io.h>
 #include "ppdev.h"
+#elif defined(HAVE_OBSD_I386)
+/* for i386_get_ioperm and i386_set_ioperm */
+#include <machine/sysarch.h>
 #elif defined(HAVE_SOLARIS)
 #include <sys/ddi.h>
 #include <sys/sunddi.h>
@@ -124,7 +127,17 @@ check_dev_port (void)
 static int
 check_io (void)
 {
-  #ifdef HAVE_LINUX
+  #ifdef HAVE_OBSD_I386
+  u_long *iomap;
+  if ((iomap = malloc(1024/8)) == NULL) return 0;
+  if ((i386_get_ioperm(iomap) == 0) && (i386_set_ioperm(iomap) == 0)) {
+    capabilities |= IO_CAPABLE;
+    dprintf ("We can use i386_get_ioperm()\n");
+    free(iomap);
+    return 1;
+  }
+  free(iomap);
+  #elif defined(HAVE_LINUX)
   if (ioperm (0x378 /* say */, 3, 1) == 0) {
     ioperm (0x378, 3, 0);
     capabilities |= IO_CAPABLE;

@@ -1,8 +1,8 @@
-/* Redefine inb and outb_p for 95 because cygwin doesn't have sys/io.h */
+/* Redefine inb and outb_p for 95 and OBSD because they don't have sys/io.h */
 
-#ifndef _IO_95_H
+#ifndef _IO_H
   
-#define _IO_95_H
+#define _IO_H
   
 static __inline unsigned char
 inb (unsigned short int port)
@@ -19,4 +19,4 @@ outb_p (unsigned char value, unsigned short int port)
 			"Nd" (port));
 }
 
-#endif /* _IO_95_H */
+#endif /* _IO_H */

@@ -1,0 +1,19 @@
+Notes on libieee1284 on OpenBSD/i386
+------------------------------------
+
+For direct port access on OpenBSD/i386, the library uses the i386_get_ioperm 
+and i386_set_ioperm syscalls.  These can only be called as root, so currently 
+only root access is supported.  They also require the linking of the i386 
+library.  
+
+This would not be a problem, except that for no good reason I can discern, 
+there is no shared version of libi386 included in the base OpenBSD install.
+The result is that programs using libieee1284 will have to manually
+link libi386 when compiling on OpenBSD.  
+
+Thanks to Rob Pearce for providing the hardware for OpenBSD and Solaris/x86.
+
+Enjoy,
+
+- Matthew Duggan
+stauff1@users.sourceforge.net

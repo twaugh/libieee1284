@@ -1,3 +1,14 @@
+2002-07-21  Matthew Duggan  <stauff1@users.sourceforge.net>
+
+	* README.OpenBSD: Notes on use in OpenBSD
+	* README: It's not Linux-only any more...
+	* configure.in: Additions for OpenBSD
+	* src/io_95.h: Moved..
+	* src/io.h: to this (now used in OBSD too)
+	* src/access_io.c: Modifications for OpenBSD.
+	* src/detect.c: ditto.
+	* src/ports.c: ditto.
+
 2002-07-06  Tim Waugh  <twaugh@redhat.com>
 
 	* Makefile.am: Fix up man page list.

@@ -281,7 +281,7 @@ populate_nt_ports (struct parport_list *list, int flags)
 static int
 populate_by_guessing (struct parport_list *list, int flags)
 {
-#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X)
+#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386)
   add_port (list, flags, "0x378", "/dev/port", 0x378, 0, -1);
   add_port (list, flags, "0x278", "/dev/port", 0x278, 0, -1);
   add_port (list, flags, "0x3bc", "/dev/port", 0x3bc, 0, -1);

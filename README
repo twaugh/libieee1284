@@ -5,9 +5,10 @@ This library is intended to be used by applications that need to
 communicate with (or at least identify) devices that are attached via
 a parallel port.
 
-It currently only works on Linux, but it would be nice to extend it to
-work on other architectures as well.  For Linux, there are some
-wrinkles in communicating with devices on parallel ports:
+It currently works on Linux, OpenBSD (i386 only), Solaris/x86, and Cygwin.
+
+For Linux, there are some wrinkles in communicating with devices on 
+parallel ports:
 
 - Applications that want to harvest IEEE 1284 Device ID information
   can look in /proc for it, but it is in a different location in 2.4

@@ -24,6 +24,10 @@ case "{$host}" in
 *-*-linux*)
         AC_DEFINE(HAVE_LINUX,1,enable ppdev access)
 ;;
+*86-*-openbsd*)
+        AC_DEFINE(HAVE_OBSD_I386,1,enable OpenBSD i386 ioperm access)
+	LIBS="-li386"
+;;
 *86-*-solaris*)
         AC_DEFINE(HAVE_SOLARIS,1,enable solaris iop access)
 	SOLARIS_IO="solaris_io"
