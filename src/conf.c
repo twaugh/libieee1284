@@ -204,6 +204,7 @@ static void disallow (FILE *f)
 	{
 	  dprintf ("* Disallowing ppdev\n");
 	  conf.disallow_ppdev = 1;
+	  break;
 	}
       else
 	{
