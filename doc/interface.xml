@@ -150,7 +150,8 @@
 	  tokens.  A non-quoted (or double-quoted) backslash character
 	  '\' preserves the literal value of the next character, and
 	  single and double quotes may be used for preserving
-	  white-space.</para>
+	  white-space.  Braces and equals signs are recognised as
+	  tokens, unless quoted or escaped.</para>
 
 	<para>The only configuration instruction that is currently
 	  recognised is <quote>disallow ppdev</quote>, for preventing
