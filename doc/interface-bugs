@@ -1,2 +1,2 @@
 - Buffers should be void*, not char*
-- The interface should enforce open/claimed conditions using types
+- ieee1284_open should be where parport*s come from, not ieee1284_find_ports
