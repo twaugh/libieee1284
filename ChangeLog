@@ -1,3 +1,13 @@
+2001-11-14  Tim Waugh  <twaugh@redhat.com>
+
+	* configure.in: Move AM_PROG_LIBTOOL to later to prevent warning.
+
+	* ieee1284.h: Add flags parameter for EPP/ECP functions.
+	default.h: Likewise.
+	default.c: Likewise.
+	detect.h: Likewise.
+	interface.c: Likewise.
+
 2001-11-13  Tim Waugh  <twaugh@redhat.com>
 
 	* ieee1284.h: s/st/dt/ in ieee1284_write_data prototype.

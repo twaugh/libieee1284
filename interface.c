@@ -143,59 +143,59 @@ ieee1284_byte_read (struct parport *port, char *buffer,
 }
 
 ssize_t
-ieee1284_epp_read_data (struct parport *port, char *buffer,
+ieee1284_epp_read_data (struct parport *port, int flags, char *buffer,
 			size_t len)
 {
   struct parport_internal *priv = port->priv;
-  return priv->fn->epp_read_data (priv, buffer, len);
+  return priv->fn->epp_read_data (priv, flags, buffer, len);
 }
 
 ssize_t
-ieee1284_epp_write_data (struct parport *port,
+ieee1284_epp_write_data (struct parport *port, int flags,
 			 const char *buffer, size_t len)
 {
   struct parport_internal *priv = port->priv;
-  return priv->fn->epp_write_data (priv, buffer, len);
+  return priv->fn->epp_write_data (priv, flags, buffer, len);
 }
 
 ssize_t
-ieee1284_epp_read_addr (struct parport *port, char *buffer,
+ieee1284_epp_read_addr (struct parport *port, int flags, char *buffer,
 			size_t len)
 {
   struct parport_internal *priv = port->priv;
-  return priv->fn->epp_read_addr (priv, buffer, len);
+  return priv->fn->epp_read_addr (priv, flags, buffer, len);
 }
 
 ssize_t
-ieee1284_epp_write_addr (struct parport *port,
+ieee1284_epp_write_addr (struct parport *port, int flags,
 			 const char *buffer, size_t len)
 {
   struct parport_internal *priv = port->priv;
-  return priv->fn->epp_write_addr (priv, buffer, len);
+  return priv->fn->epp_write_addr (priv, flags, buffer, len);
 }
 
 ssize_t
-ieee1284_ecp_read_data (struct parport *port, char *buffer,
+ieee1284_ecp_read_data (struct parport *port, int flags, char *buffer,
 			size_t len)
 {
   struct parport_internal *priv = port->priv;
-  return priv->fn->ecp_read_data (priv, buffer, len);
+  return priv->fn->ecp_read_data (priv, flags, buffer, len);
 }
 
 ssize_t
-ieee1284_ecp_write_data (struct parport *port,
+ieee1284_ecp_write_data (struct parport *port, int flags,
 			 const char *buffer, size_t len)
 {
   struct parport_internal *priv = port->priv;
-  return priv->fn->ecp_write_data (priv, buffer, len);
+  return priv->fn->ecp_write_data (priv, flags, buffer, len);
 }
 
 ssize_t
-ieee1284_ecp_write_addr (struct parport *port,
+ieee1284_ecp_write_addr (struct parport *port, int flags,
 			 const char *buffer, size_t len)
 {
   struct parport_internal *priv = port->priv;
-  return priv->fn->ecp_write_addr (priv, buffer, len);
+  return priv->fn->ecp_write_addr (priv, flags, buffer, len);
 }
 
 /*

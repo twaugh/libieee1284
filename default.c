@@ -276,56 +276,56 @@ default_byte_read (struct parport_internal *port,
 }
 
 ssize_t
-default_epp_read_data (struct parport_internal *port,
+default_epp_read_data (struct parport_internal *port, int flags,
 		       char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
 ssize_t
-default_epp_write_data (struct parport_internal *port,
+default_epp_write_data (struct parport_internal *port, int flags,
 			const char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
 ssize_t
-default_epp_read_addr (struct parport_internal *port,
+default_epp_read_addr (struct parport_internal *port, int flags,
 		       char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
 ssize_t
-default_epp_write_addr (struct parport_internal *port,
+default_epp_write_addr (struct parport_internal *port, int flags,
 			const char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
 ssize_t
-default_ecp_read_data (struct parport_internal *port,
+default_ecp_read_data (struct parport_internal *port, int flags,
 		       char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
 ssize_t
-default_ecp_write_data (struct parport_internal *port,
+default_ecp_write_data (struct parport_internal *port, int flags,
 			const char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
 ssize_t
-default_ecp_read_addr (struct parport_internal *port,
+default_ecp_read_addr (struct parport_internal *port, int flags,
 		       char *buffer, size_t len)
 {
   return E1284_NOTIMPL;
 }
 
 ssize_t
-default_ecp_write_addr (struct parport_internal *port,
+default_ecp_write_addr (struct parport_internal *port, int flags,
 			const char *buffer, size_t len)
 {
   return E1284_NOTIMPL;

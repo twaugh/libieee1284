@@ -70,21 +70,21 @@ struct parport_access_methods
 			   const char *buffer, size_t len);
   ssize_t (*byte_read) (struct parport_internal *port,
 			char *buffer, size_t len);
-  ssize_t (*epp_read_data) (struct parport_internal *port,
+  ssize_t (*epp_read_data) (struct parport_internal *port, int flags,
 			    char *buffer, size_t len);
-  ssize_t (*epp_write_data) (struct parport_internal *port,
+  ssize_t (*epp_write_data) (struct parport_internal *port, int flags,
 			     const char *buffer, size_t len);
-  ssize_t (*epp_read_addr) (struct parport_internal *port,
+  ssize_t (*epp_read_addr) (struct parport_internal *port, int flags,
 			    char *buffer, size_t len);
-  ssize_t (*epp_write_addr) (struct parport_internal *port,
+  ssize_t (*epp_write_addr) (struct parport_internal *port, int flags,
 			     const char *buffer, size_t len);
-  ssize_t (*ecp_read_data) (struct parport_internal *port,
+  ssize_t (*ecp_read_data) (struct parport_internal *port, int flags,
 			    char *buffer, size_t len);
-  ssize_t (*ecp_write_data) (struct parport_internal *port,
+  ssize_t (*ecp_write_data) (struct parport_internal *port, int flags,
 			     const char *buffer, size_t len);
-  ssize_t (*ecp_read_addr) (struct parport_internal *port,
+  ssize_t (*ecp_read_addr) (struct parport_internal *port, int flags,
 			    char *buffer, size_t len);
-  ssize_t (*ecp_write_addr) (struct parport_internal *port,
+  ssize_t (*ecp_write_addr) (struct parport_internal *port, int flags,
 			     const char *buffer, size_t len);
 };
 

@@ -207,17 +207,17 @@ extern ssize_t ieee1284_compat_write (struct parport *port,
 				      const char *buffer, size_t len);
 extern ssize_t ieee1284_byte_read (struct parport *port, char *buffer,
 				   size_t len);
-extern ssize_t ieee1284_epp_read_data (struct parport *port, char *buffer,
-				       size_t len);
-extern ssize_t ieee1284_epp_write_data (struct parport *port,
+extern ssize_t ieee1284_epp_read_data (struct parport *port, int flags,
+				       char *buffer, size_t len);
+extern ssize_t ieee1284_epp_write_data (struct parport *port, int flags,
 					const char *buffer, size_t len);
-extern ssize_t ieee1284_epp_read_addr (struct parport *port, char *buffer,
-				       size_t len);
-extern ssize_t ieee1284_epp_write_addr (struct parport *port,
+extern ssize_t ieee1284_epp_read_addr (struct parport *port, int flags,
+				       char *buffer, size_t len);
+extern ssize_t ieee1284_epp_write_addr (struct parport *port, int flags,
 					const char *buffer, size_t len);
-extern ssize_t ieee1284_ecp_read_data (struct parport *port, char *buffer,
-				       size_t len);
-extern ssize_t ieee1284_ecp_write_data (struct parport *port,
+extern ssize_t ieee1284_ecp_read_data (struct parport *port, int flags,
+				       char *buffer, size_t len);
+extern ssize_t ieee1284_ecp_write_data (struct parport *port, int flags,
 					const char *buffer, size_t len);
-extern ssize_t ieee1284_ecp_write_addr (struct parport *port,
+extern ssize_t ieee1284_ecp_write_addr (struct parport *port, int flags,
 					const char *buffer, size_t len);

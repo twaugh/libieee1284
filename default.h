@@ -34,21 +34,25 @@ extern ssize_t default_compat_write (struct parport_internal *port,
 extern ssize_t default_byte_read (struct parport_internal *port,
 				  char *buffer, size_t len);
 extern ssize_t default_epp_read_data (struct parport_internal *port,
-				      char *buffer, size_t len);
+				      int flags, char *buffer, size_t len);
 extern ssize_t default_epp_write_data (struct parport_internal *port,
-				       const char *buffer, size_t len);
+				       int flags, const char *buffer,
+				       size_t len);
 extern ssize_t default_epp_read_addr (struct parport_internal *port,
-				      char *buffer, size_t len);
+				      int flags, char *buffer, size_t len);
 extern ssize_t default_epp_write_addr (struct parport_internal *port,
-				       const char *buffer, size_t len);
+				       int flags, const char *buffer,
+				       size_t len);
 extern ssize_t default_ecp_read_data (struct parport_internal *port,
-				      char *buffer, size_t len);
+				      int flags, char *buffer, size_t len);
 extern ssize_t default_ecp_write_data (struct parport_internal *port,
-				       const char *buffer, size_t len);
+				       int flags, const char *buffer,
+				       size_t len);
 extern ssize_t default_ecp_read_addr (struct parport_internal *port,
-				      char *buffer, size_t len);
+				      int flags, char *buffer, size_t len);
 extern ssize_t default_ecp_write_addr (struct parport_internal *port,
-				       const char *buffer, size_t len);
+				       int flags, const char *buffer,
+				       size_t len);
 
 /*
  * Local Variables:
