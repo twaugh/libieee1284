@@ -57,7 +57,16 @@ esac
 
 AM_CONDITIONAL(SOLARIS_IO, test x$solaris_io = xtrue)
 
+AC_ARG_WITH([python],
+	    AC_HELP_STRING([--with-python],
+			   [build python bindings]),
+	    [ac_cv_use_python=$withval], [ac_cv_use_python=yes])
+AC_CACHE_CHECK([whether to build python bindings],
+	       [ac_cv_use_python], [ac_cv_use_python=yes])
+AM_CONDITIONAL(PYTHON, test x$ac_cv_use_python = xyes)
+if test $ac_cv_use_python = yes; then
 AM_PATH_PYTHON
+fi
 
 dnl Checks for library functions.
 

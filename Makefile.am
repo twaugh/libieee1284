@@ -31,11 +31,13 @@ libieee1284_test_SOURCES = tests/test.c
 libieee1284_test_LDADD = libieee1284.la
 
 # Python bindings
+src_ieee1284module_la_SOURCES = src/ieee1284module.c
+if PYTHON
 pyexec_LTLIBRARIES = src/ieee1284module.la
 src_ieee1284module_la_LDFLAGS = -module -avoid-version
 src_ieee1284module_la_LIBADD = libieee1284.la
 src_ieee1284module_la_CFLAGS = -I/usr/include/python$(PYTHON_VERSION) -fpic
-src_ieee1284module_la_SOURCES = src/ieee1284module.c
+endif
 
 man3_MANS = doc/libieee1284.3 \
 	doc/parport.3 \
