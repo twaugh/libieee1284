@@ -766,7 +766,8 @@
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
+	       invalid (for instance, the <parameter>port</parameter>
+	       may already be open).</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -834,7 +835,7 @@
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
+	       invalid (perhaps it is not open, for instance).</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -916,7 +917,8 @@
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
+	       invalid (for instance, it might not have been opened
+	       yet).</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -1022,9 +1024,13 @@
 	<title>Description</title>
 
 	<para>These functions manipulate the data lines of the
-	 parallel port.  The lines are represented by an 8-bit number
-	 (one line per bit) and a direction.  The data lines are
-	 driven as a group; they may be all host-driven
+	 parallel port associated with <parameter>port</parameter>
+	 (which must have been claimed using <citerefentry>
+	    <refentrytitle>ieee1284_claim</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	  </citerefentry>).  The lines are represented by an 8-bit
+	 number (one line per bit) and a direction.  The data lines
+	 are driven as a group; they may be all host-driven
 	 (<firstterm>forward</firstterm> direction) or not
 	 (<firstterm>reverse</firstterm> direction).  When the
 	 peripheral is driving them the host must not.</para>
@@ -1066,7 +1072,8 @@
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
+	       invalid (perhaps it has not been claimed, for
+	       instance).</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -1146,6 +1153,10 @@
   S1284_INVERTED = S1284_BUSY,
 };]]></programlisting>
 
+	<para>These functions all act on the parallel port associated
+	 with <parameter>port</parameter>, which must be
+	 claimed.</para>
+
 	<para>The purpose of <function>ieee1284_wait_status</function>
 	 is to wait until particular status lines have specified
 	 values.  Its <parameter>timeout</parameter> parameter may be
@@ -1199,7 +1210,8 @@
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
+	       invalid (for instance, perhaps the
+	       <parameter>port</parameter> is not claimed).</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
@@ -1288,6 +1300,10 @@
                     C1284_NSELECTIN),
 };]]></programlisting>
 
+	<para>These functions all act on the parallel port associated
+	 with <parameter>port</parameter>, which must be
+	 claimed.</para>
+
 	<para>The current values on the control lines are available by
 	 calling <function>ieee1284_read_control</function>, and may
 	 be set by calling
@@ -1353,7 +1369,8 @@
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
+	       invalid (for instance, perhaps it is not
+	       claimed).</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
@@ -1383,7 +1400,8 @@
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
+	       invalid (for instance, perhaps it is not
+	       claimed).</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
@@ -1438,6 +1456,9 @@
 	<para>To terminate the special mode and go back to
 	 compatilibity mode use
 	 <function>ieee1284_terminate</function>.</para>
+
+	<para>These functions act on the parallel port associated with
+	 <parameter>port</parameter>, which must be claimed.</para>
       </refsect1>
 
       <refsect1>
@@ -1568,7 +1589,8 @@
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
+	       invalid (for instance, perhaps the
+	       <parameter>port</parameter> is not claimed).</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
@@ -1612,6 +1634,8 @@
 	 <function>ieee1284_ecp_rev_to_fwd</function> to switch from
 	 reverse to forward.</para>
 
+	<para>They act on the parallel port associated with
+	 <parameter>port</parameter>, which must be claimed.</para>
       </refsect1>
 
       <refsect1>
@@ -1639,7 +1663,8 @@
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
+	       invalid (for instance, perhaps the
+	       <parameter>port</parameter> is not claimed).</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
@@ -1779,6 +1804,9 @@
 	 <firstterm>address</firstterm> (usually referred to as
 	 <firstterm>channel</firstterm> in ECP).</para>
 
+	<para>The supplied <parameter>port</parameter> must be a
+	 claimed port.</para>
+
 	<para>The supplied <parameter>buffer</parameter> must be at
 	 least <parameter>len</parameter> bytes long.  When reading,
 	 the transferred data is stored in the buffer; when writing
@@ -1900,7 +1928,8 @@
 	    <term>&e1284invalidport;</term>
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
+	       invalid (for instance, perhaps the
+	       <parameter>port</parameter> is not claimed).</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
@@ -2005,7 +2034,8 @@
 	      <term>&e1284invalidport;</term>
 	      <listitem>
 		<para>The <parameter>port</parameter> parameter is
-	         invalid.</para>
+	         invalid (for instance, perhaps the
+	         <parameter>port</parameter> is not open).</para>
 	      </listitem>
 	    </varlistentry>
 	  </variablelist></para>
@@ -2046,7 +2076,8 @@
 	      <term>&e1284invalidport;</term>
 	      <listitem>
 		<para>The <parameter>port</parameter> parameter is
-	         invalid.</para>
+	         invalid (for instance, perhaps the
+	         <parameter>port</parameter> is not claimed).</para>
 	      </listitem>
 	    </varlistentry>
 	  </variablelist></para>
