@@ -176,14 +176,14 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>int
 	    <function>ieee1284_find_ports</function></funcdef>
 	    <paramdef>struct parport_list
-	    *<parameter>list</parameter>, int
-	    <parameter>flags</parameter></paramdef>
+              *<parameter>list</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
       </refsynopsisdiv>
@@ -250,8 +250,8 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>void <function>ieee1284_free_ports</function></funcdef>
 	    <paramdef>struct parport_list
@@ -290,16 +290,16 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_get_deviceid</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	      <parameter>daisy</parameter>, int
-	      <parameter>flags</parameter>, char
-	      *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>daisy</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
+	    <paramdef>char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
       </refsynopsisdiv>
@@ -446,13 +446,13 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_open</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	      <parameter>flags</parameter>, int
-	      *<parameter>capabilities</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
+	    <paramdef>int *<parameter>capabilities</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
       </refsynopsisdiv>
@@ -678,8 +678,8 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_close</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
@@ -746,8 +746,8 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_claim</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
@@ -828,8 +828,8 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>void <function>ieee1284_release</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
@@ -867,28 +867,28 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_read_data</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
 	  </funcprototype>
 	  <funcprototype>
 	    <funcdef>void <function>ieee1284_write_data</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
-	    unsigned char <parameter>dt</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>unsigned char <parameter>dt</parameter></paramdef>
 	  </funcprototype>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_data_dir</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	    <parameter>reverse</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>reverse</parameter></paramdef>
 	  </funcprototype>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_wait_data</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
-	    unsigned char <parameter>mask</parameter>, unsigned char
-	    <parameter>val</parameter>, struct timeval
-	    *<parameter>timeout</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>unsigned char <parameter>mask</parameter></paramdef>
+	    <paramdef>unsigned char <parameter>val</parameter></paramdef>
+	    <paramdef>struct timeval *<parameter>timeout</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
       </refsynopsisdiv>
@@ -984,8 +984,8 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_read_status</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
@@ -993,9 +993,10 @@
 
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_wait_status</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
-	      unsigned char <parameter>mask</parameter>, unsigned char
-	    <parameter>val</parameter>, struct timeval *<parameter>timeout</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>unsigned char <parameter>mask</parameter></paramdef>
+	    <paramdef>unsigned char <parameter>val</parameter></paramdef>
+	    <paramdef>struct timeval *<parameter>timeout</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
       </refsynopsisdiv>
@@ -1110,8 +1111,8 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_read_control</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
@@ -1119,24 +1120,24 @@
 
 	  <funcprototype>
 	    <funcdef>void <function>ieee1284_write_control</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
-	      unsigned char <parameter>ct</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>unsigned char <parameter>ct</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>void <function>ieee1284_frob_control</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
-	      unsigned char <parameter>mask</parameter>, unsigned char
-	      <parameter>val</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>unsigned char <parameter>mask</parameter></paramdef>
+	    <paramdef>unsigned char <parameter>val</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>int
 	      <function>ieee1284_do_nack_handshake</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
-	      unsigned char <parameter>ct_before</parameter>, unsigned
-	      char <parameter>ct_after</parameter>, struct timeval
-	      *<parameter>timeout</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>unsigned char <parameter>ct_before</parameter></paramdef>
+	    <paramdef>unsigned char <parameter>ct_after</parameter></paramdef>
+	    <paramdef>struct timeval *<parameter>timeout</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
       </refsynopsisdiv>
@@ -1277,12 +1278,12 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_negotiate</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	    <parameter>mode</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>mode</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
@@ -1462,7 +1463,6 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_ecp_fwd_to_rev</function></funcdef>
@@ -1543,101 +1543,101 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_nibble_read</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
-	      char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_compat_write</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
-	      const char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>const char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>ssize_t <function>ieee1284_byte_read</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
-	      char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_epp_read_data</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	      <parameter>flags</parameter>,
-	      char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
+	    <paramdef>char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_epp_write_data</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	      <parameter>flags</parameter>,
-	      const char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
+	    <paramdef>const char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_epp_read_addr</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	      <parameter>flags</parameter>,
-	      char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
+	    <paramdef>char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_epp_write_addr</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	      <parameter>flags</parameter>,
-	      const char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
+	    <paramdef>const char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_ecp_read_data</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	      <parameter>flags</parameter>,
-	      char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
+	    <paramdef>char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_ecp_write_data</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	      <parameter>flags</parameter>,
-	      const char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
+	    <paramdef>const char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_ecp_read_addr</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	      <parameter>flags</parameter>,
-	      char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
+	    <paramdef>char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 
 	  <funcprototype>
 	    <funcdef>ssize_t
 	      <function>ieee1284_ecp_write_addr</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>, int
-	      <parameter>flags</parameter>,
-	      const char *<parameter>buffer</parameter>, size_t
-	      <parameter>len</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
+	    <paramdef>const char *<parameter>buffer</parameter></paramdef>
+	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
       </refsynopsisdiv>
@@ -1767,8 +1767,8 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_get_irq_fd</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
@@ -1834,13 +1834,13 @@
       </refnamediv>
 
       <refsynopsisdiv>
-	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
 	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
 	  <funcprototype>
 	    <funcdef>struct timeval
 	    *<function>ieee1284_set_timeout</function></funcdef>
-	    <paramdef>struct parport *<parameter>port</parameter>,
-	    struct timeval *<parameter>timeout</parameter></paramdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>struct timeval *<parameter>timeout</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
       </refsynopsisdiv>
