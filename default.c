@@ -221,7 +221,7 @@ default_nibble_read (struct parport_internal *port,
       if ((count & 1) == 0 &&
 	  (fn->read_status (port) & S1284_NFAULT))
 	{
-	  printf ("No more data\n");
+	  dprintf ("No more data\n");
 	  fn->frob_control (port, C1284_NAUTOFD, 0);
 	  break;
 	}
