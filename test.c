@@ -39,10 +39,13 @@ int main ()
       printf ("  %s: ", pl.portv[i]->name);
       if (ieee1284_get_deviceid (pl.portv[i], -1, F1284_FRESH, id, 500) > -1)
 	printf ("%s", class (id));
+      else if (ieee1284_get_deviceid (pl.portv[i], -1, 0, id, 500) > -1)
+	printf ("(may be cached) %s", class (id));
       printf ("\n");
       for (j = 0; j < 4; j++)
 	if (ieee1284_get_deviceid (pl.portv[i], j, 0, id, 500) > -1)
-	  printf ("    Daisy chain address %d: %s\n", j, class (id));
+	  printf ("    Daisy chain address %d: (may be cached) %s\n", j,
+		  class (id));
     }
   ieee1284_free_ports (&pl);
   return 0;
