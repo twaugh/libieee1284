@@ -1,5 +1,8 @@
 2003-02-22  Tim Waugh  <twaugh@redhat.com>
 
+	* src/default.c (default_ecp_write_data): Don't drop strobe too
+	early (spotted by Gretus).
+
 	* src/default.c (default_ecp_write_addr): Implemented by Gretus
 	Hoogestraat <gretus@nine11.de>.
 

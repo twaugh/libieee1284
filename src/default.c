@@ -733,7 +733,7 @@ default_ecp_write_data (struct parport_internal *port, int flags,
   port->current_phase = PH1284_FWD_DATA;
 
   /* HostAck high (data, not command) */
-  fn->frob_control (port, C1284_NAUTOFD | C1284_NSTROBE | C1284_NINIT, 
+  fn->frob_control (port, C1284_NAUTOFD | C1284_NINIT, 
 	           C1284_NAUTOFD | C1284_NINIT);
 
   for (written = 0; written < len; written++, buf++) {
