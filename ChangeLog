@@ -1,5 +1,9 @@
 2004-02-03  Tim Waugh  <twaugh@redhat.com>
 
+	* configure.in, Makefile.am: Version 0.2.9pre1 (pre-test).
+
+2004-02-03  Tim Waugh  <twaugh@redhat.com>
+
 	* src/ieee1284module.c: Python extension module.
 	* configure.in: Check for Python paths.
 	* Makefile.am: Build and install Python extension module.
