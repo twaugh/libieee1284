@@ -302,6 +302,9 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
 {
   int ret = -1;
 
+  if (flags & ~(F1284_FRESH))
+    return E1284_NOTIMPL;
+
   detect_environment (0);
 
   if (!(flags & F1284_FRESH))

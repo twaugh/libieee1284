@@ -2,6 +2,7 @@
 
 	* ports.c (ieee1284_find_ports): Watch out for flags we don't yet
 	support.
+	* deviceid.c (ieee1284_get_deviceid): Likewise.
 
 	* ieee1284.h (enum ieee1284_transfer_flags): Add F1284_SWE and
 	F1284_RLE flags.
