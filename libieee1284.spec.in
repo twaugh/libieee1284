@@ -27,17 +27,14 @@ developing applications that use libieee1284.
 %build
 %configure
 make CFLAGS="$RPM_OPT_FLAGS"
-# Also make the documentation in PDF and man format
+# Also make the documentation in PDF format
 cd doc
 docbook2pdf interface.sgml
-docbook2man interface.sgml
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}%{_mandir}/man3
 %makeinstall
 MAN3=%{buildroot}%{_mandir}/man3
-install -m 644 doc/*.3 ${MAN3}
 for fn in read_control write_control frob_control do_nack_handshake
 do
 	ln -s ieee1284_control.3 ${MAN3}/ieee1284_${fn}.3
@@ -79,7 +76,15 @@ rm -rf %{buildroot}
 %{_libdir}/*.la
 %{_mandir}/*/*
 
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
 %changelog
+* Wed Apr 24 2002 Tim Waugh <twaugh@redhat.com>
+- The tarball builds its own man pages now; just adjust the symlinks.
+- Run ldconfig.
+
 * Mon Jan  7 2002 Tim Waugh <twaugh@redhat.com>
 - Ship the PDF file with the devel package.
 

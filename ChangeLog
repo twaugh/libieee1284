@@ -1,3 +1,18 @@
+2002-04-24  Tim Waugh  <twaugh@redhat.com>
+
+	* Makefile.am: New directory structure.  Build man pages.
+	* configure.in: Update.  Use automake 1.6 and autoconf 2.53.
+	* access.h, access_io.c, blockio.c, debug.c, debug.h, default.c,
+	default.h, delay.c, delay.h, detect.c, detect.h, deviceid.c,
+	interface.c, parport.h, ports.c, ppdev.h, state.c: Moved..
+	* src/: ..here.
+	* ieee1284.h: Moved..
+	* include/: ..here.
+	* test.c: Moved..
+	* tests/: ..here.
+	* libieee1284.spec.in: Don't build man pages here, since we do
+	that via automake now.  Run ldconfig in scriptlets.
+
 2002-04-09  Tim Waugh  <twaugh@redhat.com>
 
 	* configure.in: Version 0.1.5 (devel).
