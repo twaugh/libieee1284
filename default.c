@@ -110,7 +110,6 @@ default_negotiate (struct parport_internal *port, int mode)
 		       S1284_PERROR|S1284_SELECT|S1284_NFAULT, &tv))
   {
     dprintf ("Failed at event 2\n");
-    ieee1284_display_status (port);
     goto abort;
   }
 
