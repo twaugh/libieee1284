@@ -1,6 +1,8 @@
 ieee1284_find_ports
 ieee1284_free_ports
 ieee1284_get_deviceid
+ieee1284_open
+ieee1284_close
 ieee1284_claim
 ieee1284_release
 ieee1284_read_data
