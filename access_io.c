@@ -141,12 +141,10 @@ raw_frob_control (struct parport_internal *port,
 		  unsigned char mask,
 		  unsigned char val)
 {
-  unsigned char newmask, newval;
   unsigned char ctr = port->ctr;
   /* Deal with inversion issues. */
-  newmask = mask | (val & C1284_INVERTED);
-  newval = val ^ (mask & C1284_INVERTED);
-  ctr = (ctr & ~newmask) ^ newval;
+  val ^= mask & C1284_INVERTED;
+  ctr = (ctr & ~mask) ^ val;
   port->fn->outb (port, ctr, port->base + 2);
   port->ctr = ctr;
 }

@@ -149,7 +149,7 @@ frob_control (struct parport_internal *port,
     }
 
   /* Deal with inversion issues. */
-  ppfs.mask = mask | (val & C1284_INVERTED);
+  ppfs.mask = mask;
   ppfs.val = val ^ (mask & C1284_INVERTED);
   dprintf ("frob_control: ioctl(%d, PPFCONTROL, { mask:%#02x, val:%#02x }\n",
 	   port->fd, ppfs.mask, ppfs.val);
