@@ -1,5 +1,9 @@
 2002-08-24  Tim Waugh  <twaugh@redhat.com>
 
+	* configure.in, Makefile.am: Version 0.2.1 (stable).
+
+2002-08-24  Tim Waugh  <twaugh@redhat.com>
+
 	* src/ports.c (sort_ports): Sort the port list in name order.
 	(add_port): Keep the list sorted, for minimal surprise.
 
