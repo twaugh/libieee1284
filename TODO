@@ -10,5 +10,7 @@ Still to do in the implementation:
 
 - Notice/handle USB printers, at least for device IDs.
 
+- Python bindings
+
 --
 Tim Waugh <tim@cyberelk.net>
