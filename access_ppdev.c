@@ -84,16 +84,10 @@ claim (struct parport_internal *port)
   return E1284_OK;
 }
 
-static int
+static void
 release (struct parport_internal *port)
 {
-  if (ioctl (port->fd, PPRELEASE))
-    {
-      dprintf ("<== E1284_SYS\n");
-      return E1284_SYS;
-    }
-  dprintf ("<== E1284_OK\n");
-  return E1284_OK;
+  ioctl (port->fd, PPRELEASE);
 }
 
 static int
