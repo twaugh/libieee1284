@@ -1,5 +1,9 @@
 2005-03-11  Tim Waugh  <twaugh@redhat.com>
 
+	* configure.in: Version 0.2.10pre2 (pre-test).
+
+2005-03-11  Tim Waugh  <twaugh@redhat.com>
+
 	* src/access_io.c, src/access_lpt.c, src/access_ppdev.c,
 	  src/detect.c, src/detect.h, src/ports.c, src/state.c: Modifications
 	to support udev-054.  Patch from Julien BLACHE <jblache@debian.org>.
