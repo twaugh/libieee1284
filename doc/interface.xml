@@ -17,7 +17,7 @@
 <book id="index">
   <bookinfo>
     <title>Public interface of &libieee1284;</title>
-    <subtitle>API 3</subtitle>
+    <subtitle>API 3.1</subtitle>
 
     <author>
       <firstname>Tim</firstname>
@@ -1931,6 +1931,7 @@
 
       <refnamediv>
 	<refname>ieee1284_get_irq_fd</refname>
+	<refname>ieee1284_clear_irq</refname>
 	<refpurpose>interrupt notification</refpurpose>
       </refnamediv>
 
@@ -1940,6 +1941,12 @@
 	  <funcprototype>
 	    <funcdef>int <function>ieee1284_get_irq_fd</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_clear_irq</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	     unsigned int *<parameter>count</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
       </refsynopsisdiv>
@@ -1970,31 +1977,79 @@
 
 	<para>The caller must not close the file descriptor, and may
 	 not use it at all when the port is not claimed.</para>
+
+	<para>When an interrupt has been detected, the caller must
+	 call <function>ieee1284_clear_irq</function> to clear the
+	 interrupt condition, at which point the number of interrupts
+	 raised can be obtained by supplying a
+	 non-<constant>NULL</constant>
+	 <parameter>count</parameter>.</para>
       </refsect1>
 
       <refsect1>
 	<title>Return value</title>
 
-	<para>If the return value is negative then it is an error code
-	 listed below.  Otherwise it is a valid file
-	 descriptor.</para>
+	<para>For <function>ieee1284_get_irq_fd</function>: If the
+	 return value is negative then it is an error code listed
+	 below.  Otherwise it is a valid file descriptor.
 
-	<variablelist>
-	  <varlistentry>
-	    <term>&e1284notavail;</term>
-	    <listitem>
-	      <para>No such file descriptor is available.</para>
-	    </listitem>
-	  </varlistentry>
+	  <variablelist>
+	    <varlistentry>
+	      <term>&e1284notavail;</term>
+	      <listitem>
+		<para>No such file descriptor is available.</para>
+	      </listitem>
+	    </varlistentry>
 
-	  <varlistentry>
-	    <term>&e1284invalidport;</term>
-	    <listitem>
-	      <para>The <parameter>port</parameter> parameter is
-	       invalid.</para>
-	    </listitem>
-	  </varlistentry>
-	</variablelist>
+	    <varlistentry>
+	      <term>&e1284invalidport;</term>
+	      <listitem>
+		<para>The <parameter>port</parameter> parameter is
+	         invalid.</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist></para>
+
+	<para>For <function>ieee1284_clear_irq</function>:
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>&e1284ok;</term>
+	      <listitem>
+		<para>The interrupt has been cleared.  If
+		 <parameter>count</parameter> was not
+		 <constant>NULL</constant> the count of interrupts has
+		 been atomically stored to
+		 <parameter>count</parameter> and reset.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>&e1284notavail;</term>
+	      <listitem>
+		<para>The <parameter>count</parameter> parameter was
+		 not <constant>NULL</constant> but interrupt counting
+		 is not supported on this type of port.  The interrupt
+		 has been cleared.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>&e1284sys;</term>
+	      <listitem>
+		<para>There was a problem clearing the
+		 interrupt.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>&e1284invalidport;</term>
+	      <listitem>
+		<para>The <parameter>port</parameter> parameter is
+	         invalid.</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist></para>
       </refsect1>
     </refentry>
 
