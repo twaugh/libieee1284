@@ -495,6 +495,20 @@
 
 	<variablelist>
 	  <varlistentry>
+	    <term><constant>CAP1284_RAW</constant></term>
+	    <listitem>
+	      <para>Pin-level access is available.  If this capability
+	       is present then the following functions are effective:
+	       <function>ieee1284_write_data</function>,
+	       <function>ieee1284_read_status</function>,
+	       <function>ieee1284_wait_status</function>,
+	       <function>ieee1284_write_control</function>,
+	       <function>ieee1284_read_control</function>,
+	       <function>ieee1284_frob_control</function>.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
 	    <term><constant>CAP1284_NIBBLE</constant></term>
 	    <listitem>
 	      <para>There is an implementation of nibble mode for this
@@ -866,7 +880,7 @@
 	    unsigned char <parameter>dt</parameter></paramdef>
 	  </funcprototype>
 	  <funcprototype>
-	    <funcdef>void <function>ieee1284_data_dir</function></funcdef>
+	    <funcdef>int <function>ieee1284_data_dir</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter>, int
 	    <parameter>reverse</parameter></paramdef>
 	  </funcprototype>
@@ -1023,7 +1037,7 @@
 
 	<para>For <function>ieee1284_wait_status</function>, the
 	 return value is &e1284ok; if the status
-	 lines now reflect the desired values (i.e. status &
+	 lines now reflect the desired values (i.e. status &amp;
 	 <parameter>mask</parameter> is <parameter>val</parameter>),
 	 or a negative result indicating an error.</para>
 
@@ -1154,7 +1168,7 @@
 
 	<para>To adjust the values on a set of control lines, use
 	 <function>ieee1284_frob_control</function>.  The effect of
-	 this can be expressed by: <literal>ctr = ((ctr & ~mask) ^
+	 this can be expressed by: <literal>ctr = ((ctr &amp; ~mask) ^
 	 val)</literal>; that is, the bits in
 	 <parameter>mask</parameter> are unset, and then those in
 	 <parameter>val</parameter> are inverted.</para>
