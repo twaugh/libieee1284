@@ -1,4 +1,4 @@
-2002-10-12  Julien BLACHE  <jblache@debian.org
+2002-10-12  Julien BLACHE  <jblache@debian.org>
 
 	* src/access_io.c, src/detect.h: Prevent conflicts with inb/outb
 	macros.
