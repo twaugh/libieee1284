@@ -29,6 +29,7 @@
 
 #include "config.h"
 #include "ieee1284.h"
+#include "debug.h"
 #include "detect.h"
 
 #define MAX_PORTS 20

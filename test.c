@@ -52,7 +52,8 @@ static char *field (char *id, enum devid_field f)
 	  *q = '\0';
 	}
       result = strdup (p); // leaks, but this is just a test harness
-      *q = c;
+      if (q)
+	*q = c;
     }
 
   return result;
@@ -103,6 +104,7 @@ static int show_capabilities (unsigned int cap)
   CAP(IRQ);
   CAP(DMA);
   putchar ('\n');
+  return 0;
 }
 
 void test_open (struct parport_list *pl)
@@ -117,9 +119,9 @@ void test_open (struct parport_list *pl)
         printf ("%s: inaccessible\n", port->name);
       else
 	{
-	  printf ("%s: %#x", port->name, port->base_addr);
+	  printf ("%s: %#lx", port->name, port->base_addr);
 	  if (port->hibase_addr)
-	    printf (" (ECR at %#x)", port->hibase_addr);
+	    printf (" (ECR at %#lx)", port->hibase_addr);
 	  printf ("\n  ");
 	  show_capabilities (cap);
 	  ieee1284_close (port);
