@@ -1,3 +1,9 @@
+2002-05-21  Tim Waugh  <twaugh@redhat.com>
+
+	* src/detect.c (check_dev_node): Check the return value of the
+	PPCLAIM ioctl to make sure that this is actually a ppdev device.
+	Suggested by Matthew Duggan.
+
 2002-04-26  Tim Waugh  <twaugh@redhat.com>
 
 	* interface.sgml: Renamed to..

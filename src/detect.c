@@ -75,7 +75,13 @@ check_dev_node (const char *type)
 	{
 	  /* Make sure that we can actually claim the device.  This will
 	   * force the low-level port driver to get loaded. */
-	  ioctl (fd, PPCLAIM);
+	  if (ioctl (fd, PPCLAIM) < 0)
+	    {
+	      dprintf ("couldn't claim %s\n", name);
+	      close (fd);
+	      continue;
+	    }
+
 	  ioctl (fd, PPRELEASE);
 	}
 
