@@ -109,8 +109,6 @@ cleanup (struct parport_internal *port)
 {
   if (port->type != IO_CAPABLE && port->fd >= 0)
     close (port->fd);
-
-  free ((struct parport_access_methods *) (port->fn));
 }
 
 static int
