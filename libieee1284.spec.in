@@ -1,0 +1,83 @@
+Summary: A library for interfacing IEEE 1284-compatible devices.
+Name: libieee1284
+Version: @VERSION@
+Release: 0.1
+License: GPL
+Group: System Environment/Libraries
+URL: http://cyberelk.net/tim/libieee1284/
+Source0: ftp://cyberelk.net/tim/data/%{name}/devel/%{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
+BuildRequires: docbook-dtd41-sgml docbook-utils-pdf >= 0.6.9-9
+
+%description
+The libieee1284 library is for communicating with parallel port devices.
+
+%package devel
+Summary: Files for developing applications that use libieee1284.
+Requires: %{name} = %{version}
+Group: Development/Libraries
+
+%description devel
+The header files, static library, libtool library and man pages for
+developing applications that use libieee1284.
+
+%prep
+%setup -q
+
+%build
+%configure
+make CFLAGS="$RPM_OPT_FLAGS"
+# Also make the documentation in PDF and man format
+cd doc
+docbook2pdf interface.sgml
+docbook2man interface.sgml
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}%{_mandir}/man3
+%makeinstall
+MAN3=%{buildroot}%{_mandir}/man3
+install -m 644 doc/*.3 ${MAN3}
+for fn in read_control write_control frob_control do_nack_handshake
+do
+	ln -s ieee1284_control.3 ${MAN3}/ieee1284_${fn}.3.gz
+done
+ln -s ieee1284_ecp_fwd_to_rev.3 ${MAN3}/ieee1284_ecp_rev_to_fwd.3.gz
+for fn in negotiate terminate
+do
+	ln -s ieee1284_negotiation.3 ${MAN3}/ieee1284_${fn}.3.gz
+done
+for fn in read wait
+do
+	ln -s ieee1284_status.3 ${MAN3}/ieee1284_${fn}_status.3.gz
+done
+for fn in nibble_read compat_write byte_read epp_read_data \
+	epp_write_data epp_read_addr epp_write_addr ecp_read_data \
+	ecp_write_data ecp_read_addr ecp_write_addr
+do
+	ln -s ieee1284_transfer.3 ${MAN3}/ieee1284_${fn}.3.gz
+done
+for fn in read_data write_data data_dir
+do
+	ln -s ieee1284_data.3 ${MAN3}/ieee1284_${fn}.3.gz
+done
+
+%clean
+rm -rf %{buildroot}
+
+%files
+%defattr(-,root,root)
+%doc README COPYING TODO
+%{_libdir}/*.so.*
+
+%files devel
+%defattr(-,root,root)
+%{_includedir}/ieee1284.h
+%{_libdir}/*.a
+%{_libdir}/*.so
+%{_libdir}/*.la
+%{_mandir}/*/*
+
+%changelog
+* Thu Nov 15 2001 Tim Waugh <twaugh@redhat.com>
+- Initial specfile.
