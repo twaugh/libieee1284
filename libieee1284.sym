@@ -3,6 +3,8 @@ ieee1284_free_ports
 ieee1284_get_deviceid
 ieee1284_open
 ieee1284_close
+ieee1284_ref
+ieee1284_unref
 ieee1284_claim
 ieee1284_release
 ieee1284_get_irq_fd
