@@ -41,6 +41,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc README COPYING TODO
 %{_libdir}/*.so.*
+%{_bindir}/*
 
 %files devel
 %defattr(-,root,root)
@@ -56,6 +57,9 @@ rm -rf %{buildroot}
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sat Aug 24 2002 Tim Waugh <twaugh@redhat.com>
+- Ship test program.
+
 * Sat Aug  3 2002 Tim Waugh <twaugh@redhat.com>
 - The archive is now distributed in .tar.bz2 format.
 
