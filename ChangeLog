@@ -1,3 +1,10 @@
+2004-02-03  Tim Waugh  <twaugh@redhat.com>
+
+	* src/ieee1284module.c: Python extension module.
+	* configure.in: Check for Python paths.
+	* Makefile.am: Build and install Python extension module.
+	* libieee1284.spec.in: Ship it.
+
 2003-08-28  Tim Waugh  <twaugh@redhat.com>
 
 	* src/access_ppdev.c (find_capabilities): Don't report impossible

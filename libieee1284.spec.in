@@ -21,6 +21,14 @@ Group: Development/Libraries
 The header files, static library, libtool library and man pages for
 developing applications that use libieee1284.
 
+%package python
+Summary: Python extension module for libieee1284.
+Group: System Environment/Libraries
+
+%description python
+Python extension module for libieee1284.  To use libieee1284 with Python,
+use 'import ieee1284'.
+
 %prep
 %setup -q
 
@@ -33,6 +41,7 @@ make doc/interface.pdf
 %install
 rm -rf %{buildroot}
 %makeinstall
+rm -f %{buildroot}%{_libdir}/python*/*/*a
 
 %clean
 rm -rf %{buildroot}
@@ -52,11 +61,18 @@ rm -rf %{buildroot}
 %{_libdir}/*.la
 %{_mandir}/*/*
 
+%files python
+%defattr(-,root,root)
+%{_libdir}/python*/*/*.so
+
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
 
 %changelog
+* Tue Feb  3 2004 Tim Waugh <twaugh@redhat.com>
+- Ship Python extension module.
+
 * Wed Feb 26 2003 Tim Waugh <twaugh@redhat.com>
 - Use the Makefile rule to build the PDF.
 

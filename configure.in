@@ -57,6 +57,8 @@ esac
 
 AM_CONDITIONAL(SOLARIS_IO, test x$solaris_io = xtrue)
 
+AM_PATH_PYTHON
+
 dnl Checks for library functions.
 
 AC_CONFIG_FILES(Makefile libieee1284.spec)
