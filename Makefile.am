@@ -13,3 +13,4 @@ include_HEADERS = ieee1284.h
 noinst_PROGRAMS = test
 test_SOURCES = test.c
 test_LDADD = libieee1284.la
+EXTRA_DIST = libieee1284.spec doc
