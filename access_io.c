@@ -29,6 +29,7 @@
 
 #include "access.h"
 #include "config.h"
+#include "debug.h"
 #include "default.h"
 #include "delay.h"
 #include "ieee1284.h"
@@ -127,7 +128,8 @@ write_data (struct parport_internal *port, unsigned char reg)
 static int
 read_status (struct parport_internal *port)
 {
-  return port->fn->inb (port, port->base + 1) ^ S1284_INVERTED;
+  return debug_display_status (port->fn->inb (port, port->base + 1) ^
+			       S1284_INVERTED);
 }
 
 static void
@@ -141,6 +143,7 @@ raw_frob_control (struct parport_internal *port,
   ctr = (ctr & ~mask) ^ val;
   port->fn->outb (port, ctr, port->base + 2);
   port->ctr = ctr;
+  debug_frob_control (mask, val);
 }
 
 static int
@@ -211,7 +214,7 @@ wait_status (struct parport_internal *port,
 
   do
     {
-      if ((read_status (port) & mask) == val)
+      if ((debug_display_status (read_status (port)) & mask) == val)
 	return E1284_OK;
 
       delay (IO_POLL_DELAY);

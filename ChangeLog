@@ -2,6 +2,10 @@
 
 	* debug.c, debug.h (debug_display_status, debug_display_control,
 	debug_frob_control): New functions for tracing pin values.
+	* access_io.c (read_status, wait_status, write_control,
+	frob_control): Use them.
+	* access_ppdev.c (read_status, wait_status, write_control,
+	frob_control): Likewise.
 
 2001-11-29  Tim Waugh  <twaugh@redhat.com>
 

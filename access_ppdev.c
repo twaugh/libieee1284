@@ -62,8 +62,6 @@ find_capabilities (int fd, int *c)
 static int
 init (struct parport_internal *port, int flags, int *capabilities)
 {
-  struct parport_access_methods *fn;
-
   if (flags & ~F1284_EXCL)
     return E1284_NOTAVAIL;
 
@@ -160,7 +158,7 @@ read_status (struct parport_internal *port)
   if (ioctl (port->fd, PPRSTATUS, &reg))
     return E1284_NOTAVAIL;
 
-  return reg ^ S1284_INVERTED;
+  return debug_display_status (reg ^ S1284_INVERTED);
 }
 
 static int
@@ -201,6 +199,7 @@ write_control (struct parport_internal *port, unsigned char reg)
   reg &= wm;
   reg ^= C1284_INVERTED;
   ioctl (port->fd, PPWCONTROL, &reg);
+  debug_display_control (reg);
 }
 
 static void
@@ -222,6 +221,7 @@ frob_control (struct parport_internal *port,
   dprintf ("frob_control: ioctl(%d, PPFCONTROL, { mask:%#02x, val:%#02x }\n",
 	   port->fd, ppfs.mask, ppfs.val);
   ioctl (port->fd, PPFCONTROL, &ppfs);
+  debug_frob_control (mask, val);
 }
 
 static int
@@ -243,7 +243,8 @@ wait_status (struct parport_internal *port,
 
   do
     {
-      if ((read_status (port) & mask) == val)
+      unsigned char st = debug_display_status (read_status (port));
+      if ((st & mask) == val)
 	return E1284_OK;
 
       delay (IO_POLL_DELAY);
