@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 # include "config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <errno.h>
+#include <fcntl.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -112,7 +114,16 @@ void dprintf (const char *fmt, ...)
     return;
 
   if (debugging_enabled == -1) {
+    int dummy;
+
     if (!getenv (ENVAR))
+      {
+	debugging_enabled = 0;
+	return;
+      }
+
+    /* Is stderr open? */
+    if (fcntl (fileno (stderr), F_GETFL, &dummy) == -1 && errno == EBADF)
       {
 	debugging_enabled = 0;
 	return;
