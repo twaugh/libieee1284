@@ -81,12 +81,19 @@ static char *get_token (FILE *f)
       /* Skip whitespace. */
       at += strspn (current_line + at, ifs);
 
+      if (current_line[at] == '#')
+	{
+	  /* Ignore the rest of the line. */
+	  at = current_line_len;
+	  continue;
+	}
+
       /* Find the end of the token. */
       for (end = at; end < current_line_len; end++)
 	{
 	  char ch = current_line[end];
 
-	  if (ch == '\\')
+	  if (ch == '\\' && quotes != 1)
 	    {
 	      end++;
 	      continue;
@@ -134,7 +141,7 @@ static char *get_token (FILE *f)
 	{
 	  char ch = current_line[at];
 
-	  if (ch == '\\')
+	  if (ch == '\\' && quotes != 1)
 	    {
 	      if (at < end - 1)
 		this_token[i++] = current_line[++at];
