@@ -1,3 +1,8 @@
+2003-05-23  Tim Waugh  <twaugh@redhat.com>
+
+	* doc/interface.xml: Clarify the directory of 'capabilities' in
+	parport_open.
+
 2003-05-09  Tim Waugh  <twaugh@redhat.com>
 
 	* src/access_ppdev.c (translate_error_code): Translate EAGAIN to

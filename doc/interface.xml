@@ -615,7 +615,8 @@
 	<para>If <parameter>capabilities</parameter> is not
 	  <constant>NULL</constant> it must point to storage for an
 	  <type>int</type>, which will be treated as a set of flags,
-	  one per bit.  If a capability is present it will be used
+	  one per bit, which the library sets or clears as
+	  appropriate.  If a capability is present it will be used
 	  when asked for.  They are:</para>
 
 	<variablelist>
