@@ -345,6 +345,14 @@ which_mode (int mode, int flags)
   return m;
 }
 
+static ssize_t
+translate_error_code (ssize_t e)
+{
+  if (e < 0)
+    return E1284_SYS;
+  return e;
+}
+
 static int
 set_mode (struct parport_internal *port, int mode, int flags, int addr)
 {
@@ -363,14 +371,6 @@ set_mode (struct parport_internal *port, int mode, int flags, int addr)
     }
 
   return ret;
-}
-
-static ssize_t
-translate_error_code (ssize_t e)
-{
-  if (e < 0)
-    return E1284_SYS;
-  return e;
 }
 
 static int
