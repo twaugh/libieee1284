@@ -1,5 +1,9 @@
 2005-01-21  Tim Waugh  <twaugh@redhat.com>
 
+	* configure.in, Makefile.am: Version 0.2.10pre1 (pre-test).
+
+2005-01-21  Tim Waugh  <twaugh@redhat.com>
+
 	* Makefile.am: Ship VC6 files.
 
 2005-01-20  Tim Waugh  <twaugh@redhat.com>
@@ -27,15 +31,7 @@
 
 2004-03-25  Tim Waugh  <twaugh@redhat.com>
 
-	* configure.in: Version 0.2.9pre2 (pre-test).
-
-2004-03-25  Tim Waugh  <twaugh@redhat.com>
-
 	* configure.in, Makefile.am: Make Python extension module optional.
-
-2004-02-03  Tim Waugh  <twaugh@redhat.com>
-
-	* configure.in, Makefile.am: Version 0.2.9pre1 (pre-test).
 
 2004-02-03  Tim Waugh  <twaugh@redhat.com>
 
