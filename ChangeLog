@@ -1,5 +1,11 @@
 2002-07-06  Tim Waugh  <twaugh@redhat.com>
 
+	* Makefile.am: Fix up man page list.
+	* Makefile.am: Add files in solaris_io to EXTRA_DIST, since it is
+	treated as a separate project.
+
+2002-07-06  Tim Waugh  <twaugh@redhat.com>
+
 	Apply patch from Matthew Duggan for Solaris/x86 and Cygwin/(NT|95)
 	ports.
 

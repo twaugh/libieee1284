@@ -23,23 +23,18 @@ man3_MANS = doc/libieee1284.3 \
 	doc/ieee1284_close.3 \
 	doc/ieee1284_claim.3 \
 	doc/ieee1284_release.3 \
-	doc/ieee1284_data.3 \
 	doc/ieee1284_read_data.3 \
 	doc/ieee1284_write_data.3 \
 	doc/ieee1284_data_dir.3 \
 	doc/ieee1284_wait_data.3 \
-	doc/ieee1284_status.3 \
 	doc/ieee1284_read_status.3 \
 	doc/ieee1284_wait_status.3 \
-	doc/ieee1284_control.3 \
 	doc/ieee1284_read_control.3 \
 	doc/ieee1284_write_control.3 \
 	doc/ieee1284_frob_control.3 \
 	doc/ieee1284_do_nack_handshake.3 \
-	doc/ieee1284_negotiation.3 \
 	doc/ieee1284_negotiate.3 doc/ieee1284_terminate.3 \
 	doc/ieee1284_ecp_fwd_to_rev.3 doc/ieee1284_ecp_rev_to_fwd.3 \
-	doc/ieee1284_transfer.3 \
 	doc/ieee1284_nibble_read.3 \
 	doc/ieee1284_compat_write.3 \
 	doc/ieee1284_byte_read.3 \
@@ -57,11 +52,10 @@ noinst_PROGRAMS = test
 test_SOURCES = tests/test.c
 test_LDADD = libieee1284.la
 
-# Automake bug?
-# CLEANFILES = tests/.libs/test
-
 EXTRA_DIST = libieee1284.spec doc/interface.xml doc/interface.txt \
-		$(man3_MANS)
+		$(man3_MANS) solaris_io/LICENSE solaris_io/README \
+		solaris_io/INSTALL solaris_io/Makefile.in \
+		solaris_io/iop.c solaris_io/iop.conf
 
 DISTCLEANFILES = include/stamp-h include/stamp-h[0-9]* \
 	doc/manpage.links doc/manpage.refs
