@@ -55,7 +55,7 @@ init_port (struct parport *port, int flags, int *caps)
   if (ret && (capabilities & IO_CAPABLE))
     {
       priv->type = IO_CAPABLE;
-      memcpy (priv->fn, &ppdev_access_methods, sizeof *priv->fn);
+      memcpy (priv->fn, &io_access_methods, sizeof *priv->fn);
       ret = priv->fn->init (priv, flags, caps);
       dprintf ("Got %d from IO init\n", ret);
     }
@@ -63,7 +63,7 @@ init_port (struct parport *port, int flags, int *caps)
   if (ret && (capabilities & DEV_PORT_CAPABLE))
     {
       priv->type = DEV_PORT_CAPABLE;
-      memcpy (priv->fn, &ppdev_access_methods, sizeof *priv->fn);
+      memcpy (priv->fn, &io_access_methods, sizeof *priv->fn);
       ret = priv->fn->init (priv, flags, caps);
       dprintf ("Got %d from /dev/port init\n", ret);
     }
