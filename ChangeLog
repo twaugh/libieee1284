@@ -1,5 +1,9 @@
 2002-04-09  Tim Waugh  <twaugh@redhat.com>
 
+	* configure.in: Version 0.1.5 (devel).
+
+2002-04-09  Tim Waugh  <twaugh@redhat.com>
+
 	* doc/interface.sgml, Makefile.am: This is API 3.
 
 	* default.c (default_nibble_read, default_compat_write,
