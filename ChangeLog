@@ -7,6 +7,8 @@
 	* access_ppdev.c (read_status, wait_status, write_control,
 	frob_control): Likewise.
 
+	* Makefile.am: API 2.
+
 2001-11-29  Tim Waugh  <twaugh@redhat.com>
 
 	* ieee1284.h, state.c, access_io.c, access_ppdev.c: Capabilities.
