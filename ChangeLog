@@ -1,3 +1,8 @@
+2001-11-30  Tim Waugh  <twaugh@redhat.com>
+
+	* debug.c, debug.h (debug_display_status, debug_display_control,
+	debug_frob_control): New functions for tracing pin values.
+
 2001-11-29  Tim Waugh  <twaugh@redhat.com>
 
 	* ieee1284.h, state.c, access_io.c, access_ppdev.c: Capabilities.

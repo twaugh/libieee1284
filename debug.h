@@ -22,7 +22,9 @@
 
 struct parport_internal;
 extern void dprintf (const char *fmt, ...);
-extern void ieee1284_display_status (struct parport_internal *port);
+extern unsigned char debug_display_status (unsigned char st);
+extern unsigned char debug_display_control (unsigned char ct);
+extern void debug_frob_control (unsigned char mask, unsigned char val);
 
 #endif /* _DEBUG_H_ */
 

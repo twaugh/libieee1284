@@ -24,6 +24,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
+#include <time.h>
 
 #include "debug.h"
 #include "detect.h"
@@ -32,21 +34,75 @@
 #define ENVAR "LIBIEEE1284_DEBUG"
 static int debugging_enabled = -1;
 
-void ieee1284_display_status (struct parport_internal *port)
+static unsigned char soft_ctr = 0xff;
+
+static const char *timeofday (void)
 {
-  struct parport_access_methods *fn = port->fn;
-  unsigned char st;
+  static char str[100];
+  struct timeval tod;
+  if (gettimeofday (&tod, NULL))
+    {
+      str[0] = '\0';
+    }
+  else
+    {
+      struct tm *tm = localtime (&tod.tv_sec);
+      char *p = str + strftime (str, 50, "%H:%M:%S.", tm);
+      sprintf (p, "%06ld", tod.tv_usec);
+    }
+  return str;
+}
+
+unsigned char debug_display_status (unsigned char st)
+{
+  static unsigned char last_status = 0xff;
+
   if (!debugging_enabled)
-    return;
+    goto out;
 
-  st = fn->read_status (port);
+  if (last_status == st)
+    goto out;
 
-  dprintf ("STATUS: %cnFault %cSelect %cPError %cnAck %cBusy\n",
+  last_status = st;
+  dprintf ("%s STATUS: %cnFault %cSelect %cPError %cnAck %cBusy\n",
+	   timeofday (),
 	   st & S1284_NFAULT ? ' ' : '!',
 	   st & S1284_SELECT ? ' ' : '!',
 	   st & S1284_PERROR ? ' ' : '!',
 	   st & S1284_NACK ? ' ' : '!',
 	   st & S1284_BUSY ? ' ' : '!');
+
+ out:
+  return st;
+}
+
+unsigned char debug_display_control (unsigned char ct)
+{
+  if (!debugging_enabled)
+    goto out;
+
+  if (soft_ctr == ct)
+    goto out;
+
+  soft_ctr = ct;
+  dprintf ("%s CONTROL: %cnStrobe %cnAutoFd %cnInit %cnSelectIn\n",
+	   timeofday (),
+	   ct & C1284_NSTROBE ? ' ' : '!',
+	   ct & C1284_NAUTOFD ? ' ' : '!',
+	   ct & C1284_NINIT ? ' ' : '!',
+	   ct & C1284_NSELECTIN ? ' ' : '!');
+
+ out:
+  return ct;
+}
+
+void debug_frob_control (unsigned char mask, unsigned char val)
+{
+  if (debugging_enabled)
+    {
+      unsigned char new_ctr = (soft_ctr & ~mask) ^ val;
+      debug_display_control (new_ctr);
+    }
 }
 
 void dprintf (const char *fmt, ...)
