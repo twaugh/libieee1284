@@ -19,3 +19,5 @@ Still to work out for the interface:
   /dev/parport, ioperm).
 
 - there is no error reporting yet
+
+- ieee1284.h needs to define symbolic names for the control/status pins.
