@@ -1,3 +1,8 @@
+2005-04-06  Tim Waugh  <twaugh@redhat.com>
+
+	* src/ports.c: Applied patch from Julien BLACHE <jblache@debian.org>
+	to prevent uninitialized buffers.
+
 2005-03-22  Tim Waugh  <twaugh@redhat.com>
 
 	* configure.in: Version 0.2.10 (stable).

@@ -274,6 +274,10 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
 		device[0] = '\0';
 	      else if (capabilities & DEV_PORT_CAPABLE)
 		strcpy (device, "/dev/port");
+	      else
+		device[0] = '\0';
+
+	      udevice[0] = '\0';
 	    }
 
 	  /* Base */
