@@ -4,6 +4,10 @@
 
 2001-11-15  Tim Waugh  <twaugh@redhat.com>
 
+	* ports.c (ieee1284_find_ports): Return E1284_NOTIMPL if a
+	configuration file is specified, since we don't have a format
+	defined yet.
+
 	* ieee1284.h: Add ieee1284_ecp_read_addr just in case anyone wants
 	it.
 	* interface.c (ieee1284_ecp_read_addr): Likewise.
