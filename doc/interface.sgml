@@ -377,8 +377,7 @@
 	  <varlistentry>
 	    <term>&e1284notavail;</term>
 	    <listitem>
-	      <para>The operating system does not provide any Device
-	       IDs (or <constant>F1284_FRESH</constant> was specified)
+	      <para><constant>F1284_FRESH</constant> was specified
 	       and the library is unable to access the port to
 	       interrogate the device.</para>
 	    </listitem>
