@@ -1747,7 +1747,9 @@
 	 <firstterm>channel</firstterm> in ECP).</para>
 
 	<para>The supplied <parameter>buffer</parameter> must be at
-	 least <parameter>len</parameter> bytes long.</para>
+	 least <parameter>len</parameter> bytes long.  When reading,
+	 the transferred data is stored in the buffer; when writing
+	 the data to be transferred is taken from the buffer.</para>
 
 	<para>For reads (peripheral to host): if no data is available
 	 and <constant>F1284_NONBLOCK</constant> is not in effect,

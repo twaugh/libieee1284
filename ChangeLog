@@ -1,5 +1,8 @@
 2002-08-07  Tim Waugh  <twaugh@redhat.com>
 
+	* doc/interface.xml (transfer): Clarify the meaning of the buffer
+	and its length.
+
 	* doc/interface.xml (libieee1284.3): Added trouble-shooting section.
 
 	* src/default.c (default_negotiate): If M1284_COMPAT is requested,
