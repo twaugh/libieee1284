@@ -17,19 +17,29 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "config.h"
+
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/io.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "config.h"
 #include "debug.h"
 #include "detect.h"
+
+#ifdef HAVE_LINUX
+#include <sys/io.h>
 #include "ppdev.h"
+#elif defined(HAVE_SOLARIS)
+#include <sys/ddi.h>
+#include <sys/sunddi.h>
+#elif defined(HAVE_CYGWIN_NT)
+#include <w32api/windows.h>
+#endif
+
 
 int capabilities;
 
@@ -71,6 +81,7 @@ check_dev_node (const char *type)
     sprintf (name, "/dev/%s%d", type, i);
     fd = open (name, O_RDONLY | O_NOCTTY);
     if (fd >= 0) {
+#ifdef HAVE_LINUX
       if (!strcmp (type, "parport"))
 	{
 	  /* Make sure that we can actually claim the device.  This will
@@ -84,6 +95,7 @@ check_dev_node (const char *type)
 
 	  ioctl (fd, PPRELEASE);
 	}
+#endif
 
       close (fd);
       dprintf ("%s is accessible\n", name);
@@ -112,13 +124,48 @@ check_dev_port (void)
 static int
 check_io (void)
 {
+  #ifdef HAVE_LINUX
   if (ioperm (0x378 /* say */, 3, 1) == 0) {
     ioperm (0x378, 3, 0);
     capabilities |= IO_CAPABLE;
     dprintf ("We can use ioperm()\n");
     return 1;
   }
+  #elif defined(HAVE_SOLARIS)
+  int fd;
+  if (fd=open("/devices/pseudo/iop@0:iop", O_RDWR) > 0) {
+    capabilities |= IO_CAPABLE;
+    dprintf ("We can use iop\n");
+    return 1;
+  }
+  dprintf ("We can't use IOP, nothing will work\n");
+  #elif defined(HAVE_CYGWIN_9X)
+  /* note: 95 allows apps direct IO access */
+  dprintf ("Taking a guess on port availability (win9x)\n");
+  capabilities |= IO_CAPABLE;
+  return 1;
+  #endif
+
   return 0;
+}
+
+/* Can we use win32 style I/O (cygwin environment) */
+
+static int
+check_lpt (void)
+{
+  #ifdef HAVE_CYGWIN_NT
+
+  HANDLE hf = CreateFile("\\\\.\\$VDMLPT1", GENERIC_READ | GENERIC_WRITE,
+      0, NULL, OPEN_EXISTING, 0, NULL);
+  if (hf == INVALID_HANDLE_VALUE) return 0;
+  CloseHandle(hf);
+
+  capabilities |= LPT_CAPABLE;
+  return 1;
+  #else
+  return 0;
+  #endif
 }
 
 /* Figure out what we can use to talk to the parallel port.
@@ -140,6 +187,8 @@ detect_environment (int forbidden)
     check_io ();
   if (!FORBIDDEN (DEV_PORT_CAPABLE))
     check_dev_port ();
+  if (!FORBIDDEN (LPT_CAPABLE))
+    check_lpt ();
 
   /* Find out what kind of /proc structure we have. */
   check_dev_node ("lp"); /* causes low-level port driver to be loaded */

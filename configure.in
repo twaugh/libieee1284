@@ -19,8 +19,36 @@ dnl Checks for libraries.
 dnl Checks for header files.
 
 dnl Checks for typedefs, structures, and compiler characteristics.
+SOLARIS_IO=""
+case "{$host}" in
+*-*-linux*)
+        AC_DEFINE(HAVE_LINUX,1,enable ppdev access)
+;;
+*86-*-solaris*)
+        AC_DEFINE(HAVE_SOLARIS,1,enable solaris iop access)
+	SOLARIS_IO="solaris_io"
+;;
+*-*-cygwin*)
+        dnl Strip version number from uname and make sure we're on NT not 9x
+        case `uname -s | sed 's/-.*$//'` in
+        CYGWIN_NT*)
+                AC_CHECK_HEADER(w32api/windows.h, [
+      	                AC_DEFINE(HAVE_CYGWIN_NT,1,enable w32api access)
+	        ], AC_MSG_ERROR(You need the cygwin w32api files on NT)) 
+        ;;
+        *)
+      	        AC_DEFINE(HAVE_CYGWIN_9X,1,enable win95 access)
+        ;;
+        esac
+;;
+*)
+        AC_MSG_ERROR(Sorry.  $host is not supported yet)
+;;
+esac
+
+AC_SUBST(SOLARIS_IO)
 
 dnl Checks for library functions.
 
-AC_CONFIG_FILES(Makefile libieee1284.spec)
+AC_CONFIG_FILES(Makefile libieee1284.spec solaris_io/Makefile)
 AC_OUTPUT

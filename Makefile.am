@@ -3,8 +3,8 @@
 lib_LTLIBRARIES = libieee1284.la
 libieee1284_la_SOURCES = src/detect.c src/detect.h src/ports.c src/deviceid.c \
 	src/state.c src/access.h src/delay.h src/delay.c src/default.h \
-	src/default.c src/access_io.c src/access_ppdev.c src/interface.c \
-	src/parport.h src/ppdev.h src/debug.h src/debug.c \
+	src/default.c src/access_io.c src/access_ppdev.c src/access_lpt.c \
+	src/interface.c src/parport.h src/ppdev.h src/debug.h src/debug.c \
 	libieee1284.sym
 # When rolling a release, remember to adjust the version info.
 # It's current:release:age.
@@ -67,3 +67,5 @@ DISTCLEANFILES = include/stamp-h include/stamp-h[0-9]* \
 	doc/manpage.links doc/manpage.refs
 
 MAINTAINERCLEANFILES = $(man3_MANS)
+
+SUBDIRS = @SOLARIS_IO@

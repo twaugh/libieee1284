@@ -32,6 +32,10 @@
 #include "debug.h"
 #include "detect.h"
 
+#ifdef HAVE_CYGWIN_NT
+#include <w32api/windows.h>
+#endif
+
 #define MAX_PORTS 20
 
 static int
@@ -250,11 +254,42 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
 }
 
 static int
+populate_nt_ports (struct parport_list *list, int flags)
+{
+#ifdef HAVE_CYGWIN_NT
+  char vdmname[] = "\\\\.\\$VDMLPT*";
+  HANDLE hf;
+  int i;
+  
+  for (i = 1; i <= 3; i++)
+  {
+    /* Name is \\.\$VDMLPT[1,2,3] */
+    vdmname[11] = i + '0';
+    hf = CreateFile(vdmname, GENERIC_READ | GENERIC_WRITE, 
+        0, NULL, OPEN_EXISTING, 0, NULL);
+    if (hf == INVALID_HANDLE_VALUE) continue;
+    CloseHandle(hf);
+    /* Friendly name is LPT1, LPT2, etc */
+    add_port (list, flags, vdmname+8, vdmname, 0, 0, -1);
+  }
+
+#endif
+  return 0;
+}
+
+
+static int
 populate_by_guessing (struct parport_list *list, int flags)
 {
+#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X)
   add_port (list, flags, "0x378", "/dev/port", 0x378, 0, -1);
   add_port (list, flags, "0x278", "/dev/port", 0x278, 0, -1);
   add_port (list, flags, "0x3bc", "/dev/port", 0x3bc, 0, -1);
+#elif defined(HAVE_SOLARIS)
+  add_port (list, flags, "0x378", "/devices/pseudo/iop@0:iop", 0x378, 0, -1);
+  add_port (list, flags, "0x278", "/devices/pseudo/iop@0:iop", 0x278, 0, -1);
+  add_port (list, flags, "0x3bc", "/devices/pseudo/iop@0:iop", 0x3bc, 0, -1);
+#endif
   return 0;
 }
 
@@ -272,7 +307,10 @@ ieee1284_find_ports (struct parport_list *list, int flags)
     populate_from_sys_dev_parport (list, flags);
   else if (capabilities & PROC_PARPORT_CAPABLE)
     populate_from_parport (list, flags);
-  else populate_by_guessing (list, flags);
+  else if (capabilities & LPT_CAPABLE)
+    populate_nt_ports (list, flags);
+  else 
+    populate_by_guessing (list, flags);
 
   if (list->portc == 0)
     {

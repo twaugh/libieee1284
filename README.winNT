@@ -1,0 +1,39 @@
+Notes on libieee1284 on Windows NT/2k/XP
+----------------------------------------
+
+The support for parallel ports in NT kernels is sub-optimal.  The port API
+specifies capabilities such as ECP Hardware support, but ports that show up
+as using the ECP driver don't actually return this capability.  Secondly,
+data writes are not supported in non-ECP modes (ie, the only modes ever 
+available).  To top it all off, control lines can be set to anything you want,
+as long as it's the initialisation state.  We end up with essentially no way of
+transferring data in through the parallel port.
+
+To work around these problems there are two possible solutions:
+
+1)  Use a driver such as PortTalk to give inb/outb permission to the 
+    application (http://www.beyondlogic.org/porttalk/porttalk.htm)
+
+    This appears an ideal solution, but requires the writing, compilation,
+    and installation of a driver.  Compiling a driver requires the DDK, which
+    is well beyond what most people have handy in NT.
+
+2)  Reverse-engineer the (undocumented) ParallelVdm driver used by the 
+    Virtual DOS Machine to provide printer compatibility.
+
+    This option is suprisingly much simpler to implement, but has the 
+    disadvantage that like the Solaris/x86 driver, every single read and write
+    requires a syscall (and reads only transfer 4 bits in nibble mode), which 
+    adds up to very slow operation indeed.
+
+
+I opted for option number 2 as it took advantage of existing capabilities of
+the OS.  Unfortunately this means amazingly slow operation, even on fast 
+machines.  If you are keen to write a driver and installation routine for NT 
+which does essentially what PortTalk does and doesn't require the DDK for 
+compilation, please do!
+
+Enjoy,
+
+- Matthew Duggan
+stauff1@users.sourceforge.net

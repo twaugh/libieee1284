@@ -1,0 +1,21 @@
+On a Solaris 2.6/ix86 machine, a 'make' and a 'make install' should
+install the driver.  You'll also have to reboot with the '-r' flag to
+rebuild the /devices directory.
+
+# /usr/sbin/reboot -- -r
+
+This also assumes that one is using gcc, but that should be pretty 
+easy to change.
+
+
+Simon Thornington
+simon@hasc.com
+
+---------
+
+On Solaris 2.8 you will probably need to run add_drv after rebooting, ie:
+
+# add_drv iop
+
+Matthew Duggan
+stauff1@users.sourceforge.net

@@ -127,6 +127,7 @@ struct parport_internal
 #define PROC_SYS_DEV_PARPORT_CAPABLE	(1<<3)
 #define DEV_LP_CAPABLE			(1<<4)
 #define DEV_PORT_CAPABLE		(1<<5)
+#define LPT_CAPABLE			(1<<6)
 extern int capabilities;
 
 extern int detect_environment (int forbidden);

@@ -15,6 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *
+ * This file defines access for VDMLPT on NT kernels.  Basically a copy of 
+ * access_io.c with some slight differences.
  */
 
 #include "config.h"
@@ -35,120 +39,28 @@
 #include "ieee1284.h"
 #include "detect.h"
 #include "parport.h"
-#include "ppdev.h"
-
-#ifdef HAVE_LINUX
-
-#include <sys/io.h>
-
-#elif defined(HAVE_SOLARIS)
-
-#define IOPREAD 1
-#define IOPWRITE 2
-struct iopbuf {
-  unsigned int port;
-  unsigned char port_value;
-};
-
-#elif defined(HAVE_CYGWIN_9X)
-
-#include "io_95.h"
-#endif
 
 
-static unsigned char
-raw_inb (struct parport_internal *port, unsigned long addr)
-{
-#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X)
-  return inb (addr);
-#elif defined(HAVE_SOLARIS)
-  struct iopbuf tmpbuf;
-  tmpbuf.port = addr;
-  if(ioctl(port->fd, IOPREAD, &tmpbuf))
-    dprintf("IOP IOCTL failed on read\n");
-  return tmpbuf.port_value;
-#endif
-}
+#ifdef HAVE_CYGWIN_NT
 
-static void
-raw_outb (struct parport_internal *port, unsigned char val, unsigned long addr)
-{
-#if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X)
-  outb_p (val, addr);
-#elif defined(HAVE_SOLARIS)
-  struct iopbuf tmpbuf;
-  tmpbuf.port = addr;
-  tmpbuf.port_value = val;
-  if(ioctl(port->fd, IOPWRITE, &tmpbuf))
-    dprintf("IOP IOCTL failed on write\n");
-#endif
-}
+#include <w32api/windows.h>
+#include "par_nt.h"
 
-static unsigned char
-port_inb (struct parport_internal *port, unsigned long addr)
-{
-  unsigned char byte = 0xff;
-
-  if (lseek (port->fd, addr, SEEK_SET) != (off_t)-1)
-    read (port->fd, &byte, 1);
-
-  return byte;
-}
-
-static void
-port_outb (struct parport_internal *port, unsigned char val,
-	   unsigned long addr)
-{
-  if (lseek (port->fd, addr, SEEK_SET) != (off_t)-1)
-    write (port->fd, &val, 1);
-}
 
 static int
 init (struct parport_internal *port, int flags, int *capabilities)
 {
-#ifdef HAVE_SOLARIS
-  struct iopbuf tmpbuf;
-#endif
-
   if (flags)
     return E1284_NOTAVAIL;
 
-  /* TODO: To support F1284_EXCL here we need to open the relevant
-   * /dev/lp device. */
-
-  switch (port->type)
-    {
-    case IO_CAPABLE:
-#ifdef HAVE_LINUX
-      if (ioperm (port->base, 3, 1) || ioperm (0x80, 1, 1))
-        return E1284_INIT;
-#elif defined(HAVE_SOLARIS)
-      if((port->fd=open("/devices/pseudo/iop@0:iop", O_RDWR)) < 0)
-      {
-        dprintf("IOP Device open failed\n");
-        return E1284_INIT;
-      } else {
-        tmpbuf.port = 0x80;
-        tmpbuf.port_value = 0xFF;
-        if(ioctl(port->fd, IOPREAD, &tmpbuf))
-        {
-          dprintf("IOP IOCTL failed on read\n");
-          return E1284_INIT;
-        }
-      }
-
-#endif
-
-      break;
-
-    case DEV_PORT_CAPABLE:
-      port->fd = open ("/dev/port", O_RDWR | O_NOCTTY);
-      if (port->fd < 0)
-	return E1284_INIT;
-      port->fn->inb = port_inb;
-      port->fn->outb = port_outb;
-      break;
-    }
+  port->fd = (int)CreateFile(port->device, GENERIC_READ | GENERIC_WRITE,
+    0, NULL, OPEN_EXISTING, 0, NULL);
+  if (port->fd == (int)INVALID_HANDLE_VALUE) 
+  {
+    if (port->device != NULL) 
+      dprintf("Failed opening %s\n", port->device);
+    return E1284_SYS;
+  }
 
   if (capabilities)
     *capabilities |= CAP1284_RAW;
@@ -164,27 +76,37 @@ init (struct parport_internal *port, int flags, int *capabilities)
 static void
 cleanup (struct parport_internal *port)
 {
-  if (port->type != IO_CAPABLE && port->fd >= 0)
-    close (port->fd);
+  CloseHandle((HANDLE)(port->fd));
 }
 
 static int
 read_data (struct parport_internal *port)
 {
-  return port->fn->inb (port, port->base);
+  printf("This function shouldn't be used in NT - bidir not supported");
+  return 0;
 }
 
 static void
 write_data (struct parport_internal *port, unsigned char reg)
 {
-  port->fn->outb (port, reg, port->base);
+  unsigned int dummy;
+
+  if (!(DeviceIoControl((HANDLE)(port->fd), NT_IOCTL_DATA, &reg, sizeof(reg), 
+          NULL, 0, (LPDWORD)&dummy, NULL)))
+      dprintf("raw_outb: DeviceIoControl failed!\n");
 }
 
 static int
 read_status (struct parport_internal *port)
 {
-  return debug_display_status (port->fn->inb (port, port->base + 1) ^
-			       S1284_INVERTED);
+  char ret;
+  unsigned int dummy;
+
+  if (!(DeviceIoControl((HANDLE)(port->fd), NT_IOCTL_STATUS, NULL, 0, &ret, 
+          sizeof(ret), (LPDWORD)&dummy, NULL)))
+      dprintf("read_status: DeviceIoControl failed!\n");
+
+  return debug_display_status (ret ^ S1284_INVERTED);
 }
 
 static void
@@ -193,10 +115,14 @@ raw_frob_control (struct parport_internal *port,
 		  unsigned char val)
 {
   unsigned char ctr = port->ctr;
+  unsigned char dummyc;
+  unsigned int dummy;
   /* Deal with inversion issues. */
   val ^= mask & C1284_INVERTED;
   ctr = (ctr & ~mask) ^ val;
-  port->fn->outb (port, ctr, port->base + 2);
+  if (!(DeviceIoControl((HANDLE)(port->fd), NT_IOCTL_CONTROL, &ctr, 
+          sizeof(ctr), &dummyc, sizeof(dummyc), (LPDWORD)&dummy, NULL)))
+      dprintf("frob_control: DeviceIoControl failed!\n");
   port->ctr = ctr;
   debug_frob_control (mask, val);
 }
@@ -282,7 +208,7 @@ wait_status (struct parport_internal *port,
   return E1284_TIMEDOUT;
 }
 
-const struct parport_access_methods io_access_methods =
+const struct parport_access_methods lpt_access_methods =
 {
   init,
   cleanup,
@@ -290,8 +216,8 @@ const struct parport_access_methods io_access_methods =
   NULL, /* claim */
   NULL, /* release */
 
-  raw_inb,
-  raw_outb,
+  NULL, /* raw_inb */
+  NULL, /* raw_outb */
 
   NULL, /* get_irq_fd */
 
@@ -325,6 +251,55 @@ const struct parport_access_methods io_access_methods =
   default_ecp_write_addr,
   default_set_timeout
 };
+#else
+
+/* Null struct to keep the compiler happy */
+const struct parport_access_methods lpt_access_methods =
+{
+  NULL,
+  NULL,
+
+  NULL,
+  NULL,
+
+  NULL, /* inb */
+  NULL, /* outb */
+
+  NULL,
+
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+
+  NULL,
+  NULL,
+
+  NULL,
+  NULL,
+  NULL,
+
+  NULL,
+
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL 
+};
+
+#endif /* HAVE_CYGWIN_NT */
 
 /*
  * Local Variables:

@@ -25,6 +25,7 @@
 
 extern const struct parport_access_methods io_access_methods;
 extern const struct parport_access_methods ppdev_access_methods;
+extern const struct parport_access_methods lpt_access_methods;
 
 static inline void
 delay (int which)

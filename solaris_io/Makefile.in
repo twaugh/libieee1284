@@ -1,0 +1,43 @@
+CC = @CC@
+CFLAGS = -D_KERNEL  # -DDEBUG
+LD = ld
+LDFLAGS = -r
+INSTALLDIR = /platform/i86pc/kernel/drv
+
+.SILENT:	
+
+all:	iop ioprtest
+
+ioprtest:	ioprtest.c
+	$(CC) -o ioprtest ioprtest.c
+
+iop:	iop.o
+	$(LD) $(LDFLAGS) -o iop iop.o
+
+iop.o:	iop.c
+	$(CC) $(CFLAGS) -c iop.c
+
+install:	bininstall
+
+bininstall:	iop
+	echo "copying iop to $(INSTALLDIR)"
+	echo
+	mkdir -p $(INSTALLDIR)
+	cp -f iop $(INSTALLDIR)
+	cp -f iop.conf $(INSTALLDIR)
+	echo "************************************************************"
+	echo " READ THIS READ THIS READ THIS READ THIS READ THIS READ THIS"
+	echo "************************************************************"
+	echo "You MUST reboot with boot flag '-r' in order for the iop"
+	echo "driver to load properly, as like this: "
+	echo
+	echo "# /usr/sbin/reboot -- -r"
+	echo ""
+	echo "For Solaris 8 run add_drv iop after rebooting"
+	echo ""
+	echo "************************************************************"
+
+distclean:	clean
+
+clean:	
+	rm -f iop ioprtest core *.o

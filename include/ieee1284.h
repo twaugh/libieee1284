@@ -18,6 +18,7 @@
  */
 
 #include <sys/types.h> /* for size_t */
+#include <sys/time.h> /* for struct timeval */
 
 #ifdef __cplusplus
 extern "C" {

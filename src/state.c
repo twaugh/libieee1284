@@ -19,7 +19,6 @@
 
 #include <fcntl.h>
 #include <string.h>
-#include <sys/io.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -34,7 +33,6 @@
 #include "ieee1284.h"
 
 #include "parport.h"
-#include "ppdev.h"
 
 static int
 init_port (struct parport *port, int flags, int *caps)
@@ -66,6 +64,16 @@ init_port (struct parport *port, int flags, int *caps)
       memcpy (priv->fn, &io_access_methods, sizeof *priv->fn);
       ret = priv->fn->init (priv, flags, caps);
       dprintf ("Got %d from /dev/port init\n", ret);
+    }
+
+  if (ret && (capabilities & LPT_CAPABLE))
+    {
+      priv->type = LPT_CAPABLE;
+      memcpy (priv->fn, &lpt_access_methods, sizeof *priv->fn);
+      ret = priv->fn->init (priv, flags, caps);
+      dprintf ("Got %d from LPT init\n", ret);
+      /* No bi-dir support in NT :( */
+      if (caps != NULL) *caps = CAP1284_COMPAT | CAP1284_NIBBLE;
     }
 
   dprintf ("<== %d\n", ret);

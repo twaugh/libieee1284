@@ -32,6 +32,9 @@
 #include "ieee1284.h"
 #include "detect.h"
 #include "parport.h"
+
+#ifdef HAVE_LINUX
+
 #include "ppdev.h"
 
 struct ppdev_priv 
@@ -629,3 +632,55 @@ const struct parport_access_methods ppdev_access_methods =
  * eval: (c-set-style "gnu")
  * End:
  */
+
+#else /* Not Linux, no ppdev */
+
+/* Null struct to keep the compiler happy */
+const struct parport_access_methods ppdev_access_methods =
+{
+  NULL,
+  NULL,
+
+  NULL,
+  NULL,
+
+  NULL, /* inb */
+  NULL, /* outb */
+
+  NULL,
+
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+
+  NULL,
+  NULL,
+
+  NULL,
+  NULL,
+  NULL,
+
+  NULL,
+
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL 
+};
+
+
+
+#endif /* HAVE_LINUX */

@@ -1,0 +1,15 @@
+This is a very simple Solaris device driver (only tested in Solaris 2.6,
+although it might work with Solaris 2.5.1) for Intel, which allows user
+level programs access to the IO ports of a machine.  This was originally
+built for a port of a QuickCam app, but it could be used anywhere.
+
+Rumour has it that the same thing can be done be done with Vx86 stuff, but
+I never tried that.  
+
+Have fun with this, and if it's useful, drop me a note at simon@hasc.com
+
+
+Simon Thornington
+
+
+(Makefile and ioprtest.c changed by M C Duggan - 1/7/02)

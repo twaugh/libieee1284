@@ -1,0 +1,36 @@
+Notes on libieee1284 on Solaris/x86
+-----------------------------------
+
+There are some problems with supporting bi-directional parallel ports in 
+Solaris/x86.  Not least of these is the fact that there is no built-in
+support, nor built-in inb/outb.  To work around this problem, I have 
+included the IOP kernel-mode driver which exposes the inb and outb
+functions to userspace.  To the end users, this means that you will need
+to install the iop driver before you can use libieee1284.
+
+After performing a make install (which will also install the driver), you 
+will probably need to reboot with -r, ie:
+
+# /usr/sbin/reboot -- -r
+
+On Solaris 2.8 you will probably need to run add_drv after rebooting, ie:
+
+# add_drv iop
+
+If that doesn't get it working, consult the add_drv man page.
+
+Once the IOP driver is installed and working, you will only be able to access
+the parallel port as root.
+
+The other downside of this method of parport access is that it is *slow*. 
+Each read and write requires an ioctl, which being a syscall is not fast.  
+On top of that, you are limited to nibble mode transfers, so each ioctl is 
+4 bits.
+
+I hope that Sun sees fit to port the ECPP system to x86 in a future version
+of Solaris.
+
+Enjoy,
+
+- Matthew Duggan
+stauff1@users.sourceforge.net

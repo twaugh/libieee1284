@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/io.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -34,7 +33,6 @@
 #include "ieee1284.h"
 #include "detect.h"
 #include "parport.h"
-#include "ppdev.h"
 
 #define ETRYNEXT	100
 #define ENODEVID	101

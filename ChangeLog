@@ -1,3 +1,28 @@
+2002-07-06  Tim Waugh  <twaugh@redhat.com>
+
+	Apply patch from Matthew Duggan for Solaris/x86 and Cygwin/(NT|95)
+	ports.
+
+	* solaris_io: New directory.
+	* solaris_io/INSTALL, solaris_io/LICENSE, solaris_io/Makefile.in,
+	solaris_io/README, solaris_io/iop.c, solaris_io/iop.conf,
+	solaris_io/ioprtest.c: New files.  These are for the Solaris
+	driver and are not linked in with libieee1284.
+	* src/access_lpt.c: New file for access for VDMLPT on NT kernels.
+	* src/io_95.h, src/par_nt.h: New files for Cygwin ports.
+	* configure.in: Solaris/Cygwin additions.
+	* Makefile.am: Solaris/Cygwin additions.
+	* include/ieee1284.h: Include <sys/time.h> for struct timeval.
+	* src/access.h: Declare lpt_access_methods.
+	* src/access_io.c: Modifications for Solaris/Cygwin.
+	* src/access_ppdev.c: Modifications for when ppdev is not
+	available on this platform.
+	* src/detect.c: Modifications for Solaris/Cygwin.
+	* src/detect.h: Likewise.
+	* src/deviceid.c: Remove redundant includes.
+	* src/ports.c: Modifications for Solaris/Cygwin.
+	* src/state.c: Likewise.
+
 2002-05-21  Tim Waugh  <twaugh@redhat.com>
 
 	* src/detect.c (check_dev_node): Check the return value of the

@@ -1,0 +1,13 @@
+Notes on libieee1284 on Windows 95/98/Me
+----------------------------------------
+
+Unlike NT, the Windows9X kernel is more lax with its I/O security.  We take
+advantage of this by using 9X the same as Linux port based I/O, just without
+the ioperm() step.  Unfortunately it's still much slower than Linux, partly
+because cygwin is very slow on 9x kernels.  It also means that we're guessing
+the parallel port base address, so it's not as reliable as ppdev.
+
+Enjoy,
+
+- Matthew Duggan
+stauff1@users.sourceforge.net
