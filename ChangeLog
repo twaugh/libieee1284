@@ -1,5 +1,9 @@
 2002-08-09  Tim Waugh  <twaugh@redhat.com>
 
+	* src/default.c (poll_port): New internal function for very short
+	waits (for EPP).
+	(default_epp_write_data): Implemented.
+
 	* src/debug.c (dprintf): Check that stderr is open.
 
 	* src/interface.c: Sprinkle dprintf calls throughout.

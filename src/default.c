@@ -21,6 +21,7 @@
 
 #include <sys/time.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "access.h"
 #include "debug.h"
@@ -349,11 +350,75 @@ default_epp_read_data (struct parport_internal *port, int flags,
   return E1284_NOTIMPL;
 }
 
+static int poll_port (struct parport_internal *port, unsigned char mask,
+		      unsigned char result, int usec)
+{
+  const struct parport_access_methods *fn = port->fn;
+  int count = usec / 5 + 2;
+  int i;
+
+  for (i = 0; i < count; i++)
+    {
+      unsigned char status = fn->read_status (port);
+
+      if ((status & mask) == result)
+	return E1284_OK;
+
+      if (i >= 2)
+	usleep (5);
+    }
+
+  return E1284_TIMEDOUT;
+}
+
 ssize_t
 default_epp_write_data (struct parport_internal *port, int flags,
 			const char *buffer, size_t len)
 {
-  return E1284_NOTIMPL;
+  const struct parport_access_methods *fn = port->fn;
+  ssize_t ret = 0;
+
+  dprintf ("==> default_epp_write_data\n");
+
+  /* Set EPP idle state (just to make sure).  Also set nStrobe low. */
+  fn->frob_control (port,
+		    C1284_NSTROBE | C1284_NAUTOFD
+		    | C1284_NSELECTIN | C1284_NINIT,
+		    C1284_NAUTOFD | C1284_NSELECTIN | C1284_NINIT);
+
+  fn->data_dir (port, 0);
+
+  for (; len > 0; len--, buffer++)
+    {
+      /* Event 62: Write data and set nAutoFd low */
+      fn->write_data (port, *buffer);
+      fn->frob_control (port, C1284_NAUTOFD, 0);
+
+      /* Event 58: wait for busy (nWait) to go high */
+      if (poll_port (port, S1284_BUSY, S1284_BUSY, 10) != E1284_OK)
+	{
+	  dprintf ("Failed at event 58\n");
+	  break;
+	}
+
+      /* Event 63: set nAutoFd (nDStrb) high */
+      fn->frob_control (port, C1284_NAUTOFD, C1284_NAUTOFD);
+
+      /* Event 60: wait for busy (nWait) to go low */
+      if (poll_port (port, S1284_BUSY, 0, 5) != E1284_OK)
+	{
+	  dprintf ("Failed at event 60\n");
+	  break;
+	}
+
+      ret++;
+    }
+
+  /* Event 61: set nStrobe (nWrite) high */
+  fn->frob_control (port, C1284_NSTROBE, C1284_NSTROBE);
+
+  dprintf ("<== %d\n", ret);
+  return ret;
 }
 
 ssize_t
