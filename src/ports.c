@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 #include "config.h"
+#include "conf.h"
 #include "ieee1284.h"
 #include "debug.h"
 #include "detect.h"
@@ -311,6 +312,8 @@ populate_by_guessing (struct parport_list *list, int flags)
 int
 ieee1284_find_ports (struct parport_list *list, int flags)
 {
+  read_config_file ();
+
   list->portc = 0;
   list->portv = malloc (sizeof(char*) * MAX_PORTS);
   if (!list->portv)
