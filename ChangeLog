@@ -1,3 +1,8 @@
+2001-11-22  Tim Waugh  <twaugh@redhat.com>
+
+	* default.c (LOG_ERROR): We now have dprintf, so this is not
+	needed.
+
 2001-11-18  Tim Waugh  <twaugh@redhat.com>
 
 	* detect.c, deviceid.c, access_ppdev.c, state.c: Include debug.h.

@@ -28,8 +28,6 @@
 #include "detect.h"
 #include "ieee1284.h"
 
-#define LOG_ERROR(x...) /* Need to write LOG_ERROR */
-
 int
 default_do_nack_handshake (struct parport_internal *port,
 			   unsigned char ct_before,
