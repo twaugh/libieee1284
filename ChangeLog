@@ -1,5 +1,9 @@
 2002-07-31  Tim Waugh  <twaugh@redhat.com>
 
+	* configure.in, Makefile.am: Version 0.1.7 (devel).
+
+2002-07-31  Tim Waugh  <twaugh@redhat.com>
+
 	* src/access_ppdev.c (terminate): Seems to need a slight delay
 	afterwards before a sensible Device ID can be obtained.
 
