@@ -858,6 +858,7 @@
 	<refname>ieee1284_read_data</refname>
 	<refname>ieee1284_write_data</refname>
 	<refname>ieee1284_data_dir</refname>
+	<refname>ieee1284_wait_data</refname>
 	<refpurpose>control the data lines</refpurpose>
       </refnamediv>
 
@@ -877,6 +878,13 @@
 	    <funcdef>void <function>ieee1284_data_dir</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter>, int
 	    <parameter>reverse</parameter></paramdef>
+	  </funcprototype>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_wait_data</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	    unsigned char <parameter>mask</parameter>, unsigned char
+	    <parameter>val</parameter>, struct timeval
+	    *<parameter>timeout</parameter></paramdef>
 	  </funcprototype>
 	</funcsynopsis>
       </refsynopsisdiv>
@@ -901,6 +909,11 @@
 	<para>Setting the data lines may have side effects on some
 	 port types (for example, some Amiga ports pulse
 	 nStrobe).</para>
+
+	<para><function>ieee1284_wait_data</function> waits, up until
+	 the <parameter>timeout</parameter>, for the data bits
+	 specified in <parameter>mask</parameter> to have the
+	 corresponding values in <parameter>val</parameter>.</para>
       </refsect1>
 
       <refsect1>
@@ -925,6 +938,23 @@
 	    <listitem>
 	      <para>The <parameter>port</parameter> parameter is
 	       invalid.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284sys;</term>
+	    <listitem>
+	      <para>There was an error at the operating system level,
+	       and <varname>errno</varname> has been set
+	       accordingly.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284timedout;</term>
+	    <listitem>
+	      <para>The <parameter>timeout</parameter> has
+	       elapsed.</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
