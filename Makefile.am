@@ -38,6 +38,8 @@ man3_MANS = doc/libieee1284.3 \
 	doc/ieee1284_get_deviceid.3 \
 	doc/ieee1284_open.3 \
 	doc/ieee1284_close.3 \
+	doc/ieee1284_ref.3 \
+	doc/ieee1284_unref.3 \
 	doc/ieee1284_claim.3 \
 	doc/ieee1284_release.3 \
 	doc/ieee1284_read_data.3 \
