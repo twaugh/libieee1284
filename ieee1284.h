@@ -30,6 +30,7 @@ enum E1284 {
   E1284_NEGFAILED          = -5, // Negotiation went wrong
   E1284_NOMEM              = -6, // No memory left
   E1284_INIT               = -7, // Error initialising port
+  E1284_SYS                = -8, // Error interfacing system
 };
 
 // A parallel port.
@@ -126,7 +127,7 @@ enum ieee1284_status_bits
 extern int ieee1284_read_status (struct parport *port);
 
 // Wait until those status pins in mask have the values in val.
-// Return 0 when condition met, 1 on timeout.
+// Return E1284_OK when condition met, E1284_TIMEDOUT on timeout.
 // timeout may be modified.
 extern int ieee1284_wait_status (struct parport *port,
                                  unsigned char mask,
@@ -159,9 +160,9 @@ extern void ieee1284_frob_control (struct parport *port, unsigned char mask,
 
 // This function may or may not be available, depending on PPWCTLONIRQ
 // availability.  Its operation is:
-// If operation unavailable, return -1.  Otherwise:
+// If operation unavailable, return E1284_NOTAVAIL.  Otherwise:
 // Set control pins to ct_before.
-// Wait for nAck interrupt.  If timeout elapses, return 1.
+// Wait for nAck interrupt.  If timeout elapses, return E1284_TIMEDOUT.
 // Otherwise, set control pins to ct_after and return 0.
 // timeout may be modified.
 extern int ieee1284_do_nack_handshake (struct parport *port,
