@@ -1,11 +1,38 @@
 disallow method ppdev
 disallow methods { direct[,] iopdev[,] ppdev[,] lpdev }
+use method ppdev
+use methods { ppdev[,] lpdev }
 debug on
 debug off
 
 for port parport0 {
   disallow method ppdev
+  ...
 }
 
-for app "..." {
+for app "my app name" {
+  disallow port "parport0"
+  disallow ports { "parport0"[,] "parport1" }
+  use port "parport0"
+  use ports { "parport0"[,] "parport1" }
+}
+
+port "parport0" {
+  method ppdev {
+    device "/dev/parport0"
+  }
+
+  method lpdev {
+    device "/dev/lp0"
+  }
+
+  method direct {
+    base 0x378
+    ecpbase 0x778
+    lplock "/dev/lp0"
+  }
+
+  method iopdev {
+    device "/dev/port"
+  }
 }
