@@ -1,0 +1,21 @@
+Still to work out for the interface:
+
+- register access functions need to return an int so that failures
+  (i.e. not implemented) can be detected.
+
+- perhaps there needs to be a run-time feature test available for the
+  application to see if various classes of functions are to be used or
+  not (register access functions again).
+
+- blocking/non-blocking: ieee1284_set_timeout enough?
+
+- need to expose a selectable_fd for /dev/parport0
+
+- need a way for the application to decide which protocol which be
+  fastest (with hardware assistance).  PPGETMODES?
+
+- need a way for the application to influence the access method:
+  faster (ioperm, ppdev, /dev/port) vs. more secure (ppdev,
+  /dev/parport, ioperm).
+
+- there is no error reporting yet
