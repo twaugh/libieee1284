@@ -1805,6 +1805,17 @@
 	       advantage of RLE.</para>
 	    </listitem>
 	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>F1284_FASTEPP</constant> (for EPP only)</term>
+	    <listitem>
+	      <para>Use multi-byte transfers.  Several bytes at a time
+	        are transferred using hardware assistance, if
+	        supporting hardware is present.  The price of this
+	        increased speed is that the return value will be less
+	        reliable when this flag is used.</para>
+	    </listitem>
+	  </varlistentry>
 	</variablelist>
 
 	<para>For ECP mode, a given direction is in force at any

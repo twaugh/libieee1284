@@ -3,6 +3,7 @@
 	* src/access_ppdev.c (set_mode): Implement F1284_FASTEPP.
 	* include/ieee1284.h (enum ieee1284_transfer_flags): New flag
 	F1284_FASTEPP.
+	* doc/interface.xml: Updated to include F1284_FASTEPP.
 
 	* src/default.c (poll_port): New internal function for very short
 	waits (for EPP).
