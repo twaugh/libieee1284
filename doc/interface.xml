@@ -143,7 +143,7 @@
 
 	<para>When <function>ieee1284_find_ports</function> is first
 	  called, the library will look for a configuration file,
-	  <filename>/etc/ieee1284rc</filename>.</para>
+	  <filename>/etc/ieee1284.conf</filename>.</para>
 
 	<para>Comments begin with a '#' character and extend to the
 	  end of the line.  Everything else is freely-formatted
@@ -171,7 +171,7 @@
 
 	<variablelist>
 	  <varlistentry>
-	    <term><filename>/etc/ieee1284rc</filename></term>
+	    <term><filename>/etc/ieee1284.conf</filename></term>
 	    <listitem>
 	      <para>Configuration file.</para>
 	    </listitem>

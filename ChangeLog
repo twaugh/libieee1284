@@ -1,3 +1,8 @@
+2002-12-19  Tim Waugh  <twaugh@redhat.com>
+
+	* doc/interface.xml: It's /etc/libieee1284.conf, not
+	/etc/libieee1284rc.
+
 2002-11-20  Tim Waugh  <twaugh@redhat.com>
 
 	* include/ieee1284.h: Guard macro.
