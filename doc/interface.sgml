@@ -580,7 +580,11 @@
 	    <term><constant>CAP1284_IRQ</constant></term>
 	    <listitem>
 	      <para>An interrupt line is configured for this
-	       port.</para>
+	       port and interrupt notifications can be received using
+               <citerefentry>
+		 <refentrytitle>ieee1284_get_irq_fd</refentrytitle>
+		 <manvolnum>3</manvolnum>
+	       </citerefentry>.</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -1694,6 +1698,73 @@
 	    <refentrytitle>ieee1284_ecp_fwd_to_rev</refentrytitle>
 	    <manvolnum>3</manvolnum>
 	  </citerefentry></para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="irq">
+      <refmeta>
+	<refentrytitle>ieee1284_get_irq_fd</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_get_irq_fd</refname>
+	<refpurpose>interrupt notification</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_get_irq_fd</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>If the <parameter>port</parameter> (which must be
+	 opened, but need not be claimed) has a configured interrupt
+	 line and the port type supports interrupt notification, it is
+	 possible to obtain a file descriptor that may be used for
+	 <citerefentry>
+	    <refentrytitle>select</refentrytitle>
+	    <manvolnum>2</manvolnum>
+	 </citerefentry> or <citerefentry>
+	    <refentrytitle>poll</refentrytitle>
+	    <manvolnum>2</manvolnum>
+	 </citerefentry>.  Any event (readable, writable
+	 or exception) means that an interrupt has been
+	 triggered.  No operations other than
+	 <function>select</function> or <function>poll</function> may
+	 be performed on the file descriptor.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<para>If the return value is negative then it is an error code
+	 listed below.  Otherwise it is a valid file
+	 descriptor.</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284notavail;</term>
+	    <listitem>
+	      <para>No such file descriptor is available.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284invalidport;</term>
+	    <listitem>
+	      <para>The <parameter>port</parameter> parameter is
+	       invalid.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
       </refsect1>
     </refentry>
   </reference>
