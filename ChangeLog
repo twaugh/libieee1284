@@ -1,7 +1,11 @@
 2001-11-14  Tim Waugh  <twaugh@redhat.com>
 
+	* ports.c (ieee1284_find_ports): Watch out for flags we don't yet
+	support.
+
 	* ieee1284.h (enum ieee1284_transfer_flags): Add F1284_SWE and
 	F1284_RLE flags.
+	(enum ieee1284_global_flags): Add F1284_EXCL flag.
 
 	* configure.in: Move AM_PROG_LIBTOOL to later to prevent warning.
 

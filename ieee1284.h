@@ -66,6 +66,10 @@ struct parport_list {
 // The first function to be called.  This gives the library a chance
 // to look around and see what's available, and gives the program a
 // chance to choose a port to use.
+enum ieee1284_global_flags
+{
+  F1284_EXCL = (1<<0), // Require exclusive access to the port
+};
 extern int ieee1284_find_ports (struct parport_list *list,
                                 const char *config_file, int flags);
 // No flags defined yet.  config_file may be NULL, but otherwise tells
@@ -87,7 +91,7 @@ extern void ieee1284_free_ports (struct parport_list *list);
 
 enum ieee1284_devid_flags
 {
-  F1284_FRESH = (1<<0), // Guarantee a fresh Device ID
+  F1284_FRESH = (1<<1), // Guarantee a fresh Device ID
 };
 
 extern ssize_t ieee1284_get_deviceid (struct parport *port, int daisy,
@@ -203,8 +207,8 @@ extern int ieee1284_ecp_rev_to_fwd (struct parport *port);
 // or an error code (only if no transfer took place).
 enum ieee1284_transfer_flags
 {
-  F1284_SWE = (1<<1), // Don't use hardware assistance
-  F1284_RLE = (1<<2), // Use ECP RLE
+  F1284_SWE = (1<<2), // Don't use hardware assistance
+  F1284_RLE = (1<<3), // Use ECP RLE
 };
 extern ssize_t ieee1284_nibble_read (struct parport *port, char *buffer,
 				     size_t len);

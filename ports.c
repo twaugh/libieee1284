@@ -246,6 +246,10 @@ int
 ieee1284_find_ports (struct parport_list *list,
 		     const char *config_file, int flags)
 {
+  /* We don't support any flags yet. */
+  if (flags)
+    return E1284_NOTIMPL;
+
   detect_environment (0);
   list->portc = 0;
   list->portv = malloc (sizeof(char*) * MAX_PORTS);
