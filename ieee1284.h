@@ -225,15 +225,16 @@ extern int ieee1284_ecp_rev_to_fwd (struct parport *port);
  * or an error code (only if no transfer took place). */
 enum ieee1284_transfer_flags
 {
-  F1284_SWE = (1<<2), /* Don't use hardware assistance */
-  F1284_RLE = (1<<3), /* Use ECP RLE */
+  F1284_NONBLOCK = (1<<0),	/* Non-blocking semantics */
+  F1284_SWE = (1<<2),		/* Don't use hardware assistance */
+  F1284_RLE = (1<<3),		/* Use ECP RLE */
 };
-extern ssize_t ieee1284_nibble_read (struct parport *port, char *buffer,
-				     size_t len);
-extern ssize_t ieee1284_compat_write (struct parport *port,
+extern ssize_t ieee1284_nibble_read (struct parport *port, int flags,
+				     char *buffer, size_t len);
+extern ssize_t ieee1284_compat_write (struct parport *port, int flags,
 				      const char *buffer, size_t len);
-extern ssize_t ieee1284_byte_read (struct parport *port, char *buffer,
-				   size_t len);
+extern ssize_t ieee1284_byte_read (struct parport *port, int flags,
+				   char *buffer, size_t len);
 extern ssize_t ieee1284_epp_read_data (struct parport *port, int flags,
 				       char *buffer, size_t len);
 extern ssize_t ieee1284_epp_write_data (struct parport *port, int flags,

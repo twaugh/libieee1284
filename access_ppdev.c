@@ -37,6 +37,7 @@
 struct ppdev_priv 
 {
   struct timeval inactivity_timer;
+  int nonblock;
 };
 
 static void
@@ -78,6 +79,7 @@ init (struct parport_internal *port, int flags, int *capabilities)
   if (!port->access_priv)
     return E1284_NOMEM;
 
+  ((struct ppdev_priv *)port->access_priv)->nonblock = 0;
   port->fd = open (port->device, O_RDWR | O_NOCTTY);
   if (port->fd < 0)
     {
@@ -377,6 +379,49 @@ set_mode (struct parport_internal *port, int mode, int flags, int addr)
   return ret;
 }
 
+static int do_nonblock (struct parport_internal *port, int flags)
+{
+  struct ppdev_priv *priv = port->access_priv;
+  if ((flags & F1284_NONBLOCK) && !priv->nonblock)
+    {
+      /* Enable O_NONBLOCK */
+      int f = fcntl (port->fd, F_GETFL);
+
+      if (f == -1)
+	{
+	  dprintf ("do_nonblock: fcntl failed on F_GETFL\n");
+	  return -1;
+	}
+
+      f |= O_NONBLOCK;
+      if (fcntl (port->fd, F_SETFL, f))
+	{
+	  dprintf ("do_nonblock: fcntl failed on F_SETFL\n");
+	  return -1;
+	}
+    }
+  else if ((!(flags & F1284_NONBLOCK)) && priv->nonblock)
+    {
+      /* Disable O_NONBLOCK */
+      int f = fcntl (port->fd, F_GETFL);
+
+      if (f == -1)
+	{
+	  dprintf ("do_nonblock: fcntl failed on F_GETFL\n");
+	  return -1;
+	}
+
+      f &= O_NONBLOCK;
+      if (fcntl (port->fd, F_SETFL, f))
+	{
+	  dprintf ("do_nonblock: fcntl failed on F_SETFL\n");
+	  return -1;
+	}
+    }
+
+  return 0;
+}
+
 static int
 negotiate (struct parport_internal *port, int mode)
 {
@@ -396,30 +441,39 @@ terminate (struct parport_internal *port)
 }
 
 static ssize_t
-nibble_read (struct parport_internal *port, char *buffer, size_t len)
+nibble_read (struct parport_internal *port, int flags,
+	     char *buffer, size_t len)
 {
   int ret;
-  ret = set_mode (port, M1284_NIBBLE, 0, 0);
+  ret = do_nonblock (port, flags);
+  if (!ret)
+    ret = set_mode (port, M1284_NIBBLE, 0, 0);
   if (!ret)
     ret = translate_error_code (read (port->fd, buffer, len));
   return ret;
 }
 
 static ssize_t
-compat_write (struct parport_internal *port, const char *buffer, size_t len)
+compat_write (struct parport_internal *port, int flags,
+	      const char *buffer, size_t len)
 {
   int ret;
-  ret = set_mode (port, M1284_COMPAT, 0, 0);
+  ret = do_nonblock (port, flags);
+  if (!ret)
+    ret = set_mode (port, M1284_COMPAT, 0, 0);
   if (!ret)
     ret = translate_error_code (write (port->fd, buffer, len));
   return ret;
 }
 
 static ssize_t
-byte_read (struct parport_internal *port, char *buffer, size_t len)
+byte_read (struct parport_internal *port, int flags,
+	   char *buffer, size_t len)
 {
   int ret;
-  ret = set_mode (port, M1284_BYTE, 0, 0);
+  ret = do_nonblock (port, flags);
+  if (!ret)
+    ret = set_mode (port, M1284_BYTE, 0, 0);
   if (!ret)
     ret = translate_error_code (read (port->fd, buffer, len));
   return ret;
@@ -430,7 +484,9 @@ epp_read_data (struct parport_internal *port, int flags,
 	       char *buffer, size_t len)
 {
   int ret;
-  ret = set_mode (port, M1284_EPP, flags, 0);
+  ret = do_nonblock (port, flags);
+  if (!ret)
+    ret = set_mode (port, M1284_EPP, flags, 0);
   if (!ret)
     ret = translate_error_code (read (port->fd, buffer, len));
   return ret;
@@ -441,7 +497,9 @@ epp_write_data (struct parport_internal *port, int flags,
 		const char *buffer, size_t len)
 {
   int ret;
-  ret = set_mode (port, M1284_EPP, flags, 0);
+  ret = do_nonblock (port, flags);
+  if (!ret)
+    ret = set_mode (port, M1284_EPP, flags, 0);
   if (!ret)
     ret = translate_error_code (write (port->fd, buffer, len));
   return ret;
@@ -452,7 +510,9 @@ epp_read_addr (struct parport_internal *port, int flags,
 	       char *buffer, size_t len)
 {
   int ret;
-  ret = set_mode (port, M1284_EPP, flags, 1);
+  ret = do_nonblock (port, flags);
+  if (!ret)
+    ret = set_mode (port, M1284_EPP, flags, 1);
   if (!ret)
     ret = translate_error_code (read (port->fd, buffer, len));
   return ret;
@@ -463,7 +523,9 @@ epp_write_addr (struct parport_internal *port, int flags,
 		const char *buffer, size_t len)
 {
   int ret;
-  ret = set_mode (port, M1284_EPP, flags, 1);
+  ret = do_nonblock (port, flags);
+  if (!ret)
+    ret = set_mode (port, M1284_EPP, flags, 1);
   if (!ret)
     ret = translate_error_code (write (port->fd, buffer, len));
   return ret;
@@ -474,7 +536,9 @@ ecp_read_data (struct parport_internal *port, int flags,
 	       char *buffer, size_t len)
 {
   int ret;
-  ret = set_mode (port, M1284_ECP, flags, 0);
+  ret = do_nonblock (port, flags);
+  if (!ret)
+    ret = set_mode (port, M1284_ECP, flags, 0);
   if (!ret)
     ret = translate_error_code (read (port->fd, buffer, len));
   return ret;
@@ -485,7 +549,9 @@ ecp_write_data (struct parport_internal *port, int flags,
 		const char *buffer, size_t len)
 {
   int ret;
-  ret = set_mode (port, M1284_ECP, flags, 0);
+  ret = do_nonblock (port, flags);
+  if (!ret)
+    ret = set_mode (port, M1284_ECP, flags, 0);
   if (!ret)
     ret = translate_error_code (write (port->fd, buffer, len));
   return ret;
@@ -496,7 +562,9 @@ ecp_write_addr (struct parport_internal *port, int flags,
 		const char *buffer, size_t len)
 {
   int ret;
-  ret = set_mode (port, M1284_ECP, flags, 1);
+  ret = do_nonblock (port, flags);
+  if (!ret)
+    ret = set_mode (port, M1284_ECP, flags, 1);
   if (!ret)
     ret = translate_error_code (write (port->fd, buffer, len));
   return ret;

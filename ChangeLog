@@ -1,5 +1,23 @@
 2002-04-09  Tim Waugh  <twaugh@redhat.com>
 
+	* default.c (default_nibble_read, default_compat_write,
+	default_byte_read): Accept new flags parameter.
+	* default.h: Likewise.
+	* detect.h: Likewise.
+	* ieee1284.h: Likewise.  Define new flag.
+	* deviceid.c (get_fresh): Use new parameter.
+	* interface.c (ieee1284_nibble_read, ieee1284_compat_write,
+	ieee1284_byte_read): Likewise.
+
+	* access_ppdev.c (init): Initialize nonblock in private
+	structure.
+	(do_nonblock): New function: enable/disable O_NONBLOCK.
+	(nibble_read, compat_write, byte_read, epp_read_data,
+	epp_write_data, epp_read_addr, epp_write_addr, ecp_read_data,
+	ecp_write_data, ecp_write_addr): Use it.
+
+	* doc/interface.sgml: New flag F1284_NONBLOCK.
+
 	* test.c (field): Avoid crashing on bad input.
 	(show_capabilities): Fix compiler warning.
 	(test_open): More compiler warning fixes.

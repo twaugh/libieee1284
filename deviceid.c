@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 1999-2001  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 1999-2002  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ get_fresh (struct parport *port, int daisy,
       return E1284_NOTAVAIL;
     }
 
-  got = ieee1284_nibble_read (port, buffer, 2);
+  got = ieee1284_nibble_read (port, 0, buffer, 2);
   if (got < 2)
     {
       dprintf ("<== E1284_NOID (no data)\n");
@@ -73,7 +73,7 @@ get_fresh (struct parport *port, int daisy,
   idlen = buffer[0] * 256 + buffer[1];
   if (idlen >= len - 2)
     idlen = len - 2;
-  got += ieee1284_nibble_read (port, buffer + 2, idlen);
+  got += ieee1284_nibble_read (port, 0, buffer + 2, idlen);
   if ((size_t) got < len)
     buffer[got] = '\0';
 

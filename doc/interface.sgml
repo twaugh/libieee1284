@@ -1616,6 +1616,7 @@
 	    <funcdef>ssize_t
 	      <function>ieee1284_nibble_read</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
 	    <paramdef>char *<parameter>buffer</parameter></paramdef>
 	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
@@ -1624,6 +1625,7 @@
 	    <funcdef>ssize_t
 	      <function>ieee1284_compat_write</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
 	    <paramdef>const char *<parameter>buffer</parameter></paramdef>
 	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
@@ -1631,6 +1633,7 @@
 	  <funcprototype>
 	    <funcdef>ssize_t <function>ieee1284_byte_read</function></funcdef>
 	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	    <paramdef>int <parameter>flags</parameter></paramdef>
 	    <paramdef>char *<parameter>buffer</parameter></paramdef>
 	    <paramdef>size_t <parameter>len</parameter></paramdef>
 	  </funcprototype>
@@ -1721,10 +1724,37 @@
 	<para>The supplied <parameter>buffer</parameter> must be at
 	 least <parameter>len</parameter> bytes long.</para>
 
+	<para>For reads (peripheral to host): if no data is available
+	 and <constant>F1284_NONBLOCK</constant> is not in effect,
+	 the inactivity timer is started.  If data becomes available
+	 before the inactivity time-out elapses it is read; otherwise
+	 the return value will be &e1284timedout;.</para>
+
+	<para>For writes (host to peripheral): if the peripheral is
+	 not willing to accept data and
+	 <constant>F1284_NONBLOCK</constant> is not in effect, the
+	 inactivity timer is started.  If the peripheral indicates
+	 that it is willing to accept data before the inactivity
+	 time-out elapses it is sent; otherwise the return value will
+	 be &e1284timedout;</para>
+
 	<para>The <parameter>flags</parameter> may alter the behaviour
 	 slightly:</para>
 
 	<variablelist>
+	  <varlistentry>
+	    <term><constant>F1284_NONBLOCK</constant></term>
+	    <listitem>
+	      <para>For reads (peripheral to host): if no data is
+	       available, return immediately (with
+	       &e1284timedout;).</para>
+
+	      <para>For writes (host to peripheral): if the peripheral
+	       is not willing to accept data, return immediately (with
+	       &e1284timedout;).</para>
+	    </listitem>
+	  </varlistentry>
+
 	  <varlistentry>
 	    <term><constant>F1284_SWE</constant></term>
 	    <listitem>

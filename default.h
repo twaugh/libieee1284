@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +30,11 @@ extern int default_negotiate (struct parport_internal *port, int mode);
 extern void default_terminate (struct parport_internal *port);
 extern int default_ecp_fwd_to_rev (struct parport_internal *port);
 extern int default_ecp_rev_to_fwd (struct parport_internal *port);
-extern ssize_t default_nibble_read (struct parport_internal *port,
+extern ssize_t default_nibble_read (struct parport_internal *port, int flags,
 				    char *buffer, size_t len);
-extern ssize_t default_compat_write (struct parport_internal *port,
+extern ssize_t default_compat_write (struct parport_internal *port, int flags,
 				     const char *buffer, size_t len);
-extern ssize_t default_byte_read (struct parport_internal *port,
+extern ssize_t default_byte_read (struct parport_internal *port, int flags,
 				  char *buffer, size_t len);
 extern ssize_t default_epp_read_data (struct parport_internal *port,
 				      int flags, char *buffer, size_t len);

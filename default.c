@@ -203,7 +203,7 @@ default_ecp_rev_to_fwd (struct parport_internal *port)
 }
 
 ssize_t
-default_nibble_read (struct parport_internal *port,
+default_nibble_read (struct parport_internal *port, int flags,
 		     char *buffer, size_t len)
 {
   const struct parport_access_methods *fn = port->fn;
@@ -278,7 +278,7 @@ default_nibble_read (struct parport_internal *port,
 }
 
 ssize_t
-default_compat_write (struct parport_internal *port,
+default_compat_write (struct parport_internal *port, int flags,
 		      const char *buffer, size_t len)
 {
   const struct parport_access_methods *fn = port->fn;
@@ -324,7 +324,7 @@ default_compat_write (struct parport_internal *port,
 }
 
 ssize_t
-default_byte_read (struct parport_internal *port,
+default_byte_read (struct parport_internal *port, int flags,
 		   char *buffer, size_t len)
 {
   return E1284_NOTIMPL;

@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -228,8 +228,8 @@ ieee1284_ecp_rev_to_fwd (struct parport *port)
 }
 
 ssize_t
-ieee1284_nibble_read (struct parport *port, char *buffer,
-		      size_t len)
+ieee1284_nibble_read (struct parport *port, int flags,
+		      char *buffer, size_t len)
 {
   struct parport_internal *priv = port->priv;
 
@@ -237,11 +237,11 @@ ieee1284_nibble_read (struct parport *port, char *buffer,
     /* Need a claimed port. */
     return E1284_INVALIDPORT;
 
-  return priv->fn->nibble_read (priv, buffer, len);
+  return priv->fn->nibble_read (priv, flags, buffer, len);
 }
 
 ssize_t
-ieee1284_compat_write (struct parport *port,
+ieee1284_compat_write (struct parport *port, int flags,
 		       const char *buffer, size_t len)
 {
   struct parport_internal *priv = port->priv;
@@ -250,12 +250,12 @@ ieee1284_compat_write (struct parport *port,
     /* Need a claimed port. */
     return E1284_INVALIDPORT;
 
-  return priv->fn->compat_write (priv, buffer, len);
+  return priv->fn->compat_write (priv, flags, buffer, len);
 }
 
 ssize_t
-ieee1284_byte_read (struct parport *port, char *buffer,
-		    size_t len)
+ieee1284_byte_read (struct parport *port, int flags, 
+		    char *buffer, size_t len)
 {
   struct parport_internal *priv = port->priv;
 
@@ -263,7 +263,7 @@ ieee1284_byte_read (struct parport *port, char *buffer,
     /* Need a claimed port. */
     return E1284_INVALIDPORT;
 
-  return priv->fn->byte_read (priv, buffer, len);
+  return priv->fn->byte_read (priv, flags, buffer, len);
 }
 
 ssize_t
