@@ -25,4 +25,5 @@ ieee1284_epp_read_addr
 ieee1284_epp_write_addr
 ieee1284_ecp_read_data
 ieee1284_ecp_write_data
+ieee1284_ecp_read_addr
 ieee1284_ecp_write_addr
