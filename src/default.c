@@ -372,7 +372,7 @@ static int poll_port (struct parport_internal *port, unsigned char mask,
 	return E1284_OK;
 
       if (i >= 2)
-	usleep (5);
+	udelay (5);
     }
 
   return E1284_TIMEDOUT;

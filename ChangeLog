@@ -1,3 +1,11 @@
+2002-09-04  Kevin Easton  <keaston@users.sourceforge.net>
+
+	* src/delay.c, src/delay.h: Changed lookup_delay into a macro that
+	does a table lookup.
+	* src/delay.c, src/delay.h: Added udelay() delay function that
+	busy-waits on gettimeofday(), in preparation for ECPSWE.
+	* src/default.c: Changed instance of usleep() into udelay().
+
 2002-09-02  Tim Waugh  <twaugh@redhat.com>
 
 	* src/conf.c: Add 'method' keyword to 'disallow', since there are

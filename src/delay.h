@@ -21,12 +21,20 @@
 #define _DELAY_H_
 
 enum Delays {
-  IO_POLL_DELAY,
-  TIMEVAL_SIGNAL_TIMEOUT,
-  TIMEVAL_STROBE_DELAY,
+  IO_POLL_DELAY = 0,
+  TIMEVAL_SIGNAL_TIMEOUT = 1,
+  TIMEVAL_STROBE_DELAY = 2,
 };
 
-extern void lookup_delay (int which, struct timeval *tv);
+static const long delay_table[] = {
+	1, /* IO_POLL_DELAY */
+	100000, /* TIMEVAL_SIGNAL_TIMEOUT */
+	1 /* TIMEVAL_STROBE_DELAY */  };
+				
+#define lookup_delay(which, tv) ((tv)->tv_sec = 0, \
+	(tv)->tv_usec = delay_table[which])
+
+void udelay(unsigned long usec);
 
 #endif /* _DELAY_H_ */
 

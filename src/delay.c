@@ -17,30 +17,24 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <stdio.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include "delay.h"
 
-// TODO: Do this with an array.
-void lookup_delay (int which, struct timeval *tv)
+void udelay(unsigned long usec)
 {
-  tv->tv_sec = 0;
-  switch (which)
-    {
-    case IO_POLL_DELAY:
-      tv->tv_usec = 1;
-      break;
-    case TIMEVAL_SIGNAL_TIMEOUT:
-      tv->tv_usec = 100000;
-      break;
-    case TIMEVAL_STROBE_DELAY:
-      tv->tv_usec = 1;
-      break;
-    default:
-      printf ("Couldn't lookup delay %d\n", which);
-    }
-  return;
+	struct timeval now, deadline;
+	
+	gettimeofday(&deadline, NULL);
+	deadline.tv_usec += usec;
+	deadline.tv_sec += deadline.tv_usec / 1000000;
+	deadline.tv_usec %= 1000000;
+	
+	do {
+		gettimeofday(&now, NULL);
+	} while ((now.tv_sec < deadline.tv_sec) || 
+		(now.tv_sec == deadline.tv_sec &&
+		now.tv_usec < deadline.tv_usec));
 }
+
