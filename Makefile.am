@@ -5,7 +5,7 @@ libieee1284_la_SOURCES = src/detect.c src/detect.h src/ports.c src/deviceid.c \
 	src/state.c src/access.h src/delay.h src/delay.c src/default.h \
 	src/default.c src/access_io.c src/access_ppdev.c src/access_lpt.c \
 	src/interface.c src/parport.h src/ppdev.h src/debug.h src/debug.c \
-	src/par_nt.h src/conf.h src/conf.c libieee1284.sym
+	src/par_nt.h src/io.h src/conf.h src/conf.c libieee1284.sym
 # When rolling a release, remember to adjust the version info.
 # It's current:release:age.
 libieee1284_la_LDFLAGS = -version-info 4:2:1 \
