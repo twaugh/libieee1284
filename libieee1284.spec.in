@@ -7,7 +7,7 @@ Group: System Environment/Libraries
 URL: http://cyberelk.net/tim/libieee1284/
 Source0: ftp://cyberelk.net/tim/data/%{name}/devel/%{name}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
-BuildRequires: xmlto
+BuildRequires: xmlto, python-devel
 
 %description
 The libieee1284 library is for communicating with parallel port devices.
@@ -71,6 +71,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Tue Feb  3 2004 Tim Waugh <twaugh@redhat.com>
+- Build requires python-devel.
 - Ship Python extension module.
 
 * Wed Feb 26 2003 Tim Waugh <twaugh@redhat.com>
