@@ -83,7 +83,8 @@ EXTRA_DIST = libieee1284.spec doc/interface.xml doc/interface.txt \
 		$(man3_MANS) solaris_io/LICENSE solaris_io/README \
 		solaris_io/INSTALL solaris_io/iop.conf \
 		README.FreeBSD README.OpenBSD README.Solaris \
-		README.win95 README.winNT
+		README.win95 README.winNT \
+		include/config.h.vc6 README.VC6 Makefile.vc6 ieee1284.def
 
 DISTCLEANFILES = include/stamp-h include/stamp-h[0-9]* \
 	doc/manpage.links doc/manpage.refs
