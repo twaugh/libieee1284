@@ -39,136 +39,6 @@
 #define ETRYNEXT	100
 #define ENODEVID	101
 
-#if 0
-static void reset (unsigned long base)
-{
-  unsigned long ctr = base + 2;
-  struct timeval tv;
-  OUTB (0xc, ctr);
-  OUTB (0x8, ctr);
-  tv.tv_sec = 0;
-  tv.tv_usec = 5000;
-  select (0, NULL, NULL, NULL, &tv);
-  OUTB (0xc, ctr);
-  tv.tv_sec = 0;
-  tv.tv_usec = 5000;
-  select (0, NULL, NULL, NULL, &tv);
-}
-
-static void terminate (unsigned base)
-{
-  unsigned long ctr = base + 2;
-  struct timeval tv;
-  OUTB ((INB (ctr) & ~2) | 8, ctr);
-  tv.tv_sec = 0;
-  tv.tv_usec = 1000;
-  select (0, NULL, NULL, NULL, &tv);
-  OUTB (INB (ctr) | 2, ctr);
-  tv.tv_sec = 0;
-  tv.tv_usec = 1000;
-  select (0, NULL, NULL, NULL, &tv);
-  OUTB (INB (ctr) & ~2, ctr);
-}
-
-static int negotiate (unsigned long base, unsigned char mode)
-{
-  struct timeval tv;
-  unsigned long data = base, status = base + 1, ctr = base + 2;
-  unsigned char val;
-  val = INB (status);
-  reset (base);
-  OUTB ((INB (ctr) & ~(1|2)) | 8, ctr);
-  OUTB (mode, data);
-  tv.tv_sec = 0;
-  tv.tv_usec = 1000;
-  select (0, NULL, NULL, NULL, &tv);
-  OUTB ((INB (ctr) & ~8) | 2, ctr);
-  tv.tv_sec = 0;
-  tv.tv_usec = 1000;
-  select (0, NULL, NULL, NULL, &tv);
-  val = INB (status);
-  if ((val & 0x78) != 0x38)
-    {
-      OUTB ((INB (ctr) & ~2) | 8, ctr);
-      fprintf (stderr, "status was %#02x\n", val);
-      return 1;
-    }
-  OUTB (INB (ctr) | 1, ctr);
-  OUTB (INB (ctr) & ~(1|2), ctr);
-  val = INB (status);
-  tv.tv_sec = 0;
-  tv.tv_usec = 1000;
-  select (0, NULL, NULL, NULL, &tv);
-  val = INB (status);
-  return !(val & 0x10);
-}
-
-static size_t read_nibble (unsigned long base, char *buffer, size_t len)
-{
-  unsigned long status = base + 1, ctr = base + 2;
-  unsigned char byte = 0;
-  char *buf = buffer;
-  struct timeval tv;
-  size_t i;
-
-  len *= 2; /* in nibbles */
-  for (i = 0; i < len; i++)
-    {
-      unsigned char nibble;
-      unsigned char val = INB (status);
-
-      if ((i & 1) == 0 && (val & 8))
-	{
-	  OUTB (INB (ctr) | 2, ctr);
-	  return i/2;
-	}
-
-      OUTB (INB (ctr) | 2, ctr);
-      tv.tv_sec = 0;
-      tv.tv_usec = 1000;
-      select (0, NULL, NULL, NULL, &tv);
-      nibble = INB (status) >> 3;
-      nibble &= ~8;
-      if ((nibble & 0x10) == 0)
-	nibble |= 8;
-      nibble &= 0xf;
-      OUTB (INB (ctr) & ~2, ctr);
-      tv.tv_sec = 0;
-      tv.tv_usec = 1000;
-      select (0, NULL, NULL, NULL, &tv);
-      if (i & 1)
-	{
-	  byte |= nibble << 4;
-	  *buf++ = byte;
-	}
-      else
-	{
-	  byte = nibble;
-	}
-    }
-
-  return i/2;
-}
-
-static ssize_t get_using_io (struct parport *port, int daisy,
-			     char *buffer, size_t len)
-{
-  struct parport_internal *priv = port->priv;
-  if (daisy > -1)
-    return -1;
-
-  if (negotiate (priv->base, 4))
-    {
-      fprintf (stderr, "Couldn't go to nibble mode\n");
-      return -ENODEVID;
-    }
-
-  len = read_nibble (priv->base, buffer, len);
-  terminate (priv->base);
-  return len;
-}
-#endif
-
 static ssize_t
 get_fresh (struct parport *port, int daisy,
 	   char *buffer, size_t len)
@@ -328,9 +198,17 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
   if (!(flags & F1284_FRESH))
     {
       if (capabilities & PROC_SYS_DEV_PARPORT_CAPABLE)
-	ret = get_from_sys_dev_parport (port, daisy, buffer, len);
+	{
+	  ret = get_from_sys_dev_parport (port, daisy, buffer, len);
+	  dprintf ("Trying /proc/sys/dev/parport: %s\n",
+		   ret < 0 ? "failed" : "success");
+	}
       else if (capabilities & PROC_PARPORT_CAPABLE)
-	ret = get_from_proc_parport (port, daisy, buffer, len);
+	{
+	  ret = get_from_proc_parport (port, daisy, buffer, len);
+	  dprintf ("Trying /proc/parport: %s\n",
+		   ret < 0 ? "failed" : "success");
+	}
 
       if (ret > -1)
 	{
@@ -345,6 +223,7 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
 	}
     }
 
+  dprintf ("Trying device...\n");
   if ((ret = ieee1284_open (port, 0, NULL)) != E1284_OK)
     {
       dprintf ("<== %d (from ieee1284_open)\n", ret);
