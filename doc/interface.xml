@@ -154,8 +154,8 @@
 	  tokens, unless quoted or escaped.</para>
 
 	<para>The only configuration instruction that is currently
-	  recognised is <quote>disallow ppdev</quote>, for preventing
-	  the use of the Linux ppdev driver.</para>
+	  recognised is <quote>disallow method ppdev</quote>, for
+	  preventing the use of the Linux ppdev driver.</para>
       </refsect1>
 
       <refsect1>

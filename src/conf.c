@@ -198,36 +198,30 @@ static char *get_token (FILE *f)
   return this_token;
 }
 
-static void disallow (FILE *f)
+static char *disallow (FILE *f)
 {
   char *token = NULL;
   int i;
 
-  for (i = 0; i < 2; i++)
+  token = get_token (f);
+  if (!token || strcmp (token, "method"))
     {
-      if (token)
-	free (token);
-
-      token = get_token (f);
-      if (!token)
-	break;
-
-      if (!strcmp (token, "ppdev"))
-	{
-	  dprintf ("* Disallowing ppdev\n");
-	  conf.disallow_ppdev = 1;
-	  break;
-	}
-      else
-	{
-	  dprintf ("Skipping unknown token: %s\n", token);
-	  if (i)
-	    dprintf ("Ignoring: disallow\n");
-	}
+      dprintf ("'disallow' requires 'method'\n");
+      return token;
     }
 
-  if (token)
-    free (token);
+  free (token);
+  token = get_token (f);
+  if (!token || strcmp (token, "ppdev"))
+    {
+      dprintf ("'disallow method' requires a method name (e.g. ppdev)\n");
+      return token;
+    }
+
+  dprintf ("* Disallowing method: ppdev\n");
+  conf.disallow_ppdev = 1;
+  free (token);
+  return get_token (f);
 }
 
 static int try_read_config_file (const char *path)
@@ -240,20 +234,23 @@ static int try_read_config_file (const char *path)
 
   dprintf ("Reading configuration from %s:\n", path);
 
-  do
+  token = get_token (f);
+  while (token)
     {
-      token = get_token (f);
-      if (token)
+      char *next_token;
+      if (!strcmp (token, "disallow"))
 	{
-	  if (!strcmp (token, "disallow"))
-	    disallow (f);
-	  else
-	    dprintf ("Skipping unknown word: %s\n", token);
-
-	  free (token);
+	  next_token = disallow (f);
 	}
+      else
+	{
+	  dprintf ("Skipping unknown word: %s\n", token);
+	  next_token = get_token (f);
+	}
+
+      free (token);
+      token = next_token;
     }
-  while (token);
 
   fclose (f);
   dprintf ("End of configuration\n");
