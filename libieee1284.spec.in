@@ -5,7 +5,7 @@ Release: 0.1
 License: GPL
 Group: System Environment/Libraries
 URL: http://cyberelk.net/tim/libieee1284/
-Source0: ftp://cyberelk.net/tim/data/%{name}/devel/%{name}-%{version}.tar.gz
+Source0: ftp://cyberelk.net/tim/data/%{name}/devel/%{name}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
 BuildRequires: xmlto
 
@@ -56,6 +56,9 @@ rm -rf %{buildroot}
 %postun -p /sbin/ldconfig
 
 %changelog
+* Sat Aug  3 2002 Tim Waugh <twaugh@redhat.com>
+- The archive is now distributed in .tar.bz2 format.
+
 * Fri Apr 26 2002 Tim Waugh <twaugh@redhat.com>
 - No need to create man page symlinks any more.
 - Build requires xmlto now, not docbook-utils.
