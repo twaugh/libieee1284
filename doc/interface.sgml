@@ -14,6 +14,7 @@
 <book id="index">
   <bookinfo>
     <title>Public interface of &libieee1284;</title>
+    <subtitle>API 1</subtitle>
 
     <author>
       <firstname>Tim</firstname>
@@ -33,9 +34,8 @@
     <title>Overview</title>
 
     <para>The &libieee1284; library is a library for accessing
-     parallel port devices.  It is currently under development, but
-     this interface is the one that I think will remain in place for a
-     while.</para>
+     parallel port devices.  It is currently under development, and
+     this is CVS ID <literal>$Id $</literal>.</para>
 
     <para>The model presented to the user is fairly abstract: a list
      of parallel ports with arbitrary names, with functions to access
