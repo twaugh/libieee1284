@@ -27,16 +27,211 @@
 #include "conf.h"
 #include "debug.h"
 
+struct config_variables conf;
+
 static const char *const ieee1284rc = "ieee1284rc";
+static const size_t max_line_len = 1000;
+static const char *ifs = " \t\n";
+
+/* Get the next token.  Caller frees returned zero-terminated string. */
+static char *get_token (FILE *f)
+{
+  static char *current_line = NULL;
+  static size_t current_line_len = 0;
+  static size_t at = 0;
+  size_t end, i;
+  char *this_token;
+
+  for (;;)
+    {
+      int quotes = 0;
+
+      if (at == current_line_len)
+	{
+	  if (current_line)
+	    free (current_line);
+
+	  current_line = NULL;
+	  current_line_len = 0;
+	  at = 0;
+	}
+
+      if (!current_line)
+	{
+	  current_line = malloc (sizeof (char) * max_line_len);
+	  if (!current_line)
+	    return NULL;
+
+	  /* Ideally we'd use getline here, but that isn't available
+	   * everywhere. In fact, *ideally* we'd use wordexp for this
+	   * whole function, but that isn't widely available either. */
+	  if (!fgets (current_line, max_line_len, f))
+	    {
+	      free (current_line);
+	      current_line = NULL;
+	      current_line_len = 0;
+	      at = 0;
+	      return NULL;
+	    }
+
+	  current_line_len = strlen (current_line);
+	  at = 0;
+	}
+
+      /* Skip whitespace. */
+      at += strspn (current_line + at, ifs);
+
+      /* Find the end of the token. */
+      for (end = at; end < current_line_len; end++)
+	{
+	  char ch = current_line[end];
+
+	  if (ch == '\\')
+	    {
+	      end++;
+	      continue;
+	    }
+
+	  if (ch == '\'')
+	    {
+	      if (quotes == 0)
+		{
+		  quotes = 1;
+		  continue;
+		}
+
+	      if (quotes == 1)
+		quotes = 0;
+	    }
+
+	  if (ch == '"')
+	    {
+	      if (quotes == 0)
+		{
+		  quotes = 2;
+		  continue;
+		}
+
+	      if (quotes == 2)
+		quotes = 0;
+	    }
+
+	  if (!quotes && strchr (ifs, ch))
+	    break;
+	}
+
+      if (at == end)
+	/* Next line. */
+	continue;
+
+      /* Copy this token. */
+      this_token = malloc (sizeof (char) * (end - at + 1)); /* worst case */
+      if (!this_token)
+	return NULL;
+
+      quotes = 0;
+      for (i = 0; at < end; at++)
+	{
+	  char ch = current_line[at];
+
+	  if (ch == '\\')
+	    {
+	      if (at < end - 1)
+		this_token[i++] = current_line[++at];
+
+	      continue;
+	    }
+
+	  if (ch == '\'')
+	    {
+	      if (quotes == 0)
+		{
+		  quotes = 1;
+		  continue;
+		}
+
+	      if (quotes == 1)
+		{
+		  quotes = 0;
+		  continue;
+		}
+	    }
+
+	  if (ch == '"')
+	    {
+	      if (quotes == 0)
+		{
+		  quotes = 2;
+		  continue;
+		}
+
+	      if (quotes == 2)
+		{
+		  quotes = 0;
+		  continue;
+		}
+	    }
+
+	  this_token[i++] = ch;
+	}
+
+      this_token[i] = '\0';
+      break;
+    }
+
+  return this_token;
+}
+
+static void disallow (FILE *f)
+{
+  char *token;
+  int i;
+
+  for (i = 0; i < 2; i++)
+    {
+      token = get_token (f);
+      if (!token)
+	return;
+
+      if (!strcmp (token, "ppdev"))
+	{
+	  dprintf ("* Disallowing ppdev\n");
+	  conf.disallow_ppdev = 1;
+	}
+      else
+	{
+	  dprintf ("Skipping unknown token: %s\n", token);
+	  if (i)
+	    dprintf ("Ignoring: disallow\n");
+	}
+    }
+}
 
 static int try_read_config_file (const char *path)
 {
   FILE *f = fopen (path, "r");
+  char *token;
 
   if (!f)
     return 1;
 
   dprintf ("Reading configuration from %s:\n", path);
+
+  do
+    {
+      token = get_token (f);
+      if (token)
+	{
+	  if (!strcmp (token, "disallow"))
+	    disallow (f);
+	  else
+	    dprintf ("Skipping unknown word: %s\n", token);
+
+	  free (token);
+	}
+    }
+  while (token);
+
   fclose (f);
   dprintf ("End of configuration\n");
   return 0;
@@ -53,6 +248,8 @@ read_config_file (void)
   if (config_read)
     return;
 
+  conf.disallow_ppdev = 0;
+
   rclen = strlen (ieee1284rc);
   home = getenv ("HOME");
   if (home)
@@ -66,11 +263,12 @@ read_config_file (void)
       memcpy (path + homelen, "/.", 2);
       memcpy (path + homelen + 2, ieee1284rc, rclen + 1);
       if (!try_read_config_file (path))
-	{
-	  /* Success. */
-	  config_read = 1;
-	  return;
-	}
+	/* Success. */
+	config_read = 1;
+
+      free (path);
+      if (config_read)
+	return;
     }
 
   path = malloc (1 + 5 + rclen);
@@ -82,6 +280,7 @@ read_config_file (void)
   if (try_read_config_file (path))
     config_read = 1;
 
+  free (path);
   return;
 }
 

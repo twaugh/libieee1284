@@ -22,6 +22,11 @@
 
 void read_config_file (void);
 
+extern struct config_variables
+{
+  int disallow_ppdev;
+} conf;
+
 #endif /* _CONF_H_ */
 
 /*

@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "access.h"
 #include "config.h"
+#include "access.h"
+#include "conf.h"
 #include "debug.h"
 #include "default.h"
 #include "delay.h"
@@ -42,7 +43,7 @@ init_port (struct parport *port, int flags, int *caps)
 
   dprintf ("==> init_port\n");
 
-  if ((capabilities & PPDEV_CAPABLE) && priv->device)
+  if ((capabilities & PPDEV_CAPABLE) && priv->device && !conf.disallow_ppdev)
     {
       priv->type = PPDEV_CAPABLE;
       memcpy (priv->fn, &ppdev_access_methods, sizeof *priv->fn);
