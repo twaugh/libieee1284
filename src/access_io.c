@@ -39,7 +39,9 @@
 
 #ifdef HAVE_LINUX
 
+#ifdef HAVE_SYS_IO_H
 #include <sys/io.h>
+#endif
 
 #elif defined(HAVE_SOLARIS)
 
@@ -116,7 +118,12 @@ raw_inb (struct parport_internal *port, unsigned long addr)
 {
 #if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386) \
 	|| defined(HAVE_FBSD_I386)
+#ifdef HAVE_SYS_IO_H
   return inb (addr);
+#else
+  return E1284_SYS; /* might not be the best error code to use */
+#endif /* HAVE_SYS_IO_H */
+
 #elif defined(HAVE_SOLARIS)
   struct iopbuf tmpbuf;
   tmpbuf.port = addr;
@@ -131,7 +138,10 @@ raw_outb (struct parport_internal *port, unsigned char val, unsigned long addr)
 {
 #if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386) \
 	|| defined(HAVE_FBSD_I386)
+#ifdef HAVE_SYS_IO_H
   outb_p (val, addr);
+#endif /* HAVE_SYS_IO_H */
+  
 #elif defined(HAVE_SOLARIS)
   struct iopbuf tmpbuf;
   tmpbuf.port = addr;
@@ -179,8 +189,13 @@ init (struct parport_internal *port, int flags, int *capabilities)
     {
     case IO_CAPABLE:
 #ifdef HAVE_LINUX
+#ifdef HAVE_SYS_IO_H
       if (ioperm (port->base, 3, 1) || ioperm (0x80, 1, 1))
         return E1284_INIT;
+#else
+      return E1284_SYS; /* might not be the best error code to use */
+#endif /* HAVE_SYS_IO_H */
+
 #elif defined(HAVE_FBSD_I386)
 	/* open the special io device which does the ioperm change for us */
       if ((port->fd = open("/dev/io", O_RDONLY)) < 0)

@@ -1,3 +1,8 @@
+2002-09-26  Julien BLACHE  <jblache@debian.org>
+
+	* configure.in: Test for sys/io.h.
+	* src/access_io.c, src/detect.c: Check for sys/io.h
+
 2002-09-19  Tim Waugh  <twaugh@redhat.com>
 
 	* configure.in, Makefile.am: Version 0.2.3 (stable).

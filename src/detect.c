@@ -31,7 +31,9 @@
 #include "detect.h"
 
 #ifdef HAVE_LINUX
+#ifdef HAVE_SYS_IO_H
 #include <sys/io.h>
+#endif /* HAVE_SYS_IO_H */
 #include "ppdev.h"
 #elif defined(HAVE_OBSD_I386)
 /* for i386_get_ioperm and i386_set_ioperm */
@@ -140,12 +142,18 @@ check_io (void)
     return 1;
   }
   #elif defined(HAVE_LINUX)
+  #ifdef HAVE_SYS_IO_H
   if (ioperm (0x378 /* say */, 3, 1) == 0) {
     ioperm (0x378, 3, 0);
     capabilities |= IO_CAPABLE;
     dprintf ("We can use ioperm()\n");
     return 1;
   }
+  #else
+  dprintf ("We cannot use ioperm() : not supported\n");
+  return 0;
+  #endif /* HAVE_SYS_IO_H */
+  
   #elif defined(HAVE_SOLARIS)
   int fd;
   if (fd=open("/devices/pseudo/iop@0:iop", O_RDWR) > 0) {

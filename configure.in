@@ -18,6 +18,8 @@ dnl Checks for libraries.
 
 dnl Checks for header files.
 
+AC_CHECK_HEADERS(sys/io.h)
+
 dnl Checks for typedefs, structures, and compiler characteristics.
 SOLARIS_IO=""
 case "{$host}" in
