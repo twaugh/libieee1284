@@ -3,6 +3,9 @@
 	* default.c (LOG_ERROR): We now have dprintf, so this is not
 	needed.
 
+	* default.c (default_nibble_read, default_compat_write): Print
+	debugging info.
+
 2001-11-18  Tim Waugh  <twaugh@redhat.com>
 
 	* detect.c, deviceid.c, access_ppdev.c, state.c: Include debug.h.

@@ -186,6 +186,8 @@ default_nibble_read (struct parport_internal *port,
   int low, high;
   struct timeval tv;
 
+  dprintf ("==> default_nibble_read\n");
+
   /* start of reading data from the scanner */
   while (count < len)
     {
@@ -231,10 +233,12 @@ default_nibble_read (struct parport_internal *port,
       count++;
     }
 
+  dprintf ("<== %d\n", len);
   return len; 
 
  error:
   fn->terminate (port);
+  dprintf ("<== %d (terminated on error)\n", count);
   return count;
 }
 
@@ -245,6 +249,8 @@ default_compat_write (struct parport_internal *port,
   const struct parport_access_methods *fn = port->fn;
   size_t count = 0;
   struct timeval tv;
+
+  dprintf ("==> default_compat_write\n");
 
   while (count < len)
     {		
@@ -272,11 +278,13 @@ default_compat_write (struct parport_internal *port,
 
       count++;
     }
-		
+
+  dprintf ("<== %d\n", len);
   return len;
 
  error:
   fn->terminate (port);
+  dprintf ("<== %d (terminated on error)\n", count);
   return count;  
 }
 
