@@ -104,6 +104,10 @@ extern ssize_t ieee1284_get_deviceid (struct parport *port, int daisy,
  * Sharing hooks
  */
 
+extern int ieee1284_open (struct parport *port, int flags, int *capabilities);
+
+extern int ieee1284_close (struct parport *port);
+
 extern int ieee1284_claim (struct parport *port);
 /* Must be called before any function below.  May fail. */
 
