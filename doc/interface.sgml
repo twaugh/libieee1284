@@ -601,13 +601,16 @@
 	<para>These functions manipulate the data lines of the
 	 parallel port.  The lines are represented by an 8-bit number
 	 (one line per bit) and a direction.  The data lines are
-	 driven as a group; they may be host-driven
+	 driven as a group; they may be all host-driven
 	 (<firstterm>forward</firstterm> direction) or not
 	 (<firstterm>reverse</firstterm> direction).  When the
 	 peripheral is driving them the host must not.</para>
 
-	<para>Some port types may be unable to switch off the data
-	 line drivers.</para>
+	<para>For <function>ieee1284_data_dir</function> the
+	 <parameter>reverse</parameter> parameter should be zero to
+	 turn the data line drivers on and non-zero to turn them off.
+	 Some port types may be unable to switch off the data line
+	 drivers.</para>
 
 	<para>Setting the data lines may have side effects on some
 	 port types (for example, some Amiga ports pulse
@@ -1109,8 +1112,10 @@
 	<title>Description</title>
 
 	<para>These functions are used to switch directions when in
-	 ECP mode.  Use <function>ieee1284_ecp_fwd_to_rev</function>
-	 to switch from forward to reverse, and
+	 ECP mode.  On negotiation to ECP mode the direction is
+	 forward (in other words, host-to-peripheral).  Use
+	 <function>ieee1284_ecp_fwd_to_rev</function> to switch from
+	 forward to reverse, and
 	 <function>ieee1284_ecp_rev_to_fwd</function> to switch from
 	 reverse to forward.</para>
 
@@ -1289,6 +1294,11 @@
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
+
+	<para>For ECP mode, a given direction is in force at any
+	 particular time, and it is up to the application to ensure
+	 that it is only writing when in forward mode, and reading
+	 when in reverse mode.</para>
       </refsect1>
 
       <refsect1>
@@ -1334,6 +1344,18 @@
 	<para>If any bytes are successfully transferred, that number
 	 is returned.  An error is returned only if no bytes are
 	 transferred.</para>
+
+	<para>For host-to-peripheral transfers, all data is at the
+	 peripheral by the time the call returns.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>See also</title>
+
+	<para><citerefentry>
+	    <refentrytitle>ieee1284_ecp_fwd_to_rev</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	  </citerefentry></para>
       </refsect1>
     </refentry>
   </reference>
