@@ -1,6 +1,10 @@
 libieee1284 news
 ----------------
 
+0.1.6 (devel)
+
+	The directory structure was reorganised.
+
 0.1.5 (devel)
 
 	Some small clean-ups were made, as well as the last interface
