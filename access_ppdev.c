@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -306,16 +306,17 @@ do_nack_handshake (struct parport_internal *port,
 }
 
 static int
-set_mode (struct parport_internal *port, int mode, int flags, int addr)
+which_mode (int mode, int flags)
 {
   int m;
-  int ret = 0;
-
   switch (mode)
     {
     case M1284_NIBBLE:
     case M1284_BYTE:
     case M1284_COMPAT:
+    case M1284_ECPRLE:
+    case M1284_ECPSWE:
+    case M1284_EPPSWE:
       m = mode;
       break;
 
@@ -341,6 +342,18 @@ set_mode (struct parport_internal *port, int mode, int flags, int addr)
       return E1284_NOTIMPL;
     }
 
+  return m;
+}
+
+static int
+set_mode (struct parport_internal *port, int mode, int flags, int addr)
+{
+  int m = which_mode (mode, flags);
+  int ret = E1284_OK;
+
+  if (m < 0)
+    return m;
+
   m |= addr ? IEEE1284_ADDR : IEEE1284_DATA;
   if (port->current_mode != m)
     {
@@ -358,6 +371,24 @@ translate_error_code (ssize_t e)
   if (e < 0)
     return E1284_SYS;
   return e;
+}
+
+static int
+negotiate (struct parport_internal *port, int mode)
+{
+  int m = which_mode (mode, 0);
+  int ret = ioctl (port->fd, PPNEGOT, &m);
+  if (!ret)
+    port->current_mode = mode;
+  return translate_error_code (ret);
+}
+
+static void
+terminate (struct parport_internal *port)
+{
+  int m = IEEE1284_MODE_COMPAT;
+  if (!ioctl (port->fd, PPNEGOT, &m))
+    port->current_mode = IEEE1284_MODE_COMPAT;
 }
 
 static ssize_t
@@ -503,8 +534,8 @@ const struct parport_access_methods ppdev_access_methods =
 
   do_nack_handshake,
 
-  default_negotiate,
-  default_terminate,
+  negotiate,
+  terminate,
   default_ecp_fwd_to_rev,
   default_ecp_rev_to_fwd,
   nibble_read,
