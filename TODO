@@ -1,8 +1,7 @@
 Still to do:
 
-- Default implementation of ECP direction switching functions.
-
-- F1284_EXCL for iopl() and /dev/port (use /dev/lp0).
+- F1284_EXCL for iopl() and /dev/port (use /dev/lp0).  This needs
+  configuration file support.
 
 - Default implementations of the block transfer functions, in terms of
   the pins.

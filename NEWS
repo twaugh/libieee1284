@@ -1,6 +1,11 @@
 libieee1284 news
 ----------------
 
+0.2.2 (stable)
+
+	This release contains several bugfixes, speed optimizations for
+	direct I/O, and preliminary configuration file support.
+
 0.2.1 (stable)
 
 	Minor bugfixes.
