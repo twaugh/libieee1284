@@ -3,6 +3,18 @@ Desired interface for libieee1284
 
 The interface will be callable from C.
 
+// Errors.  When a function returns a negative number, it's one of
+// these errors.
+enum E1284 {
+  E1284_OK                 = 0,  // Everything went fine
+  E1284_NOTIMPL            = -1, // Not implemented in libieee1284
+  E1284_NOTAVAIL           = -2, // Not available on this system
+  E1284_TIMEDOUT           = -3, // Operation timed out
+  E1284_REJECTED           = -4, // IEEE 1284 negotiation rejected
+  E1284_NEGFAILED          = -5, // Negotiation went wrong
+  E1284_NOMEM              = -6, // No memory left
+};
+
 // A parallel port.
 struct parport {
   // An arbitrary name for the port
@@ -42,7 +54,7 @@ extern int ieee1284_find_ports (struct parport_list *list,
 // the library where its configuration file is. (No configuration
 // options defined yet, but to include base addresses, access
 // methods, timings and such.)
-// Returns 0, or an error code.  No errors defined yet.
+// Returns E1284_OK, or an error code.  No errors defined yet.
 
 // The last function to be called.  After calling this, only
 // ieee1284_find_ports may be used.
@@ -80,18 +92,18 @@ extern void ieee1284_write_data (struct parport *port, unsigned char st);
 extern void ieee1284_data_dir (struct parport *port, int reverse);
 
 // The status pin functions operate in terms of these bits:
-static const int STATUS_NFAULT          =0x08;
-static const int STATUS_SELECT          =0x10;
-static const int STATUS_PERROR          =0x20;
-static const int STATUS_NACK            =0x40;
-static const int STATUS_BUSY            =0x80;
+static const int S1284_NFAULT          =0x08;
+static const int S1284_SELECT          =0x10;
+static const int S1284_PERROR          =0x20;
+static const int S1284_NACK            =0x40;
+static const int S1284_BUSY            =0x80;
 // To convert those values into PC-style register values, use this:
-#define STATUS_INVERTED (STATUS_BUSY)
+#define S1284_INVERTED (S1284_BUSY)
 
 extern int ieee1284_read_status (struct parport *port);
 
 // Wait until those status pins in mask have the values in val.
-// Return 0 when condition met, 1 on timeout.
+// Return E1284_OK when condition met, E1284_TIMEDOUT on timeout.
 // timeout may be modified.
 extern int ieee1284_wait_status (struct parport *port,
                                  unsigned char mask,
@@ -99,14 +111,14 @@ extern int ieee1284_wait_status (struct parport *port,
 				 struct timeval *timeout);
 
 // The control pin functions operate in terms of these bits:
-static const int CONTROL_NSTROBE        =0x01;
-static const int CONTROL_NAUTOFD        =0x02;
-static const int CONTROL_NINIT          =0x04;
-static const int CONTROL_NSELECTIN      =0x08;
+static const int C1284_NSTROBE        =0x01;
+static const int C1284_NAUTOFD        =0x02;
+static const int C1284_NINIT          =0x04;
+static const int C1284_NSELECTIN      =0x08;
 // To convert those values into PC-style register values, use this:
-#define CONTROL_INVERTED (CONTROL_NSTROBE| \
-                         CONTROL_NAUTOFD|  \
-                         CONTROL_NSELECTIN)
+#define C1284_INVERTED (C1284_NSTROBE| \
+                       C1284_NAUTOFD|  \
+                       C1284_NSELECTIN)
 
 extern int ieee1284_read_control (struct parport *port);
 // ieee1284_read_control may be unreliable
@@ -115,16 +127,16 @@ extern void ieee1284_write_control (struct parport *port, unsigned char ct);
 // NOTE: This will not change the direction of the data lines; use
 // ieee1284_data_dir for that.
 
-extern void ieee1284_frob_control (struct parport *port, unsigned char mask,
-				   unsigned char val);
-// frob is "out ((in & ~mask) | val)"
+extern int ieee1284_frob_control (struct parport *port, unsigned char mask,
+				  unsigned char val);
+// frob is "out ((in & ~mask) ^ val)"
 
 // This function may or may not be available, depending on PPWCTLONIRQ
 // availability.  Its operation is:
-// If operation unavailable, return -1.  Otherwise:
+// If operation unavailable, return E1284_NOTAVAIL.  Otherwise:
 // Set control pins to ct_before.
-// Wait for nFault interrupt.  If timeout elapses, return 1.
-// Otherwise, set control pins to ct_after and return 0.
+// Wait for nFault interrupt.  If timeout elapses, return E1284_TIMEDOUT.
+// Otherwise, set control pins to ct_after and return E1284_OK.
 // timeout may be modified.
 extern int ieee1284_do_nfault_handshake (struct parport *port,
                                          unsigned char ct_before,
@@ -136,6 +148,18 @@ extern int ieee1284_do_nfault_handshake (struct parport *port,
 //
 
 // Negotiation/termination
+static const int M1284_NIBBLE =  0;
+static const int M1284_BYTE   = (1<<0);
+static const int M1284_COMPAT = (1<<8);
+static const int M1284_BECP   = (1<<9);
+static const int M1284_ECP    = (1<<4);
+static const int M1284_ECPRLE = (M1284_ECP | (1<<5));
+static const int M1284_ECPSWE = (1<<10); // Software emulated
+static const int M1284_EPP    = (1<<6);
+static const int M1284_EPPSL  = (1<<11); // EPP 1.7
+static const int M1284_EPPSWE = (1<<12); // Software emulated
+static const int M1284_FLAG_DEVICEID = (1<<2);
+static const int M1284_FLAG_EXT_LINK = (1<<14); // Uses bits in 0x7f
 extern int ieee1284_negotiate (struct parport *port, int mode);
 extern void ieee1284_terminate (struct parport *port);
 
@@ -169,8 +193,6 @@ Still to work out for the interface:
 
 - blocking/non-blocking: ieee1284_set_timeout enough?  Perhaps config
   file can help here.
-
-- there is no error reporting yet
 
 - perhaps there needs to be a run-time feature test available for the
   application to see if various classes of functions are to be used or
