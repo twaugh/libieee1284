@@ -1,5 +1,8 @@
 2002-01-05  Tim Waugh  <twaugh@redhat.com>
 
+	* ports.c (deref_port): Don't call the cleanup method; this is
+	done by ieee1284_close.
+
 	* access_ppdev.c (which_mode): Pass through modes with flags set.
 
 	* access_ppdev.c (set_mode): Translate the error code returned by

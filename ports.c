@@ -297,8 +297,6 @@ deref_port (struct parport *p)
   struct parport_internal *priv = p->priv;
   if (!--priv->ref)
     {
-      if (priv->fn && priv->fn->cleanup)
-	priv->fn->cleanup (priv);
       if (priv->fn)
 	free (priv->fn);
       if (p->name)
