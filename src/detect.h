@@ -38,8 +38,8 @@ struct parport_access_methods
   int (*claim) (struct parport_internal *port);
   void (*release) (struct parport_internal *port);
 
-  unsigned char (*inb) (struct parport_internal *port, unsigned long addr);
-  void (*outb) (struct parport_internal *port, unsigned char val,
+  unsigned char (*do_inb) (struct parport_internal *port, unsigned long addr);
+  void (*do_outb) (struct parport_internal *port, unsigned char val,
 		unsigned long addr);
 
   int (*get_irq_fd) (struct parport_internal *port);

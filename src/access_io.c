@@ -138,8 +138,10 @@ raw_outb (struct parport_internal *port, unsigned char val, unsigned long addr)
 {
 #if defined(HAVE_LINUX) || defined(HAVE_CYGWIN_9X) || defined(HAVE_OBSD_I386) \
 	|| defined(HAVE_FBSD_I386)
-#ifdef HAVE_SYS_IO_H
+#if defined(HAVE_SYS_IO_H) && defined(__i386__)
   outb_p (val, addr);
+#elif defined(HAVE_SYS_IO_H)
+  outb (val, addr);
 #endif /* HAVE_SYS_IO_H */
   
 #elif defined(HAVE_SOLARIS)
@@ -245,8 +247,8 @@ init (struct parport_internal *port, int flags, int *capabilities)
       port->fd = open ("/dev/port", O_RDWR | O_NOCTTY);
       if (port->fd < 0)
 	return E1284_INIT;
-      port->fn->inb = port_inb;
-      port->fn->outb = port_outb;
+      port->fn->do_inb = port_inb;
+      port->fn->do_outb = port_outb;
       break;
     }
 
@@ -275,19 +277,19 @@ cleanup (struct parport_internal *port)
 static int
 read_data (struct parport_internal *port)
 {
-  return port->fn->inb (port, port->base);
+  return port->fn->do_inb (port, port->base);
 }
 
 static void
 write_data (struct parport_internal *port, unsigned char reg)
 {
-  port->fn->outb (port, reg, port->base);
+  port->fn->do_outb (port, reg, port->base);
 }
 
 static int
 read_status (struct parport_internal *port)
 {
-  return debug_display_status (port->fn->inb (port, port->base + 1) ^
+  return debug_display_status (port->fn->do_inb (port, port->base + 1) ^
 			       S1284_INVERTED);
 }
 
@@ -300,7 +302,7 @@ raw_frob_control (struct parport_internal *port,
   /* Deal with inversion issues. */
   val ^= mask & C1284_INVERTED;
   ctr = (ctr & ~mask) ^ val;
-  port->fn->outb (port, ctr, port->base + 2);
+  port->fn->do_outb (port, ctr, port->base + 2);
   port->ctr = ctr;
   debug_frob_control (mask, val);
 }
