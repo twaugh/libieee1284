@@ -22,16 +22,17 @@
 /* Errors.  When a function returns a negative number, it's one of
  * these errors. */
 enum E1284 {
-  E1284_OK                 = 0,  /* Everything went fine */
-  E1284_NOTIMPL            = -1, /* Not implemented in libieee1284 */
-  E1284_NOTAVAIL           = -2, /* Not available on this system */
-  E1284_TIMEDOUT           = -3, /* Operation timed out */
-  E1284_REJECTED           = -4, /* IEEE 1284 negotiation rejected */
-  E1284_NEGFAILED          = -5, /* Negotiation went wrong */
-  E1284_NOMEM              = -6, /* No memory left */
-  E1284_INIT               = -7, /* Error initialising port */
-  E1284_SYS                = -8, /* Error interfacing system */
-  E1284_NOID               = -9, /* No IEEE 1284 ID available */
+  E1284_OK                 = 0,   /* Everything went fine */
+  E1284_NOTIMPL            = -1,  /* Not implemented in libieee1284 */
+  E1284_NOTAVAIL           = -2,  /* Not available on this system */
+  E1284_TIMEDOUT           = -3,  /* Operation timed out */
+  E1284_REJECTED           = -4,  /* IEEE 1284 negotiation rejected */
+  E1284_NEGFAILED          = -5,  /* Negotiation went wrong */
+  E1284_NOMEM              = -6,  /* No memory left */
+  E1284_INIT               = -7,  /* Error initialising port */
+  E1284_SYS                = -8,  /* Error interfacing system */
+  E1284_NOID               = -9,  /* No IEEE 1284 ID available */
+  E1284_INVALIDPORT        = -10, /* Invalid port */
 };
 
 /* A parallel port. */
