@@ -70,7 +70,7 @@ port_outb (struct parport_internal *port, unsigned char val,
 static int
 init (struct parport_internal *port, int flags, int *capabilities)
 {
-  if (flags || capabilities)
+  if (flags)
     return E1284_NOTAVAIL;
 
   /* TODO: To support F1284_EXCL here we need to open the relevant
@@ -91,6 +91,9 @@ init (struct parport_internal *port, int flags, int *capabilities)
       port->fn->outb = port_outb;
       break;
     }
+
+  if (capabilities)
+    *capabilities |= CAP1284_RAW;
 
   /* Need to write this.
    * If we find an ECP port, we can adjust some of the access function

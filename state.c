@@ -80,7 +80,8 @@ ieee1284_open (struct parport *port, int flags, int *capabilities)
   dprintf ("==> ieee1284_open\n");
 
   if (capabilities)
-    *capabilities = 0;
+    *capabilities = (CAP1284_NIBBLE | CAP1284_BYTE | CAP1284_COMPAT |
+		     CAP1284_ECPSWE);
 
   ret = init_port (port, flags, capabilities);
   if (ret)

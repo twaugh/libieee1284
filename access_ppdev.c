@@ -39,6 +39,26 @@ struct ppdev_priv
   struct timeval inactivity_timer;
 };
 
+static void
+find_capabilities (int fd, int *c)
+{
+  int m;
+  if (ioctl (fd, PPGETMODES, &m))
+    {
+      *c |= CAP1284_ECP | CAP1284_ECPRLE | CAP1284_EPP;
+      return;
+    }
+
+  if (m & PARPORT_MODE_PCSPP)
+    *c |= CAP1284_RAW;
+  if (m & PARPORT_MODE_EPP)
+    *c |= CAP1284_EPP;
+  if (m & PARPORT_MODE_ECP)
+    *c |= CAP1284_ECP | CAP1284_ECPRLE;
+  if (m & PARPORT_MODE_DMA)
+    *c |= CAP1284_DMA;
+}
+
 static int
 init (struct parport_internal *port, int flags, int *capabilities)
 {
@@ -72,6 +92,11 @@ init (struct parport_internal *port, int flags, int *capabilities)
     /* Our implementation of do_nack_handshake relies on interrupts
      * being available.  They aren't, so use the default one instead. */
     port->fn->do_nack_handshake = default_do_nack_handshake;
+  else if (capabilities)
+    *capabilities |= CAP1284_IRQ;
+
+  if (capabilities)
+    find_capabilities (port->fd, capabilities);
 
   return E1284_OK;
 }

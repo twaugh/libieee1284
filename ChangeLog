@@ -1,5 +1,7 @@
 2001-11-29  Tim Waugh  <twaugh@redhat.com>
 
+	* ieee1284.h, state.c, access_io.c, access_ppdev.c: Capabilities.
+
 	* interface.c, access_ppdev.c access_io.c, detect.h, ieee1284.h:
 	ieee1284_data_dir returns int.
 

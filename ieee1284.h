@@ -94,6 +94,22 @@ enum ieee1284_open_flags
 {
   F1284_EXCL = (1<<0), /* Require exclusive access to the port */
 };
+enum ieee1284_capabilities
+{
+  CAP1284_RAW = (1<<0),  /* Pin-level access */
+  CAP1284_NIBBLE = (1<<1),
+  CAP1284_BYTE = (1<<2),
+  CAP1284_COMPAT = (1<<3),
+  CAP1284_BECP = (1<<4),
+  CAP1284_ECP = (1<<5),
+  CAP1284_ECPRLE = (1<<6),
+  CAP1284_ECPSWE = (1<<7),
+  CAP1284_EPP = (1<<8),
+  CAP1284_EPPSL = (1<<9),
+  CAP1284_EPPSWE = (1<<10),
+  CAP1284_IRQ = (1<<11),
+  CAP1284_DMA = (1<<12),
+};
 extern int ieee1284_open (struct parport *port, int flags, int *capabilities);
 
 extern int ieee1284_close (struct parport *port);
