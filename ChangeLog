@@ -9,6 +9,10 @@
 	* debug.c, debug.h: New function ieee1284_display_status for
 	debugging.
 
+	* access_io.c, access_ppdev.c, default.c, detect.h, deviceid.c,
+	interface.c, ports.c, state.c: Port reference counting, and
+	ieee1284_open and ieee1284_close.
+
 2001-11-22  Tim Waugh  <twaugh@redhat.com>
 
 	* default.c (LOG_ERROR): We now have dprintf, so this is not

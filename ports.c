@@ -66,13 +66,23 @@ add_port (struct parport_list *list, int flags,
       return E1284_NOMEM;
     }
 
+  priv->fn = malloc (sizeof *priv->fn);
+  if (!priv->fn)
+    {
+      free ((char *) (p->name));
+      free (p);
+      free (priv);
+      return E1284_NOMEM;
+    }
+
   p->priv = priv;
   priv->device = strdup (device);
   if (!priv->device)
     {
-      free (priv);
       free ((char *) (p->name));
       free (p);
+      free (priv->fn);
+      free (priv);
       return E1284_NOMEM;
     }
 
@@ -83,9 +93,10 @@ add_port (struct parport_list *list, int flags,
   priv->interrupt = interrupt;
   priv->fd = -1;
   priv->type = 0;
-  priv->claimed = -1;
+  priv->opened = 0;
+  priv->claimed = 0;
+  priv->ref = 1;
   priv->selectable_fd = &p->selectable_fd;
-  priv->flags = flags;
 
   list->portv[list->portc++] = p;
   return 0;
@@ -278,11 +289,25 @@ ieee1284_free_ports (struct parport_list *list)
   int i;
 
   for (i = 0; i < list->portc; i++)
+    deref_port (list->portv[i]);
+  
+  if (list->portv)
+    free (list->portv);
+
+  list->portv = NULL;
+  list->portc = 0;
+}
+
+void
+deref_port (struct parport *p)
+{
+  struct parport_internal *priv = p->priv;
+  if (!--priv->ref)
     {
-      struct parport *p = list->portv[i];
-      struct parport_internal *priv = p->priv;
-      if (priv->fn)
+      if (priv->fn && priv->fn->cleanup)
 	priv->fn->cleanup (priv);
+      if (priv->fn)
+	free (priv->fn);
       if (p->name)
 	free ((char *) (p->name));
       if (priv->device)
@@ -290,12 +315,6 @@ ieee1284_free_ports (struct parport_list *list)
       free (priv);
       free (p);
     }
-
-  if (list->portv)
-    free (list->portv);
-
-  list->portv = NULL;
-  list->portc = 0;
 }
 
 /*

@@ -68,21 +68,13 @@ port_outb (struct parport_internal *port, unsigned char val,
 }
 
 static int
-init (struct parport_internal *port)
+init (struct parport_internal *port, int flags, int *capabilities)
 {
-  struct parport_access_methods *fn;
-
-  if (port->flags)
+  if (flags || capabilities)
     return E1284_NOTAVAIL;
 
   /* TODO: To support F1284_EXCL here we need to open the relevant
    * /dev/lp device. */
-
-  fn = malloc (sizeof *fn);
-  if (!fn)
-    return E1284_NOMEM;
-
-  memcpy (fn, port->fn, sizeof *fn);
 
   switch (port->type)
     {
@@ -95,8 +87,8 @@ init (struct parport_internal *port)
       port->fd = open ("/dev/port", O_RDWR | O_NOCTTY);
       if (port->fd < 0)
 	return E1284_INIT;
-      fn->inb = port_inb;
-      fn->outb = port_outb;
+      port->fn->inb = port_inb;
+      port->fn->outb = port_outb;
       break;
     }
 
@@ -105,7 +97,6 @@ init (struct parport_internal *port)
    * pointers in io_access_functions to point to functions that use
    * hardware assistance. */
 
-  port->fn = fn;
   return E1284_OK;
 }
 
@@ -233,6 +224,9 @@ const struct parport_access_methods io_access_methods =
 {
   init,
   cleanup,
+
+  NULL,
+  NULL,
 
   raw_inb,
   raw_outb,

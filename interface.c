@@ -17,8 +17,43 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "detect.h"
 #include "ieee1284.h"
+#include "detect.h"
+
+/* ieee1284_open is in state.c */
+
+void
+ieee1284_close (struct parport *port)
+{
+  struct parport_internal *priv = port->priv;
+  if (priv->fn->cleanup)
+    priv->fn->cleanup (priv);
+  priv->opened = 0;
+  deref_port (port);
+}
+
+int
+ieee1284_claim (struct parport *port)
+{
+  int ret = E1284_OK;
+  struct parport_internal *priv = port->priv;
+  if (priv->fn->claim)
+    ret = priv->fn->claim (priv);
+
+  if (ret == E1284_OK)
+    priv->claimed = 1;
+
+  return ret;
+}
+
+void
+ieee1284_release (struct parport *port)
+{
+  struct parport_internal *priv = port->priv;
+  if (priv->fn->release)
+    priv->fn->release (priv);
+  priv->claimed = 0;
+}
 
 int
 ieee1284_read_data (struct parport *port)

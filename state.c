@@ -27,6 +27,7 @@
 #include "access.h"
 #include "config.h"
 #include "debug.h"
+#include "default.h"
 #include "delay.h"
 #include "detect.h"
 #include "ieee1284.h"
@@ -35,7 +36,7 @@
 #include "ppdev.h"
 
 static int
-init_port (struct parport *port)
+init_port (struct parport *port, int flags, int *caps)
 {
   struct parport_internal *priv = port->priv;
   int ret = E1284_INIT;
@@ -45,24 +46,24 @@ init_port (struct parport *port)
   if ((capabilities & PPDEV_CAPABLE) && priv->device)
     {
       priv->type = PPDEV_CAPABLE;
-      priv->fn = &ppdev_access_methods;
-      ret = priv->fn->init (priv);
+      memcpy (priv->fn, &ppdev_access_methods, sizeof *priv->fn);
+      ret = priv->fn->init (priv, flags, caps);
       dprintf ("Got %d from ppdev init\n", ret);
     }
 
   if (ret && (capabilities & IO_CAPABLE))
     {
       priv->type = IO_CAPABLE;
-      priv->fn = &io_access_methods;
-      ret = priv->fn->init (priv);
+      memcpy (priv->fn, &ppdev_access_methods, sizeof *priv->fn);
+      ret = priv->fn->init (priv, flags, caps);
       dprintf ("Got %d from IO init\n", ret);
     }
 
   if (ret && (capabilities & DEV_PORT_CAPABLE))
     {
       priv->type = DEV_PORT_CAPABLE;
-      priv->fn = &io_access_methods;
-      ret = priv->fn->init (priv);
+      memcpy (priv->fn, &ppdev_access_methods, sizeof *priv->fn);
+      ret = priv->fn->init (priv, flags, caps);
       dprintf ("Got %d from /dev/port init\n", ret);
     }
 
@@ -71,50 +72,26 @@ init_port (struct parport *port)
 }
 
 int
-ieee1284_claim (struct parport *port)
+ieee1284_open (struct parport *port, int flags, int *capabilities)
 {
   struct parport_internal *priv = port->priv;
   int ret;
 
-  dprintf ("==> ieee1284_claim, priv->type is %d\n", priv->type);
+  dprintf ("==> ieee1284_open\n");
 
-  if (priv->type == 0)
+  if (capabilities)
+    *capabilities = 0;
+
+  ret = init_port (port, flags, capabilities);
+  if (ret)
     {
-      ret = init_port (port);
-      if (ret)
-	{
-	  dprintf ("<== %d (propagated)\n", ret);
-	  return ret;
-	}
+      dprintf ("<== %d (propagated)\n", ret);
+      return ret;
     }
 
-  switch (priv->type)
-    {
-    case 0: /* no way to talk to port.  Shouldn't get here. */
-      dprintf ("<== E1284_INIT\n");
-      return E1284_INIT;
-
-    case PPDEV_CAPABLE:
-      if (!ioctl (priv->fd, PPCLAIM))
-	priv->claimed = 1;
-      break;
-
-    default:
-      priv->claimed = 1;
-    }
-
-  ret = priv->claimed ? E1284_OK : E1284_INIT;
-  dprintf ("<== %d\n", ret);
-  return ret;
-}
-
-void
-ieee1284_release (struct parport *port)
-{
-  struct parport_internal *priv = port->priv;
-  if (priv->type == PPDEV_CAPABLE)
-    ioctl (priv->fd, PPRELEASE);
-  priv->claimed = 0;
+  priv->opened = 1;
+  priv->ref++;
+  return E1284_OK;
 }
 
 /*

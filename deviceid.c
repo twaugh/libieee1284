@@ -323,7 +323,7 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
       return E1284_NOTIMPL;
     }
 
-  detect_environment (0);
+  //  detect_environment (0);
 
   if (!(flags & F1284_FRESH))
     {
@@ -345,6 +345,12 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
 	}
     }
 
+  if ((ret = ieee1284_open (port, 0, NULL)) != E1284_OK)
+    {
+      dprintf ("<== %d (from ieee1284_open)\n", ret);
+      return ret;
+    }
+
   if ((ret = ieee1284_claim (port)) != E1284_OK)
     {
       dprintf ("<== %d (from ieee1284_claim)\n", ret);
@@ -354,6 +360,7 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
   ret = get_fresh (port, daisy, buffer, len);
 
   ieee1284_release (port);
+  ieee1284_close (port);
   dprintf ("<== %d (from get_fresh)\n", ret);
   return ret;
 }

@@ -35,33 +35,32 @@
 #include "ppdev.h"
 
 static int
-init (struct parport_internal *port)
+init (struct parport_internal *port, int flags, int *capabilities)
 {
-  struct parport_access_methods *fn = malloc (sizeof *fn);
+  struct parport_access_methods *fn;
 
-  if (!fn)
-    return E1284_NOMEM;
-
-  memcpy (fn, port->fn, sizeof *fn);
+  if (flags & ~F1284_EXCL)
+    return E1284_NOTAVAIL;
 
   port->fd = open (port->device, O_RDWR | O_NOCTTY);
   if (port->fd < 0)
     return E1284_INIT;
 
-  if (port->flags & F1284_EXCL)
+  if (flags & F1284_EXCL)
     {
       if (ioctl (port->fd, PPEXCL))
-	return E1284_INIT;
+	{
+	  close (port->fd);
+	  return E1284_INIT;
+	}
     }
 
   if (port->interrupt == -1)
     /* Our implementation of do_nack_handshake relies on interrupts
      * being available.  They aren't, so use the default one instead. */
-    fn->do_nack_handshake = default_do_nack_handshake;
+    port->fn->do_nack_handshake = default_do_nack_handshake;
   else *(port->selectable_fd) = port->fd;
 
-
-  port->fn = fn;
   return E1284_OK;
 }
 
@@ -70,6 +69,31 @@ cleanup (struct parport_internal *port)
 {
   if (port->fd >= 0)
     close (port->fd);
+}
+
+static int
+claim (struct parport_internal *port)
+{
+  dprintf ("==> claim\n");
+  if (ioctl (port->fd, PPCLAIM))
+    {
+      dprintf ("<== E1284_SYS\n");
+      return E1284_SYS;
+    }
+  dprintf ("<== E1284_OK\n");
+  return E1284_OK;
+}
+
+static int
+release (struct parport_internal *port)
+{
+  if (ioctl (port->fd, PPRELEASE))
+    {
+      dprintf ("<== E1284_SYS\n");
+      return E1284_SYS;
+    }
+  dprintf ("<== E1284_OK\n");
+  return E1284_OK;
 }
 
 static int
@@ -393,6 +417,9 @@ const struct parport_access_methods ppdev_access_methods =
 {
   init,
   cleanup,
+
+  claim,
+  release,
 
   NULL,
   NULL,

@@ -27,12 +27,16 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
+struct parport;
 struct parport_internal;
 
 struct parport_access_methods
 {
-  int (*init) (struct parport_internal *port);
+  int (*init) (struct parport_internal *port, int flags, int *capabilities);
   void (*cleanup) (struct parport_internal *port);
+
+  int (*claim) (struct parport_internal *port);
+  void (*release) (struct parport_internal *port);
 
   unsigned char (*inb) (struct parport_internal *port, unsigned long addr);
   void (*outb) (struct parport_internal *port, unsigned char val,
@@ -96,8 +100,8 @@ struct parport_internal
   unsigned long base_hi;
   int interrupt;
   int fd;
+  int opened;
   int claimed;
-  int flags;
   unsigned char ctr;
   int *selectable_fd;
 
@@ -105,7 +109,10 @@ struct parport_internal
   int current_mode;
   int current_channel;
 
-  const struct parport_access_methods *fn;
+  /* Reference count */
+  int ref;
+
+  struct parport_access_methods *fn;
   void *access_priv; /* For the access methods to use. */
 };
 
@@ -118,6 +125,8 @@ struct parport_internal
 extern int capabilities;
 
 extern int detect_environment (int forbidden);
+
+extern void deref_port (struct parport *port);
 
 #endif /* _DETECT_H_ */
 
