@@ -1,6 +1,11 @@
 libieee1284 news
 ----------------
 
+0.2.8 (stable)
+
+	Several small bugs were fixed, and there were some minor API
+	additions.
+
 0.2.7 (stable)
 
 	This release adds a fallback implementation for ECP address transfers.
