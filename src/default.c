@@ -19,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -651,7 +652,7 @@ default_ecp_read_data (struct parport_internal *port, int flags,
     if (command) {
       if (byte & 0x80) {
 	dprintf ("Stopping short at channel command (%02x)\n", byte);
-	port->current_phase != PH1284_REV_IDLE;
+	port->current_phase = PH1284_REV_IDLE;
 	return count;
       }
       else if (!(flags & F1284_RLE))
