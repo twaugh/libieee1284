@@ -1947,10 +1947,10 @@
       <refsect1>
 	<title>Description</title>
 
-	<para>If the <parameter>port</parameter> (which must be
-	 opened, but need not be claimed) has a configured interrupt
-	 line and the port type supports interrupt notification, it is
-	 possible to obtain a file descriptor that may be used for
+	<para>If the <parameter>port</parameter> has a configured
+	 interrupt line and the port type supports interrupt
+	 notification, it is possible to obtain a file descriptor that
+	 may be used for
 	 <citerefentry>
 	    <refentrytitle>select</refentrytitle>
 	    <manvolnum>2</manvolnum>
@@ -1962,6 +1962,14 @@
 	 triggered.  No operations other than
 	 <function>select</function> or <function>poll</function> may
 	 be performed on the file descriptor.</para>
+
+	<para>The port must be open in order to call
+	 <function>ieee1284_get_irq_fd</function>, and must be claimed
+	 when using <function>select</function> or
+	 <function>poll</function>.</para>
+
+	<para>The caller must not close the file descriptor, and may
+	 not use it at all when the port is not claimed.</para>
       </refsect1>
 
       <refsect1>
