@@ -1,6 +1,11 @@
 libieee1284 news
 ----------------
 
+0.2.3 (stable)
+
+	This release contains files that were accidentally missing from
+	previous releases, and a port to another operating system.
+
 0.2.2 (stable)
 
 	This release contains several bugfixes, speed optimizations for
