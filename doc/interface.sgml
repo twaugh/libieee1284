@@ -52,21 +52,29 @@
      transfers using DMA are possible.</para>
 
     <para>The normal sequence of events will be that the application
-     calls <function>ieee1284_find_ports</function> to get a list of
-     available ports, then <function>ieee1284_get_deviceid</function>
-     to look for a device on each port that it is interested in, and
-     then <function>ieee1284_open</function> to open each port it
-     finds a device it can control on.  The list of ports returned
-     from <function>ieee1284_find_ports</function> can be disposed of
-     using <function>ieee1284_free_ports</function>.  Then when it
-     wants to control the device, it will call
+    <orderedlist>
+    <listitem><para>calls <function>ieee1284_find_ports</function> to get a
+     list of available ports</para></listitem>
+    <listitem><para>then <function>ieee1284_get_deviceid</function>
+     to look for a device on each port that it is interested in</para>
+     </listitem>
+    <listitem><para>and then <function>ieee1284_open</function> to open each
+     port it finds a device it can control on.</para></listitem>
+    <listitem><para>The list of ports returned from
+     <function>ieee1284_find_ports</function> can now be disposed of using
+     <function>ieee1284_free_ports</function>.</para></listitem>
+    <listitem><para>Then when it wants to control the device, it will call
      <function>ieee1284_claim</function> to prevent other drivers from
-     using the port, then perhaps do some data transfers, and then
-     <function>ieee1284_release</function> when it is finished that
-     that particular command.  This claim-control-release sequence
-     will be repeated each time it wants to tell the device to do
-     something.  Finally when the application is finished with the
-     device it will call <function>ieee1284_close</function>.</para>
+     using the port</para></listitem>
+    <listitem><para>then perhaps do some data transfers</para></listitem>
+    <listitem><para>and then <function>ieee1284_release</function> when it is
+     finished that that particular command.  This claim-control-release
+     sequence will be repeated each time it wants to tell the device to do
+     something.</para></listitem>
+    <listitem><para>Finally when the application is finished with the
+     device it will call <function>ieee1284_close</function>.</para></listitem>
+    </orderedlist>
+    </para>
 
     <para>Usually a port needs to be claimed before it can be used.
      This is to prevent multiple drivers from trampling on each other
