@@ -801,7 +801,76 @@ ssize_t
 default_ecp_write_addr (struct parport_internal *port, int flags,
 			const char *buffer, size_t len)
 {
-  return E1284_NOTIMPL;
+  const struct parport_access_methods *fn = port->fn;
+  const unsigned char *buf = buffer;
+  size_t written;
+  int retry;
+  struct timeval tv;
+
+  debugprintf ("==> default_ecp_write_addr\n");
+
+  if (port->current_phase != PH1284_FWD_IDLE)
+    if (fn->ecp_rev_to_fwd(port))
+      return 0;
+  port->current_phase = PH1284_FWD_DATA;
+
+  /* HostAck (nAutoFd) low (command mode) */
+  fn->frob_control (port, C1284_NAUTOFD | C1284_NINIT, 
+		    C1284_NINIT);
+
+  for (written = 0; written < len; written++, buf++)
+    {
+      unsigned char byte;
+      byte = *buf;
+
+    try_again:
+      fn->write_data (port, byte);
+      /* Event 35: Set NSTROBE low */
+      fn->frob_control (port, C1284_NSTROBE, 0);
+      udelay (5);
+      lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+      for (retry = 0; retry < 100; retry++)
+	{
+	  /* Event 36: peripheral sets BUSY high */
+	  if (!fn->wait_status (port, S1284_BUSY, S1284_BUSY, &tv))
+	    goto success;
+	}
+
+      /* Time for Host Transfer Recovery (page 41 of IEEE1284) */
+      debugprintf ("ECP address transfer stalled!\n");
+
+      fn->frob_control (port, C1284_NINIT, C1284_NINIT);
+      udelay (50);
+      if (fn->read_status (port) & S1284_PERROR)
+	{      
+	  /* It's buggered. */
+	  fn->frob_control (port, C1284_NINIT, 0);
+	  break;
+	}
+
+      fn->frob_control (port, C1284_NINIT, 0);
+      udelay (50);
+      if (!(fn->read_status (port) & S1284_PERROR))
+	break;
+
+      debugprintf ("Host address transfer recovered\n");
+
+      /* FIXME: Check for timeout here ? */
+      goto try_again;
+    
+    success:
+      /* Event 37: HostClk (nStrobe) high */
+      fn->frob_control (port, C1284_NSTROBE, C1284_NSTROBE);
+      udelay (5);
+      lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
+      if (fn->wait_status (port, S1284_BUSY, 0, &tv))
+	/* Peripheral hasn't accepted the data. */
+	break;
+    }
+
+  debugprintf ("<== default_ecp_write_addr\n");
+  port->current_phase = PH1284_FWD_IDLE;
+  return written;
 }
 
 struct timeval *
