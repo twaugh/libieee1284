@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "ieee1284.h"
+#include <ieee1284.h>
 
 static char *class (char *id)
 {
