@@ -379,6 +379,15 @@ default_ecp_write_addr (struct parport_internal *port, int flags,
   return E1284_NOTIMPL;
 }
 
+struct timeval *
+default_set_timeout (struct parport_internal *port, struct timeval *timeout)
+{
+  static struct timeval to;
+  to.tv_sec = 9999;
+  to.tv_usec = 0;
+  return &to;
+}
+
 /*
  * Local Variables:
  * eval: (c-set-style "gnu")

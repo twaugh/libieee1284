@@ -94,6 +94,8 @@ struct parport_access_methods
 			    char *buffer, size_t len);
   ssize_t (*ecp_write_addr) (struct parport_internal *port, int flags,
 			     const char *buffer, size_t len);
+  struct timeval *(*set_timeout) (struct parport_internal *port,
+				  struct timeval *timeout);
 };
 
 struct parport_internal

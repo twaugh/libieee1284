@@ -1,5 +1,8 @@
 2001-11-29  Tim Waugh  <twaugh@redhat.com>
 
+	* interface.c (ieee1284_set_timeout): New function.
+	* access_ppdev (set_timeout): New function.
+
 	* ieee1284.h, ports.c: Remove config_file parameter from
 	ieee1284_find_ports.
 

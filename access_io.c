@@ -260,7 +260,8 @@ const struct parport_access_methods io_access_methods =
   default_ecp_read_data,
   default_ecp_write_data,
   default_ecp_read_addr,
-  default_ecp_write_addr
+  default_ecp_write_addr,
+  default_set_timeout
 };
 
 /*

@@ -34,6 +34,11 @@
 #include "parport.h"
 #include "ppdev.h"
 
+struct ppdev_priv 
+{
+  struct timeval inactivity_timer;
+};
+
 static int
 init (struct parport_internal *port, int flags, int *capabilities)
 {
@@ -42,15 +47,23 @@ init (struct parport_internal *port, int flags, int *capabilities)
   if (flags & ~F1284_EXCL)
     return E1284_NOTAVAIL;
 
+  port->access_priv = malloc (sizeof (struct ppdev_priv));
+  if (!port->access_priv)
+    return E1284_NOMEM;
+
   port->fd = open (port->device, O_RDWR | O_NOCTTY);
   if (port->fd < 0)
-    return E1284_INIT;
+    {
+      free (port->access_priv);
+      return E1284_INIT;
+    }
 
   if (flags & F1284_EXCL)
     {
       if (ioctl (port->fd, PPEXCL))
 	{
 	  close (port->fd);
+	  free (port->access_priv);
 	  return E1284_INIT;
 	}
     }
@@ -66,6 +79,7 @@ init (struct parport_internal *port, int flags, int *capabilities)
 static void
 cleanup (struct parport_internal *port)
 {
+  free (port->access_priv);
   if (port->fd >= 0)
     close (port->fd);
 }
@@ -415,6 +429,15 @@ ecp_write_addr (struct parport_internal *port, int flags,
   return ret;
 }
 
+static struct timeval *
+set_timeout (struct parport_internal *port, struct timeval *timeout)
+{
+  struct ppdev_priv *priv = port->access_priv;
+  ioctl (port->fd, PPGETTIME, &priv->inactivity_timer);
+  ioctl (port->fd, PPSETTIME, timeout);
+  return &priv->inactivity_timer;
+}
+
 const struct parport_access_methods ppdev_access_methods =
 {
   init,
@@ -456,7 +479,8 @@ const struct parport_access_methods ppdev_access_methods =
   ecp_read_data,
   ecp_write_data,
   default_ecp_read_addr,
-  ecp_write_addr
+  ecp_write_addr,
+  set_timeout
 };
 
 /*

@@ -252,6 +252,13 @@ ieee1284_ecp_write_addr (struct parport *port, int flags,
   return priv->fn->ecp_write_addr (priv, flags, buffer, len);
 }
 
+struct timeval *
+ieee1284_set_timeout (struct parport *port, struct timeval *timeout)
+{
+  struct parport_internal *priv = port->priv;
+  return priv->fn->set_timeout (priv, timeout);
+}
+
 /*
  * Local Variables:
  * eval: (c-set-style "gnu")
