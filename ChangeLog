@@ -1,5 +1,9 @@
 2001-11-18  Tim Waugh  <twaugh@redhat.com>
 
+	* access_ppdev.c (frob_control): Messy calculations to deal with
+	inverted pins.
+	* access_io.c (raw_frob_control): Likewise.
+
 	* state.c: Debugging.
 	* detect.c: Debugging.
 	* deviceid.c: Debugging.
