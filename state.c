@@ -39,11 +39,14 @@ init_port (struct parport *port)
   struct parport_internal *priv = port->priv;
   int ret = E1284_INIT;
 
+  dprintf ("==> init_port\n");
+
   if ((capabilities & PPDEV_CAPABLE) && priv->device)
     {
       priv->type = PPDEV_CAPABLE;
       priv->fn = &ppdev_access_methods;
       ret = priv->fn->init (priv);
+      dprintf ("Got %d from ppdev init\n", ret);
     }
 
   if (ret && (capabilities & IO_CAPABLE))
@@ -51,6 +54,7 @@ init_port (struct parport *port)
       priv->type = IO_CAPABLE;
       priv->fn = &io_access_methods;
       ret = priv->fn->init (priv);
+      dprintf ("Got %d from IO init\n", ret);
     }
 
   if (ret && (capabilities & DEV_PORT_CAPABLE))
@@ -58,8 +62,10 @@ init_port (struct parport *port)
       priv->type = DEV_PORT_CAPABLE;
       priv->fn = &io_access_methods;
       ret = priv->fn->init (priv);
+      dprintf ("Got %d from /dev/port init\n", ret);
     }
 
+  dprintf ("<== %d\n", ret);
   return ret;
 }
 
@@ -68,16 +74,23 @@ ieee1284_claim (struct parport *port)
 {
   struct parport_internal *priv = port->priv;
   int ret;
+
+  dprintf ("==> ieee1284_claim, priv->type is %d\n", priv->type);
+
   if (priv->type == 0)
     {
       ret = init_port (port);
       if (ret)
-	return ret;
+	{
+	  dprintf ("<== %d (propagated)\n", ret);
+	  return ret;
+	}
     }
 
   switch (priv->type)
     {
     case 0: /* no way to talk to port.  Shouldn't get here. */
+      dprintf ("<== E1284_INIT\n");
       return E1284_INIT;
 
     case PPDEV_CAPABLE:
@@ -89,7 +102,9 @@ ieee1284_claim (struct parport *port)
       priv->claimed = 1;
     }
 
-  return !priv->claimed;
+  ret = priv->claimed ? E1284_OK : E1284_INIT;
+  dprintf ("<== %d\n", ret);
+  return ret;
 }
 
 void

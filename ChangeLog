@@ -1,3 +1,14 @@
+2001-11-18  Tim Waugh  <twaugh@redhat.com>
+
+	* state.c: Debugging.
+	* detect.c: Debugging.
+	* deviceid.c: Debugging.
+	* default.c (default_negotiate): Debugging.
+
+	* debug.h: New file.
+	* debug.c: New file.
+	* Makefile.am (libieee1284_la_SOURCES): Add debug.h and debug.c.
+
 2001-11-15  Tim Waugh  <twaugh@redhat.com>
 
 	* configure.in: Version 0.1.0 (devel).

@@ -47,6 +47,8 @@ default_negotiate (struct parport_internal *port, int mode)
   struct timeval tv;
   int m = mode;
 
+  dprintf ("==> default_negotiate (to %#02x)\n", mode);
+
   switch (mode)
     {
     case M1284_ECPSWE:
@@ -66,6 +68,7 @@ default_negotiate (struct parport_internal *port, int mode)
 
   /* Event 0: Write extensibility request to data lines. */
   fn->write_data (port, m);
+  dprintf ("IEEE 1284 mode %#02x\n", m);
 
   /* Event 1: nSelectIn=1, nAutoFd=0, nStrobe=1, nInit=1. */
   fn->frob_control (port,
@@ -79,7 +82,10 @@ default_negotiate (struct parport_internal *port, int mode)
 		       S1284_PERROR|S1284_SELECT|S1284_NFAULT
 		       |S1284_NACK,
 		       S1284_PERROR|S1284_SELECT|S1284_NFAULT, &tv))
+  {
+    dprintf ("Failed at event 2\n");
     goto abort;
+  }
 
   /* Event 3: nStrobe=0. */
   fn->frob_control (port, C1284_NSTROBE, 0);
@@ -92,16 +98,18 @@ default_negotiate (struct parport_internal *port, int mode)
   /* Event 6: nAck=1. */
   lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
   if (fn->wait_status (port, S1284_NACK, S1284_NACK, &tv))
+  {
+    dprintf ("Failed at event 6\n");
     goto abort;
+  }
 
   /* Event 5: Select=0 for nibble-0, =1 for other modes. */
   port->current_mode = !mode;
   if ((fn->read_status (port) & S1284_SELECT) !=
       (mode ? S1284_SELECT : 0))
     {
-      LOG_ERROR(cEXBP,0,cCausePeriphError,
-		"negotiate(mode=0x%2.2X): rejected!\n", mode);
       ret = E1284_REJECTED;
+      dprintf ("Mode rejected\n");
       goto abort;
     }
   port->current_mode = mode;
@@ -115,15 +123,20 @@ default_negotiate (struct parport_internal *port, int mode)
       /* Event 31: PError=1. */
       lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
       if (fn->wait_status (port, S1284_PERROR, S1284_PERROR, &tv))
+      {
+	dprintf ("Failed at event 31\n");
 	goto abort;
+      }
 
       port->current_channel=0;
     }
 
+  dprintf ("<== E1284_OK\n");
   return E1284_OK;
 
  abort:
   fn->terminate(port);
+  dprintf ("<== %d\n", ret);
   return ret;
 }
 

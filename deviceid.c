@@ -175,18 +175,29 @@ get_fresh (struct parport *port, int daisy,
   ssize_t got;
   size_t idlen;
 
+  dprintf ("==> get_fresh\n");
+
   if (daisy > -1)
-    /* No implementation yet for IEEE 1284.3 devices. */
-    return E1284_NOTIMPL;
+    {
+      /* No implementation yet for IEEE 1284.3 devices. */
+      dprintf ("<== E1284_NOTIMPL (IEEE 1284.3)\n");
+      return E1284_NOTIMPL;
+    }
 
   ieee1284_terminate (port);
   if (ieee1284_negotiate (port,
 			  M1284_NIBBLE | M1284_FLAG_DEVICEID) != E1284_OK)
-    return E1284_NOTAVAIL;
+    {
+      dprintf ("<== E1284_NOTAVAIL (couldn't negotiate)\n");
+      return E1284_NOTAVAIL;
+    }
 
   got = ieee1284_nibble_read (port, buffer, 2);
   if (got < 2)
-    return E1284_NOTAVAIL;
+    {
+      dprintf ("<== E1284_NOTAVAIL (no data)\n");
+      return E1284_NOTAVAIL;
+    }
 
   idlen = buffer[0] * 256 + buffer[1];
   if (idlen >= len - 2)
@@ -196,6 +207,7 @@ get_fresh (struct parport *port, int daisy,
     buffer[got] = '\0';
 
   ieee1284_terminate (port);
+  dprintf ("<== %d\n", got);
   return got;
 }
 
@@ -302,8 +314,13 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
 {
   int ret = -1;
 
+  dprintf ("==> libieee1284_get_deviceid\n");
+
   if (flags & ~(F1284_FRESH))
-    return E1284_NOTIMPL;
+    {
+      dprintf ("<== E1284_NOTIMPL (flags)\n");
+      return E1284_NOTIMPL;
+    }
 
   detect_environment (0);
 
@@ -315,18 +332,28 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
 	ret = get_from_proc_parport (port, daisy, buffer, len);
 
       if (ret > -1)
-	return ret;
+	{
+	  dprintf ("<== %d\n", ret);
+	  return ret;
+	}
 
       if (ret == -ENODEVID)
-	return E1284_NOTAVAIL;
+	{
+	  dprintf ("<== E1284_NOTAVAIL (got -ENODEVID)\n");
+	  return E1284_NOTAVAIL;
+	}
     }
 
   if ((ret = ieee1284_claim (port)) != E1284_OK)
-    return ret;
+    {
+      dprintf ("<== %d (from ieee1284_claim)\n", ret);
+      return ret;
+    }
 
   ret = get_fresh (port, daisy, buffer, len);
 
   ieee1284_release (port);
+  dprintf ("<== %d (from get_fresh)\n", ret);
   return ret;
 }
 

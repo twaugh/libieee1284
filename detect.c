@@ -40,11 +40,17 @@ check_proc_type (void)
   if (stat ("/proc/sys/dev/parport", &st) == 0 &&
       st.st_mode & S_IFDIR &&
       st.st_nlink > 2)
-    which = PROC_SYS_DEV_PARPORT_CAPABLE;
+    {
+      which = PROC_SYS_DEV_PARPORT_CAPABLE;
+      dprintf ("This system has /proc/sys/dev/parport\n");
+    }
   else if (stat ("/proc/parport", &st) == 0 &&
 	   st.st_mode & S_IFDIR &&
 	   st.st_nlink > 2)
-    which = PROC_PARPORT_CAPABLE;
+    {
+      which = PROC_PARPORT_CAPABLE;
+      dprintf ("This system has /proc/parport\n");
+    }
   capabilities |= which;
   return which;
 }
@@ -62,6 +68,7 @@ check_dev_node (const char *type)
     fd = open (name, O_RDONLY | O_NOCTTY);
     if (fd >= 0) {
       close (fd);
+      dprintf ("%s is accessible\n", name);
       return 1;
     }
   }
@@ -77,6 +84,7 @@ check_dev_port (void)
   if (fd >= 0) {
     close (fd);
     capabilities |= DEV_PORT_CAPABLE;
+    dprintf ("/dev/port is accessible\n");
     return 1;
   }
   return 0;
@@ -89,6 +97,7 @@ check_io (void)
   if (ioperm (0x378 /* say */, 3, 1) == 0) {
     ioperm (0x378, 3, 0);
     capabilities |= IO_CAPABLE;
+    dprintf ("We can use ioperm()\n");
     return 1;
   }
   return 0;
