@@ -1047,8 +1047,10 @@
 	  <varlistentry>
 	    <term>&e1284notimpl;</term>
 	    <listitem>
-	      <para>This operation is not implemented in &libieee1284;
-	       yet.</para>
+	      <para>The <parameter>port</parameter> lacks the
+	       required capability.  This could be due to a limitation
+	       of this version of &libieee1284;, or a hardware
+	       limitation.</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -1502,8 +1504,10 @@
 	  <varlistentry>
 	    <term>&e1284notimpl;</term>
 	    <listitem>
-	      <para>This is not yet implemented in
-	       &libieee1284;.</para>
+	      <para>The <parameter>port</parameter> lacks the
+	       required capability.  This could be due to a limitation
+	       of this version of &libieee1284;, or a hardware
+	       limitation.</para>
 	    </listitem>
 	  </varlistentry>
 
