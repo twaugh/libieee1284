@@ -1,3 +1,7 @@
+2002-10-02  Tim Waugh  <twaugh@redhat.com>
+
+	* Makefile.am: Fix solaris_io/iop link rule.
+
 2002-10-02  Matthew Duggan  <stauff1@users.sourceforge.net>
 
 	* src/interface.c (ieee1284_wait_data): Implement this.

@@ -19,11 +19,11 @@ nobase_drvdata_DATA=solaris_io/iop.conf
 
 if SOLARIS_IO
 iop_CFLAGS=-D_KERNEL # -DDEBUG
-iop_LDFLAGS=-r
 drvexecdir=/platform/i86pc/kernel/drv
 drvdatadir=/platform/i86pc/kernel/drv
 nobase_drvexec_PROGRAMS=iop
 noinst_PROGRAMS=ioprtest
+iop_LINK=$(LD) -r -o $@
 endif
 
 bin_PROGRAMS = libieee1284_test
