@@ -252,8 +252,7 @@ populate_by_guessing (struct parport_list *list, int flags)
 
 /* Find out what ports there are. */
 int
-ieee1284_find_ports (struct parport_list *list,
-		     const char *config_file, int flags)
+ieee1284_find_ports (struct parport_list *list, int flags)
 {
   if (config_file)
     return E1284_NOTIMPL;

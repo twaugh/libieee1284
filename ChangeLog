@@ -1,5 +1,8 @@
 2001-11-29  Tim Waugh  <twaugh@redhat.com>
 
+	* ieee1284.h, ports.c: Remove config_file parameter from
+	ieee1284_find_ports.
+
 	* interface.c (ieee1284_get_irq_fd): New function.
 	* access_ppdev (get_irq_fd): New function.
 

@@ -64,17 +64,7 @@ struct parport_list {
 /* The first function to be called.  This gives the library a chance
  * to look around and see what's available, and gives the program a
  * chance to choose a port to use. */
-enum ieee1284_global_flags
-{
-  F1284_EXCL = (1<<0), /* Require exclusive access to the port */
-};
-extern int ieee1284_find_ports (struct parport_list *list,
-                                const char *config_file, int flags);
-/* config_file may be NULL, but otherwise tells
- * the library where its configuration file is. (No configuration
- * options defined yet, but to include base addresses, access
- * methods, timings and such.)
- * Returns 0, or an error code. */
+extern int ieee1284_find_ports (struct parport_list *list, int flags);
 
 /* The last function to be called.  After calling this, only
  * ieee1284_find_ports may be used. */
@@ -100,6 +90,10 @@ extern ssize_t ieee1284_get_deviceid (struct parport *port, int daisy,
  * Sharing hooks
  */
 
+enum ieee1284_open_flags
+{
+  F1284_EXCL = (1<<0), /* Require exclusive access to the port */
+};
 extern int ieee1284_open (struct parport *port, int flags, int *capabilities);
 
 extern int ieee1284_close (struct parport *port);
