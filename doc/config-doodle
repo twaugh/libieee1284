@@ -1,0 +1,11 @@
+disallow method ppdev
+disallow methods { direct[,] iopdev[,] ppdev[,] lpdev }
+debug on
+debug off
+
+for port parport0 {
+  disallow method ppdev
+}
+
+for app "..." {
+}
