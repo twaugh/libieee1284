@@ -823,6 +823,7 @@ default_ecp_write_addr (struct parport_internal *port, int flags,
       unsigned char byte;
       byte = *buf;
 
+      /* FIXME: should we do RLE here? */
     try_again:
       fn->write_data (port, byte);
       /* Event 35: Set NSTROBE low */
@@ -857,7 +858,6 @@ default_ecp_write_addr (struct parport_internal *port, int flags,
 
       /* FIXME: Check for timeout here ? */
       goto try_again;
-    
     success:
       /* Event 37: HostClk (nStrobe) high */
       fn->frob_control (port, C1284_NSTROBE, C1284_NSTROBE);
