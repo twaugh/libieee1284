@@ -85,6 +85,7 @@ init (struct parport_internal *port, int flags, int *capabilities)
       return E1284_INIT;
     }
 
+  port->current_mode = M1284_COMPAT;
   if (flags & F1284_EXCL)
     {
       if (ioctl (port->fd, PPEXCL))
