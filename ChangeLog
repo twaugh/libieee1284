@@ -1,3 +1,7 @@
+2004-08-10  Matthew Duggan <stauff1@users.sourceforge.net>
+	
+	* src/access_lpt.c: Make error message more useful.
+
 2004-08-09  Matthew Duggan <stauff1@users.sourceforge.net>
 
 	* TODO: Add some more TODOs

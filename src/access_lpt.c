@@ -156,7 +156,8 @@ write_control (struct parport_internal *port, unsigned char reg)
 			    C1284_NSELECTIN);
   if (reg & 0x20)
     {
-      printf ("use ieee1284_data_dir to change data line direction!\n");
+      /* Note: data direction not supported by LPT driver */
+      printf ("error: setting data dir is invalid in this mode!\n");
     }
 
   raw_frob_control (port, wm, (unsigned char)(reg & wm));
@@ -173,7 +174,8 @@ frob_control (struct parport_internal *port,
 			    C1284_NSELECTIN);
   if (mask & 0x20)
     {
-      printf ("use ieee1284_data_dir to change data line direction!\n");
+      /* Note: data direction not supported by LPT driver */
+      printf ("error: setting data dir is invalid in this mode!\n");
     }
 
   mask &= wm;
