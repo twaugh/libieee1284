@@ -55,8 +55,13 @@
   <refsect1><title>Overview</title>
 
     <para>The &libieee1284; library is a library for accessing
-     parallel port devices.  It is currently under development, and
-     this is CVS ID <literal>$Id$</literal>.</para>
+     parallel port devices.</para>
+
+<!-- Commented out for stable release.
+
+ It is currently under development, and this is CVS ID
+<literal>$Id$</literal>.
+  -->
 
     <para>The model presented to the user is fairly abstract: a list
      of parallel ports with arbitrary names, with functions to access
