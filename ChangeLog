@@ -1,3 +1,7 @@
+2002-12-25  Tim Waugh  <twaugh@redhat.com>
+
+	* configure.in, Makefile.am: Version 0.2.6 (stable).
+
 2002-12-19  Tim Waugh  <twaugh@redhat.com>
 
 	* doc/interface.xml: It's /etc/libieee1284.conf, not
