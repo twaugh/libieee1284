@@ -20,8 +20,16 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
 
+/* GCC attributes */
+#if !defined(__GNUC__) || __GNUC__ < 2 || \
+    (__GNUC__ == 2 && __GNUC_MINOR__ < 5) || __STRICT_ANSI__
+# define FORMAT(x)
+#else /* GNU C: */
+# define FORMAT(x) __attribute__ ((__format__ x))
+#endif
+
 struct parport_internal;
-extern void dprintf (const char *fmt, ...);
+extern void dprintf (const char *fmt, ...) FORMAT ((__printf__, 1, 2));
 extern unsigned char debug_display_status (unsigned char st);
 extern unsigned char debug_display_control (unsigned char ct);
 extern void debug_frob_control (unsigned char mask, unsigned char val);
