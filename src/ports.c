@@ -75,6 +75,7 @@ add_port (struct parport_list *list, int flags,
       return E1284_NOMEM;
     }
 
+  p->filename = strdup (device);
   p->base_addr = base;
   p->hibase_addr = hibase;
 
@@ -372,6 +373,8 @@ deref_port (struct parport *p)
 	free ((char *) (p->name));
       if (priv->device)
 	free (priv->device);
+      if (p->filename)
+	free (p->filename);
       free (priv);
       free (p);
     }

@@ -1,6 +1,16 @@
 2003-05-30  Tim Waugh  <twaugh@redhat.com>
 
+	* configure.in, Makefile.am: Version 0.2.8pre1 (pre-test).
+
+2003-05-30  Tim Waugh  <twaugh@redhat.com>
+
+	* include/ieee1284.h (struct parport): New member 'filename'.
+	* src/ports.c (add_port): Set it.
+	(deref_port): Free it.
+	* doc/interface.xml: Document it.
+	
 	* include/ieee1284.h: New prototypes.
+
 	* src/interface.c (ieee1284_ref): New function.
 	(ieee1284_unref): New function.
 	* doc/interface.xml: Document them.

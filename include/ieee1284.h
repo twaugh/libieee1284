@@ -56,6 +56,10 @@ struct parport {
 
   /* For internal use only: */
   void *priv;
+
+  /* The filename associated with this port,
+   * if that has any meaning, or NULL. */
+  const char *filename;
 };
 
 /* Some parallel ports. */

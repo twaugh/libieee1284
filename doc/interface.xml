@@ -242,6 +242,10 @@
 
   /* The ECR address of the port, if that has any meaning, or zero. */
   unsigned long hibase_addr;
+
+  /* The filename associated with this port,
+   * if that has any meaning, or NULL. */
+  const char *filename;
 };]]></programlisting>
       </refsect1>
     </refentry>
