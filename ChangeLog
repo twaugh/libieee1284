@@ -1,3 +1,8 @@
+2003-05-06  Tim Waugh  <twaugh@redhat.com>
+
+	* include/ieee1284.h: Avoid trailing commas in enums, to prevent
+	compiler warnings.
+
 2003-05-03  Tim Waugh  <twaugh@redhat.com>
 
 	* doc/interface.xml: Fix reference to selectable_fd, which was

@@ -40,7 +40,7 @@ enum E1284 {
   E1284_INIT               = -7,  /* Error initialising port */
   E1284_SYS                = -8,  /* Error interfacing system */
   E1284_NOID               = -9,  /* No IEEE 1284 ID available */
-  E1284_INVALIDPORT        = -10, /* Invalid port */
+  E1284_INVALIDPORT        = -10  /* Invalid port */
 };
 
 /* A parallel port. */
@@ -82,7 +82,7 @@ extern void ieee1284_free_ports (struct parport_list *list);
 
 enum ieee1284_devid_flags
 {
-  F1284_FRESH = (1<<1), /* Guarantee a fresh Device ID */
+  F1284_FRESH = (1<<1)  /* Guarantee a fresh Device ID */
 };
 
 extern ssize_t ieee1284_get_deviceid (struct parport *port, int daisy,
@@ -95,7 +95,7 @@ extern ssize_t ieee1284_get_deviceid (struct parport *port, int daisy,
 
 enum ieee1284_open_flags
 {
-  F1284_EXCL = (1<<0), /* Require exclusive access to the port */
+  F1284_EXCL = (1<<0)  /* Require exclusive access to the port */
 };
 enum ieee1284_capabilities
 {
@@ -111,7 +111,7 @@ enum ieee1284_capabilities
   CAP1284_EPPSL = (1<<9),
   CAP1284_EPPSWE = (1<<10),
   CAP1284_IRQ = (1<<11),
-  CAP1284_DMA = (1<<12),
+  CAP1284_DMA = (1<<12)
 };
 extern int ieee1284_open (struct parport *port, int flags, int *capabilities);
 
@@ -148,7 +148,7 @@ enum ieee1284_status_bits
   S1284_NACK   = 0x40,
   S1284_BUSY   = 0x80,
   /* To convert those values into PC-style register values, use this: */
-  S1284_INVERTED = S1284_BUSY,
+  S1284_INVERTED = S1284_BUSY
 };
 
 extern int ieee1284_read_status (struct parport *port);
@@ -171,7 +171,7 @@ enum ieee1284_control_bits
   /* To convert those values into PC-style register values, use this: */
   C1284_INVERTED = (C1284_NSTROBE|
 		    C1284_NAUTOFD|
-		    C1284_NSELECTIN),
+		    C1284_NSELECTIN)
 };
 
 extern int ieee1284_read_control (struct parport *port);
@@ -215,7 +215,7 @@ enum ieee1284_modes
   M1284_EPPSL  = (1<<11), /* EPP 1.7 */
   M1284_EPPSWE = (1<<12), /* Software emulated */
   M1284_FLAG_DEVICEID = (1<<2),
-  M1284_FLAG_EXT_LINK = (1<<14), /* Uses bits in 0x7f */
+  M1284_FLAG_EXT_LINK = (1<<14)  /* Uses bits in 0x7f */
 };
 
 extern int ieee1284_negotiate (struct parport *port, int mode);
@@ -233,7 +233,7 @@ enum ieee1284_transfer_flags
   F1284_NONBLOCK = (1<<0),	/* Non-blocking semantics */
   F1284_SWE = (1<<2),		/* Don't use hardware assistance */
   F1284_RLE = (1<<3),		/* Use ECP RLE */
-  F1284_FASTEPP = (1<<4),	/* Use faster EPP (counts are unreliable) */
+  F1284_FASTEPP = (1<<4)	/* Use faster EPP (counts are unreliable) */
 };
 extern ssize_t ieee1284_nibble_read (struct parport *port, int flags,
 				     char *buffer, size_t len);
