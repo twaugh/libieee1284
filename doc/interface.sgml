@@ -1,0 +1,1267 @@
+<!-- -*- sgml -*- -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN"[
+<!ENTITY libieee1284 "libieee1284">
+<!ENTITY e1284ok "<errorcode>E1284_OK</errorcode>">
+<!ENTITY e1284nomem "<errorcode>E1284_NOMEM</errorcode>">
+<!ENTITY e1284notavail "<errorcode>E1284_NOTAVAIL</errorcode>">
+<!ENTITY e1284notimpl "<errorcode>E1284_NOTIMPL</errorcode>">
+<!ENTITY e1284init "<errorcode>E1284_INIT</errorcode>">
+<!ENTITY e1284negfailed "<errorcode>E1284_NEGFAILED</errorcode>">
+<!ENTITY e1284rejected "<errorcode>E1284_REJECTED</errorcode>">
+<!ENTITY e1284timedout "<errorcode>E1284_TIMEDOUT</errorcode>">
+]>
+<book>
+  <bookinfo>
+    <title>Public interface of &libieee1284;</title>
+
+    <author>
+      <firstname>Tim</firstname>
+      <surname>Waugh</surname>
+      <affiliation>
+	<address><email>twaugh@redhat.com</email></address>
+      </affiliation>
+    </author>
+
+    <copyright>
+      <year>2001</year>
+      <holder>Tim Waugh</holder>
+    </copyright>
+  </bookinfo>
+
+  <preface>
+    <title>Overview</title>
+
+    <para>The &libieee1284; library is a library for accessing
+     parallel port devices.  It is currently under development, but
+     this interface is the one that I think will remain in place for a
+     while.</para>
+
+    <para>The model presented to the user is fairly abstract: a list
+     of parallel ports with arbitrary names, with functions to access
+     them in various ways ranging from bit operations to block data
+     transfer in one of the IEEE 1284 sanctioned protocols.</para>
+
+    <para>Although the library resides in user space the speed penalty
+     may not be as bad as you initially think, since the operating
+     system may well provide assistance with block data transfer
+     operations; in fact, the operating system may even use hardware
+     assistance to get the job done.  So, using &libieee1284;, ECP
+     transfers using DMA are possible.</para>
+
+    <para>Usually a port needs to be claimed before it can be used.
+     This is to prevent multiple drivers from trampling on each other
+     if they both want to use the same port.  The exception to this
+     rule is the collection of IEEE 1284 Device IDs, which has an
+     implicit claim and release sequence.  The reason for this is that
+     it may be possible to collect a Device ID from the operating
+     system, without bothering the device with it.</para>
+  </preface>
+
+  <reference>
+    <title>Structures</title>
+
+    <refentry id="parport">
+      <refmeta>
+	<refentrytitle>parport</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>parport</refname>
+	<refpurpose>representation of a parallel port</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>A <structname>parport</structname> structure represents
+	a parallel port.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Structure members</title>
+
+	<para>The structure has the following members:</para>
+
+	<programlisting><![CDATA[struct parport {
+  // An artibrary name for the port.
+  const char *name;
+
+  // A set of bits indicating the capabilities of the port that we
+  // can use.  Whether hardware-assisted ECP is available; whether
+  // that includes DMA, etc.
+  int modes;
+
+  // -1, or else a file descriptor that can be used by select() for
+  // wait for nAck.
+  int selectable_fd;
+
+  // The base address of the port, if that has any meaning, or zero.
+  unsigned long base_addr;
+
+  // The ECR address of the port, if that has any meaning, or zero.
+  unsigned long hibase_addr;
+};]]></programlisting>
+      </refsect1>
+    </refentry>
+
+    <refentry id="parport-list">
+      <refmeta>
+	<refentrytitle>parport_list</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>parport_list</refname>
+	<refpurpose>a collection of parallel ports</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>A <structname>parport_list</structname> structure is
+	 just a vector of <structname>parport</structname>
+	 structures.</para>
+
+      </refsect1>
+
+      <refsect1>
+	<title>Structure members</title>
+
+	<para>The structure has the following members:</para>
+
+	<programlisting><![CDATA[struct parport_list {
+  // Number of elements in the vector.
+  int portc;
+
+  // The ports.
+  struct parport **portv;
+};]]></programlisting>
+      </refsect1>
+    </refentry>
+
+  </reference>
+
+  <reference>
+    <title>Functions</title>
+
+    <refentry id="find-ports">
+      <refmeta>
+	<refentrytitle>ieee1284_find_ports</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_find_ports</refname>
+	<refpurpose>find ports on the system</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>int
+	    <function>ieee1284_find_ports</function></funcdef>
+	    <paramdef>struct parport_list
+	    *<parameter>list</parameter>, const char
+	    *<parameter>config_file</parameter>, int
+	    <parameter>flags</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>This function should be called before the other
+	 &libieee1284; functions.  This gives the library a chance to
+	 look around and see what's available, and gives the program a
+	 chance to choose a port to use.</para>
+
+	<para>The <parameter>list</parameter> is a pointer to a
+	 <structname>parport_list</structname> structure that will be
+	 filled in on success.</para>
+
+	<para>The <parameter>config_file</parameter> parameter must be
+         <constant>NULL</constant>; it is there for when &libieee1284;
+         has a configuration file format defined.</para>
+
+	<para>There are no flags currently defined, and so the
+	 <parameter>flags</parameter> parameter should be zero.</para>
+
+	<remark>A good flag to define would be one for
+	 exclusivity.</remark>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284ok;</term>
+	    <listitem>
+	      <para>Success. <parameter>list</parameter> is filled in
+	       and must be destroyed using
+	       <function>ieee1284_free_ports</function>.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284nomem;</term>
+	    <listitem>
+	      <para>There was not enough memory available.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+
+    <refentry id="free-ports">
+      <refmeta>
+	<refentrytitle>ieee1284_free_ports</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_free_ports</refname>
+	<refpurpose>safely deallocate a port list</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>void <function>ieee1284_free_ports</function></funcdef>
+	    <paramdef>struct parport_list
+	      *<parameter>list</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>When the &libieee1284; library will no longer be used,
+	 the program should call
+	 <function>ieee1284_free_ports</function> giving it a pointer
+	 to the <structname>parport_list</structname> structure that
+	 holds the list of ports returned by
+	 <function>ieee1284_find_ports</function>.  Note that the
+	 ports are <emphasis>not</emphasis> reference counted, and so
+	 the port list must not be freed until the program no longer
+	 wishes to use the ports in the list.</para>
+
+	<para>After freeing the ports, it is possible to call
+	 <function>ieee1284_find_ports</function> again.  This
+	 function may perform initial set-up on ports that it finds,
+	 and so the only safe times to call it are before any other
+	 &libieee1284; functions or after
+	 <function>ieee1284_free_ports</function>.</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="get-deviceid">
+      <refmeta>
+	<refentrytitle>ieee1284_get_deviceid</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_get_deviceid</refname>
+	<refpurpose>retrieve an IEEE 1284 Device ID</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_get_deviceid</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	      <parameter>daisy</parameter>, int
+	      <parameter>flags</parameter>, char
+	      *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>This function is for retrieving the IEEE 1284 Device ID
+	 of the specified device.  The device is specified by the
+	 <parameter>port</parameter> to which it is attached, and
+	 optionally an address (<parameter>daisy</parameter>) on the
+	 daisy chain of devices on that port.</para>
+
+	<para><parameter>daisy</parameter> should be &minus;1 to
+	 indicate that the device is not participating in a IEEE
+	 1284.3 daisy chain, meaning it is the last (or only) device
+	 on the port, or should be a number from 0 to 3 inclusive to
+	 indicate that it has the specified daisy chain address (0 is
+	 next to the port).</para>
+
+	<para>The <parameter>flags</parameter> parameter should be a
+	 bitwise union of any flags that the program wants to use.
+	 Available flags are:</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term><constant>F1284_FRESH</constant></term>
+	    <listitem>
+	      <para>Guarantee a fresh Device ID.  A cached or
+	       OS-provided ID will not be used.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+	<para>The provided <parameter>buffer</parameter> must be at
+         least <parameter>len</parameter> bytes long, and will contain
+         the Device ID including the initial two-byte length field and
+         a terminating zero byte on successful return, or as much of
+         the above as will fit into the buffer.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<para>A return value less than zero indicates an error as
+	 below.  Otherwise, the return value is the number of bytes of
+	 <parameter>buffer</parameter> that have been filled.  A
+	 return value equal to the length of the buffer indicates that
+	 the Device ID may be longer than the buffer will
+	 allow.</para>
+
+	<remark>Note that the implementation needs some fixing to
+	 actually behave as documented.</remark>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284ok;</term>
+	    <listitem>
+	      <para>The device did not provide an IEEE 1284 Device ID
+	       when interrogated (perhaps by the operating system if
+	       <constant>F1284_FRESH</constant> was not
+	       specified).</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284notimpl;</term>
+	    <listitem>
+	      <para>This function is not implemented for this type of
+	       port or this type of system.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284notavail;</term>
+	    <listitem>
+	      <para>The operating system does not provide any Device
+	       IDs (or <constant>F1284_FRESH</constant> was specified)
+	       and the library is unable to access the port to
+	       interrogate the device.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284nomem;</term>
+	    <listitem>
+	      <para>There was not enough memory.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284init;</term>
+	    <listitem>
+	      <para>There was a problem initializing the port.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+
+      <refsect1>
+	<title>Notes</title>
+
+	<para>Unless the <constant>F1284_FRESH</constant> flag is
+	 given, the library will try to find the device's ID as
+	 unobtrusively as possible.  First it will ask the operating
+	 system if it knows it, and then it will try actually asking
+	 the device for it.  Because of this, the Device ID may be
+	 partially computed (the length field, for example) or even
+	 partially missing if the operating system has only remembered
+	 some parts of the ID.  To guarantee that you are getting the
+	 bytes that the device sent, use
+	 <constant>F1284_FRESH</constant>.  Be aware that the
+	 operating system may allow any user to inspect the Device IDs
+	 that it provides, whereas device access is normally more
+	 restricted.</para>
+
+	<para>The initial two-byte length field is a big-endian 16 bit
+	 unsigned integer provided by the device and may not be
+	 accurate.  In particular, it is meant to indicate the length
+	 of the entire string including the length field itself;
+	 however, some manufacturers exclude the length field or just
+	 set the length field to some arbitrary number greater than
+	 the ID length.</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="claim">
+      <refmeta>
+	<refentrytitle>ieee1284_claim</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_claim</refname>
+	<refpurpose>claim access to the port</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_claim</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>With the exception of <citerefentry>
+	    <refentrytitle>ieee1284_get_deviceid</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	  </citerefentry>, <function>ieee1284_claim</function> must be
+	 called before any other &libieee1284; function for accessing
+	 a device on a port.  Any necessary port initialization is
+	 performed at the first call to this function.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284ok;</term>
+	    <listitem>
+	      <para>Success.</para>
+	      <remark>When an exclusivity flag is provided, there
+	       should be a note here about reasonable behaviour.</remark>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284nomem;</term>
+	    <listitem>
+	      <para>There was not enough memory.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284init;</term>
+	    <listitem>
+	      <para>There was a problem during port initialization.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+
+      <refsect1>
+	<title>See also</title>
+
+	<para><citerefentry>
+	    <refentrytitle>ieee1284_release</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	  </citerefentry></para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="release">
+      <refmeta>
+	<refentrytitle>ieee1284_release</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_release</refname>
+	<refpurpose>release a port</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>void <function>ieee1284_release</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>This function undoes the effect of
+          <citerefentry>
+	    <refentrytitle>ieee1284_claim</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	  </citerefentry> by releasing the port for use by other
+	 drivers.  It is could practice to release the port whenever
+	 convenient.</para>
+
+	<remark>If it is never convenient to do so, the exclusivity
+	 flag should be specified at initialisation.</remark>
+      </refsect1>
+    </refentry>
+
+    <refentry id="data-pin-access">
+      <refmeta>
+	<refentrytitle>ieee1284_write_data</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_read_data</refname>
+	<refname>ieee1284_write_data</refname>
+	<refname>ieee1284_data_dir</refname>
+	<refpurpose>control the data lines</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_read_data</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+	  <funcprototype>
+	    <funcdef>void <function>ieee1284_write_data</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	    unsigned char <parameter>dt</parameter></paramdef>
+	  </funcprototype>
+	  <funcprototype>
+	    <funcdef>void <function>ieee1284_data_dir</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	    <parameter>reverse</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>These functions manipulate the data lines of the
+	 parallel port.  The lines are represented by an 8-bit number
+	 (one line per bit) and a direction.  The data lines are
+	 driven as a group; they may be host-driven
+	 (<firstterm>forward</firstterm> direction) or not
+	 (<firstterm>reverse</firstterm> direction).  When the
+	 peripheral is driving them the host must not.</para>
+
+	<para>Some port types may be unable to switch off the data
+	 line drivers.</para>
+
+	<para>Setting the data lines may have side effects on some
+	 port types (for example, some Amiga ports pulse
+	 nStrobe).</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<para><function>ieee1284_read_data</function> returns the
+	 8-bit number representing the data lines unless it is not
+	 possible to return such a value with this port type, in which
+	 case it returns an error code.  Possible error codes:</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284notavail;</term>
+	    <listitem>
+	      <para>Bi-directional data lines are not available on
+	       this system.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+
+    <refentry id="status-pin-access">
+      <refmeta>
+	<refentrytitle>ieee1284_status</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_read_status</refname>
+	<refname>ieee1284_wait_status</refname>
+	<refpurpose>analyse status lines</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_read_status</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_wait_status</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      unsigned char <parameter>mask</parameter>, unsigned char
+	    <parameter>val</parameter>, struct timeval *<parameter>timeout</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>There are five status lines, one of which is usually
+	 inverted on PC-style ports.  Where they differ, &libieee1284;
+	 operates on the IEEE 1284 values, not the PC-style inverted
+	 values.  The status lines are represented by the following
+	 enumeration:</para>
+
+	<programlisting><![CDATA[enum ieee1284_status_bits
+{
+  S1284_NFAULT = 0x08,
+  S1284_SELECT = 0x10,
+  S1284_PERROR = 0x20,
+  S1284_NACK   = 0x40,
+  S1284_BUSY   = 0x80,
+// To convert those values into PC-style register values, use this:
+  S1284_INVERTED = S1284_BUSY,
+};]]></programlisting>
+
+	<para>The purpose of <function>ieee1284_wait_status</function>
+	 is to wait until particular status lines have specified
+	 values.  Its <parameter>timeout</parameter> parameter may be
+	 modified on return.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<para>For <function>ieee1284_read_status</function>, the
+	 return value is a non-negative integer with bits set as
+	 appropriate representing the status lines.  A negative result
+	 indicates an error.</para>
+
+	<para>For <function>ieee1284_wait_status</function>, the
+	 return value is &e1284ok; if the status
+	 lines now reflect the desired values (i.e. status &
+	 <parameter>mask</parameter> is <parameter>val</parameter>),
+	 or a negative result indicating an error.</para>
+
+	<para>Possible error codes:</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284notimpl;</term>
+	    <listitem>
+	      <para>This operation is not implemented in &libieee1284;
+	       yet.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284notavail;</term>
+	    <listitem>
+	      <para>Access to the status lines is not available on this
+	       port type.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284timedout;</term>
+	    <listitem>
+	      <para>The <parameter>timeout</parameter> has
+	       elapsed.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+
+      <refsect1>
+	<title>Notes</title>
+
+	<para>The nAck pin is often able to trigger interrupts on the
+	 host machine.  With operating system help these interrupts
+	 may be visible to the application via the
+	 <structfield>selectable_fd</structfield> member of the
+	 <structname>parport</structname> structure.</para>
+
+	<para>Under Linux, the conditions are that the parallel port
+	 driver knows which interrupt line to use and is using it, and
+	 that the relevant <filename>/dev/parport</filename> device
+	 node is accessible and backed by a device driver.</para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="control-line-access">
+      <refmeta>
+	<refentrytitle>ieee1284_control</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_read_control</refname>
+	<refname>ieee1284_write_control</refname>
+	<refname>ieee1284_frob_control</refname>
+	<refname>ieee1284_do_nack_handshake</refname>
+	<refpurpose>manipulate control lines</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_read_control</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>void <function>ieee1284_write_control</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      unsigned char <parameter>ct</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>void <function>ieee1284_frob_control</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      unsigned char <parameter>mask</parameter>, unsigned char
+	      <parameter>val</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>int
+	      <function>ieee1284_do_nack_handshake</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      unsigned char <parameter>ct_before</parameter>, unsigned
+	      char <parameter>ct_after</parameter>, struct timeval
+	      *<parameter>timeout</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>There are four control lines, three of which are usually
+	 inverted on PC-style ports.  Where they differ, &libieee1284;
+	 operates on the IEEE 1284 values, not the PC-style inverted
+	 values.  The control lines are represented by the following
+	 enumeration:</para>
+
+	<programlisting><![CDATA[enum ieee1284_control_bits
+{
+  C1284_NSTROBE   = 0x01,
+  C1284_NAUTOFD   = 0x02,
+  C1284_NINIT     = 0x04,
+  C1284_NSELECTIN = 0x08,
+// To convert those values into PC-style register values, use this:
+  C1284_INVERTED = (C1284_NSTROBE|
+                    C1284_NAUTOFD|
+                    C1284_NSELECTIN),
+};]]></programlisting>
+
+	<para>The current values on the control lines are available by
+	 calling <function>ieee1284_read_control</function>, and may
+	 be set by calling
+	 <function>ieee1284_write_control</function>.</para>
+
+	<para>To adjust the values on a set of control lines, use
+	 <function>ieee1284_frob_control</function>.  The effect of
+	 this can be expressed by: <literal>ctr = ((ctr & ~mask) ^
+	 val)</literal>; that is, the bits in
+	 <parameter>mask</parameter> are unset, and then those in
+	 <parameter>val</parameter> are inverted.</para>
+
+	<para>The special function
+	 <function>ieee1284_do_nack_handshake</function> is for
+	 responding very quickly in a protocol where the peripheral
+	 sets nAck and the host must respond by setting a control
+	 line.  Its operation, which relies on the host machine
+	 knowing which interrupt nAck generates, is as follows:</para>
+
+	<procedure>
+	  <step>
+	    <para>Set the control lines as indicated in
+	      <parameter>ct_before</parameter>.</para>
+	  </step>
+
+	  <step>
+	    <para>Wait for nAck interrupt.  If
+	      <parameter>timeout</parameter> elapses, return
+	      &e1284timedout;.</para>
+	  </step>
+
+	  <step>
+	    <para>Set the control lines as indicated in
+	      <parameter>ct_after</parameter>.</para>
+	  </step>
+	</procedure>
+
+	<para>On Linux using the ppdev driver, this is performed by
+	 the device driver in the kernel, and so is faster than
+	 normally possible in a user-space library.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<para>The return value of
+	 <function>ieee1284_read_control</function>, if non-negative,
+	 is a number representing the value on the control lines.</para>
+
+	<para>Possible error codes for
+	  <function>ieee1284_read_control</function>:</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284notavail;</term>
+	    <listitem>
+	      <para>The control lines of this port are not accessible
+	       by the application.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+	<para>Possible error codes for
+	 <function>ieee1284_do_nack_handshake</function>:</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284ok;</term>
+	    <listitem>
+	      <para>The handshake was successful.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284notavail;</term>
+	    <listitem>
+	      <para>This operation is not available on this port type
+	       or system.  This could be because port interrupts are
+	       not available, or because the underlying device driver
+	       does not support the operation.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+
+    <refentry id="negotiation">
+      <refmeta>
+	<refentrytitle>ieee1284_negotiation</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_negotiate</refname>
+	<refname>ieee1284_terminate</refname>
+	<refpurpose>IEEE 1284 negotiation</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_negotiate</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>, int
+	    <parameter>mode</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>void <function>ieee1284_terminate</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>These functions are for negotiating to and terminating
+	 from IEEE 1284 data transfer modes.  The default mode is
+	 called compatibility mode, or in other words normal printer
+	 protocol.  It is a host-to-peripheral mode only.  There are
+	 special modes that allow peripheral-to-host transfer as well,
+	 which may be negotiated to using
+	 <function>ieee1284_negotiate</function>.  IEEE 1284
+	 negotiation is a process by which the host requests a
+	 transfer mode and the peripheral accepts or rejects it.  An
+	 IEEE 1284-compliant device will require a successful
+	 negotiation to a particular mode before it is used for data
+	 transfer (but simpler devices may not if they only speak one
+	 transfer mode).</para>
+
+	<para>To terminate the special mode and go back to
+	 compatilibity mode use
+	 <function>ieee1284_terminate</function>.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Available modes</title>
+
+	<refsect2>
+	  <title>Uni-directional modes</title>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para><constant>M1284_COMPAT</constant>: Compatibility
+	       mode.  Normal printer protocol.  This is not a
+	       negotiated mode, but is the default mode in absence of
+	       negotiation.  <userinput>ieee1284_negotiate(port,
+	       M1284_COMPAT)</userinput> is equivalent to
+	       <userinput>ieee1284_terminate(port)</userinput>.  This
+	       host-to-peripheral mode is used for sending data to
+	       printers, and is historically the mode that has been
+	       used for that before IEEE 1284.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><constant>M1284_NIBBLE</constant>: Nibble mode.
+	       This peripheral-to-host mode uses the status lines to
+	       read data from the peripheral four bits at a time.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><constant>M1284_BYTE</constant>: Byte mode.  This
+	       peripheral-to-host mode uses the data lines in reverse
+	       mode to read data from the peripheral a byte at a
+	       time.</para>
+	    </listitem>
+	  </itemizedlist>
+	</refsect2>
+
+	<refsect2>
+	  <title>Bi-directional modes</title>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para><constant>M1284_ECP</constant>: ECP mode.  On
+	       entry to ECP mode it is a host-to-peripheral
+	       (i.e. forward) mode, but it may be set to reverse mode
+	       using <citerefentry>
+		  <refentrytitle>ieee1284_ecp_fwd_to_rev</refentrytitle>
+		  <manvolnum>3</manvolnum>
+		</citerefentry>.  It is common
+	       for PC hardware to provide assistance with this mode by
+	       the use of a FIFO which the host (or, in reverse mode,
+	       the peripheral) may fill, so that the hardware can do
+	       the handshaking itself.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><constant>M1284_EPP</constant>: EPP mode.  In this
+	       bi-directional mode the direction of data transfer is
+	       signalled at each byte.</para>
+	    </listitem>
+	  </itemizedlist>
+	</refsect2>
+
+	<refsect2>
+	  <title>Mode variations</title>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para><constant>M1284_FLAG_DEVICEID</constant>: Device
+	       ID retrieval.  This flag may be combined with a nibble,
+	       byte, or ECP mode to notify the device that it should
+	       send its IEEE 1284 Device ID when asked for
+	       data.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><constant>M1284_BECP</constant>: Bounded ECP is a
+	       modification to ECP that makes it more robust at the
+	       point that the direction is changed. (Unfortunately it
+	       is not yet implemented in the Linux kernel
+	       driver.)</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><constant>M1284_ECPRLE</constant>: ECP with run
+	       length encoding.  In this mode, consecutive data bytes
+	       of the same value may be transferred in only a few
+	       cycles.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><constant>M1284_ECPSWE</constant>:
+	       Software-emulated ECP is not a distinct wire protocol,
+	       but specifying this mode instructs the library to avoid
+	       using hardware assistance for the data transfer.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><constant>M1284_EPPSWE</constant>: As
+	       software-emulated ECP, but with EPP.</para>
+	    </listitem>
+	  </itemizedlist>
+	</refsect2>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284ok;</term>
+	    <listitem>
+	      <para>The negotiation was successful.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284notavail;</term>
+	    <listitem>
+	      <para>Negotiation is not available with this port
+	       type.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284rejected;</term>
+	    <listitem>
+	      <para>Negotiation was rejected by the peripheral.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284negfailed;</term>
+	    <listitem>
+	      <para>Negotiation failed for some reason.  Perhaps the
+	       device is not IEEE 1284 compliant.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+
+    <refentry id="fwd-rev">
+      <refmeta>
+	<refentrytitle>ieee1284_ecp_fwd_to_rev</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_ecp_fwd_to_rev</refname>
+	<refname>ieee1284_ecp_rev_to_fwd</refname>
+	<refpurpose>ECP direction switching</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_ecp_fwd_to_rev</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_ecp_rev_to_fwd</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>These functions are used to switch directions when in
+	 ECP mode.  Use <function>ieee1284_ecp_fwd_to_rev</function>
+	 to switch from forward to reverse, and
+	 <function>ieee1284_ecp_rev_to_fwd</function> to switch from
+	 reverse to forward.</para>
+
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284ok;</term>
+	    <listitem>
+	      <para>Direction switched successfully.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284notimpl;</term>
+	    <listitem>
+	      <para>This is not yet implemented in
+	       &libieee1284;.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect1>
+    </refentry>
+
+    <refentry id="transfer">
+      <refmeta>
+	<refentrytitle>ieee1284_transfer</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_nibble_read</refname>
+	<refname>ieee1284_compat_write</refname>
+	<refname>ieee1284_byte_read</refname>
+	<refname>ieee1284_epp_read_data</refname>
+	<refname>ieee1284_epp_write_data</refname>
+	<refname>ieee1284_epp_read_addr</refname>
+	<refname>ieee1284_epp_write_addr</refname>
+	<refname>ieee1284_ecp_read_data</refname>
+	<refname>ieee1284_ecp_write_data</refname>
+	<refname>ieee1284_ecp_write_addr</refname>
+	<refpurpose>data transfer functions</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<synopsis><![CDATA[#include <ieee1284.h>]]></synopsis>
+	<funcsynopsis>
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_nibble_read</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_compat_write</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      const char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>ssize_t <function>ieee1284_byte_read</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_epp_read_data</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_epp_write_data</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      const char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_epp_read_addr</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_epp_write_addr</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      const char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_ecp_read_data</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_ecp_write_data</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      const char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+
+	  <funcprototype>
+	    <funcdef>ssize_t
+	      <function>ieee1284_ecp_write_addr</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter>,
+	      const char *<parameter>buffer</parameter>, size_t
+	      <parameter>len</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>This set of functions is for tranferring bytes in the
+	 relevant transfer mode.  For ECP and EPP modes two types of
+	 transfer are possible: <firstterm>data</firstterm> and
+	 <firstterm>address</firstterm> (usually referred to as
+	 <firstterm>channel</firstterm> in ECP).</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<para>The return value is the number of bytes successfully
+	 transferred or, if negative, one of:</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term>&e1284notimpl;</term>
+	    <listitem>
+	      <para>This transfer mode is not yet implemented in
+	       &libieee1284;.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284timedout;</term>
+	    <listitem>
+	      <para>Timed out waiting for peripheral to
+	       handshake.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284nomem;</term>
+	    <listitem>
+	      <para>Not enough memory is available.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+	<para>If any bytes are successfully transferred, that number
+	 is returned.  An error is returned only if no bytes are
+	 transferred.</para>
+      </refsect1>
+    </refentry>
+  </reference>
+</book>
