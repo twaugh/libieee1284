@@ -2,7 +2,7 @@
  * libieee1284 - IEEE 1284 library
  * Copyright (C) 2000-2001 Hewlett-Packard Company
  * Integrated into libieee1284:
- * Copyright (C) 2001  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001-2002  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -175,8 +175,7 @@ default_terminate (struct parport_internal *port)
   fn->write_control (port, C1284_NINIT | C1284_NAUTOFD | C1284_NSTROBE);
 
   lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);
-  if (fn->wait_status (port, S1284_NACK | S1284_SELECT, 
-		       S1284_SELECT, &tv) != E1284_OK)
+  if (fn->wait_status (port, S1284_NACK, 0, &tv) != E1284_OK)
     return;
 	
   fn->write_control (port, C1284_NINIT | C1284_NSTROBE);
@@ -218,6 +217,15 @@ default_nibble_read (struct parport_internal *port,
   /* start of reading data from the scanner */
   while (count < len)
     {
+      /* More data? */
+      if ((count & 1) == 0 &&
+	  (fn->read_status (port) & S1284_NFAULT))
+	{
+	  printf ("No more data\n");
+	  fn->frob_control (port, C1284_NAUTOFD, 0);
+	  break;
+	}
+
       fn->write_control (port, C1284_NSTROBE | C1284_NINIT | C1284_NSELECTIN);
 
       lookup_delay (TIMEVAL_SIGNAL_TIMEOUT, &tv);

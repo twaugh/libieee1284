@@ -1,5 +1,8 @@
 2002-01-16  Tim Waugh  <twaugh@redhat.com>
 
+	* default.c (default_terminate): Don't wait for SELECT.
+	(default_nibble_read): Check nDataAvail.
+
 	* ports.c (add_port): Set hibase_addr as well.
 	(populate_from_sys_dev_parport): Find out ECR address.
 
