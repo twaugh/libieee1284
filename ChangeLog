@@ -1,5 +1,9 @@
 2001-11-30  Tim Waugh  <twaugh@redhat.com>
 
+	* configure.in: Version 0.1.2 (devel).
+
+2001-11-30  Tim Waugh  <twaugh@redhat.com>
+
 	* debug.c, debug.h (debug_display_status, debug_display_control,
 	debug_frob_control): New functions for tracing pin values.
 	* access_io.c (read_status, wait_status, write_control,
