@@ -156,8 +156,8 @@ extern int ieee1284_negotiate (struct parport *port, int mode);
 extern void ieee1284_terminate (struct parport *port);
 
 // ECP direction switching
-extern int ieee1284_ecp_forward_to_reverse (struct parport *port);
-extern int ieee1284_ecp_reverse_to_forward (struct parport *port);
+extern int ieee1284_ecp_fwd_to_rev (struct parport *port);
+extern int ieee1284_ecp_rev_to_fwd (struct parport *port);
 
 // Block I/O
 extern ssize_t ieee1284_nibble_read (struct parport *port, char *buffer,

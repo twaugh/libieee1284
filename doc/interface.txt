@@ -86,7 +86,7 @@ static const int STATUS_PERROR          =0x20;
 static const int STATUS_NACK            =0x40;
 static const int STATUS_BUSY            =0x80;
 // To convert those values into PC-style register values, use this:
-static const int STATUS_INVERTED        =(STATUS_BUSY);
+#define STATUS_INVERTED (STATUS_BUSY)
 
 extern int ieee1284_read_status (struct parport *port);
 
@@ -104,9 +104,10 @@ static const int CONTROL_NAUTOFD        =0x02;
 static const int CONTROL_NINIT          =0x04;
 static const int CONTROL_NSELECTIN      =0x08;
 // To convert those values into PC-style register values, use this:
-static const int CONTROL_INVERTED       =(CONTROL_NSTROBE|
-                                          CONTROL_NAUTOFD|
-                                          CONTROL_NSELECTIN);
+#define CONTROL_INVERTED (CONTROL_NSTROBE| \
+                         CONTROL_NAUTOFD|  \
+                         CONTROL_NSELECTIN)
+
 extern int ieee1284_read_control (struct parport *port);
 // ieee1284_read_control may be unreliable
 
@@ -139,8 +140,8 @@ extern int ieee1284_negotiate (struct parport *port, int mode);
 extern void ieee1284_terminate (struct parport *port);
 
 // ECP direction switching
-extern int ieee1284_ecp_forward_to_reverse (struct parport *port);
-extern int ieee1284_ecp_reverse_to_forward (struct parport *port);
+extern int ieee1284_ecp_fwd_to_rev (struct parport *port);
+extern int ieee1284_ecp_rev_to_fwd (struct parport *port);
 
 // Block I/O
 extern ssize_t ieee1284_nibble_read (struct parport *port, char *buffer,
