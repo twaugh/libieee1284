@@ -26,7 +26,7 @@ struct parport {
   int modes;
 
   // -1, or else a file descriptor that can be used by select() for
-  // waiting for nFault.
+  // waiting for nAck.
   int selectable_fd;
 
   // The base address of the port, if that has any meaning, or zero.
@@ -135,13 +135,13 @@ extern int ieee1284_frob_control (struct parport *port, unsigned char mask,
 // availability.  Its operation is:
 // If operation unavailable, return E1284_NOTAVAIL.  Otherwise:
 // Set control pins to ct_before.
-// Wait for nFault interrupt.  If timeout elapses, return E1284_TIMEDOUT.
+// Wait for nAck interrupt.  If timeout elapses, return E1284_TIMEDOUT.
 // Otherwise, set control pins to ct_after and return E1284_OK.
 // timeout may be modified.
-extern int ieee1284_do_nfault_handshake (struct parport *port,
-                                         unsigned char ct_before,
-                                         unsigned char ct_after,
-                                         struct timeval *timeout);
+extern int ieee1284_do_nack_handshake (struct parport *port,
+                                       unsigned char ct_before,
+                                       unsigned char ct_after,
+                                       struct timeval *timeout);
 
 //
 // IEEE 1284 operations
