@@ -18,16 +18,25 @@
  */
 
 #include "ieee1284.h"
+#include "debug.h"
 #include "detect.h"
 
 /* ieee1284_open is in state.c */
+
+static const char *needs_open_port = \
+"%s called for port that wasn't opened (use ieee1284_open first)\n";
+static const char *needs_claimed_port = \
+"%s called for port that wasn't claimed (use ieee1284_claim first)\n";
 
 int
 ieee1284_close (struct parport *port)
 {
   struct parport_internal *priv = port->priv;
   if (!priv->opened)
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_open_port, "ieee1284_close");
+      return E1284_INVALIDPORT;
+    }
   if (priv->fn->cleanup)
     priv->fn->cleanup (priv);
   priv->opened = 0;
@@ -41,10 +50,17 @@ ieee1284_claim (struct parport *port)
   int ret = E1284_OK;
   struct parport_internal *priv = port->priv;
 
-  if (!priv->opened || priv->claimed)
-    /* Can't claim a port you haven't opened, or one that is already
-     * claimed. */
-    return E1284_INVALIDPORT;
+  if (!priv->opened)
+    {
+      dprintf (needs_open_port, "ieee1284_claim");
+      return E1284_INVALIDPORT;
+    }
+
+  if (priv->claimed)
+    {
+      dprintf ("ieee1284_claim called for a port already claimed\n");
+      return E1284_INVALIDPORT;
+    }
 
   if (priv->fn->claim)
     ret = priv->fn->claim (priv);
@@ -62,8 +78,10 @@ ieee1284_get_irq_fd (struct parport *port)
   struct parport_internal *priv = port->priv;
 
   if (!priv->opened)
-    /* Need an opened port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_open_port, "ieee1284_get_irq_fd");
+      return E1284_INVALIDPORT;
+    }
 
   if (priv->fn->get_irq_fd)
     ret = priv->fn->get_irq_fd (priv);
@@ -85,8 +103,10 @@ ieee1284_read_data (struct parport *port)
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_read_data");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->read_data (priv);
 }
@@ -97,6 +117,8 @@ ieee1284_write_data (struct parport *port, unsigned char st)
   struct parport_internal *priv = port->priv;
   if (priv->claimed)
     priv->fn->write_data (priv, st);
+  else
+    dprintf (needs_claimed_port, "ieee1284_write_data");
 }
 
 int
@@ -105,8 +127,10 @@ ieee1284_data_dir (struct parport *port, int reverse)
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_data_dir");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->data_dir (priv, reverse);
 }
@@ -117,8 +141,10 @@ ieee1284_read_status (struct parport *port)
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_read_status");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->read_status (priv);
 }
@@ -132,8 +158,10 @@ ieee1284_wait_status (struct parport *port,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_wait_status");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->wait_status (priv, mask, val, timeout);
 }
@@ -144,8 +172,10 @@ ieee1284_read_control (struct parport *port)
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_read_control");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->read_control (priv);
 }
@@ -156,6 +186,8 @@ ieee1284_write_control (struct parport *port, unsigned char ct)
   struct parport_internal *priv = port->priv;
   if (priv->claimed)
     priv->fn->write_control (priv, ct);
+  else
+    dprintf (needs_claimed_port, "ieee1284_write_control");
 }
 
 void
@@ -166,6 +198,8 @@ ieee1284_frob_control (struct parport *port, unsigned char mask,
 
   if (priv->claimed)
     priv->fn->frob_control (priv, mask, val);
+  else
+    dprintf (needs_claimed_port, "ieee1284_frob_control");
 }
 
 int
@@ -177,8 +211,10 @@ ieee1284_do_nack_handshake (struct parport *port,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_do_nack_handshake");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->do_nack_handshake (priv, ct_before, ct_after, timeout);
 }
@@ -189,8 +225,10 @@ ieee1284_negotiate (struct parport *port, int mode)
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_negotiate");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->negotiate (priv, mode);
 }
@@ -201,6 +239,8 @@ ieee1284_terminate (struct parport *port)
   struct parport_internal *priv = port->priv;
   if (priv->claimed)
     priv->fn->terminate (priv);
+  else
+    dprintf (needs_claimed_port, "ieee1284_terminate");
 }
 
 int
@@ -209,8 +249,10 @@ ieee1284_ecp_fwd_to_rev (struct parport *port)
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_ecp_fwd_to_rev");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->ecp_fwd_to_rev (priv);
 }
@@ -221,8 +263,10 @@ ieee1284_ecp_rev_to_fwd (struct parport *port)
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_ecp_rev_to_fwd");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->ecp_rev_to_fwd (priv);
 }
@@ -234,8 +278,10 @@ ieee1284_nibble_read (struct parport *port, int flags,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_nibble_read");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->nibble_read (priv, flags, buffer, len);
 }
@@ -247,8 +293,10 @@ ieee1284_compat_write (struct parport *port, int flags,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_compat_write");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->compat_write (priv, flags, buffer, len);
 }
@@ -260,8 +308,10 @@ ieee1284_byte_read (struct parport *port, int flags,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_byte_read");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->byte_read (priv, flags, buffer, len);
 }
@@ -273,8 +323,10 @@ ieee1284_epp_read_data (struct parport *port, int flags, char *buffer,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_epp_read_data");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->epp_read_data (priv, flags, buffer, len);
 }
@@ -286,8 +338,10 @@ ieee1284_epp_write_data (struct parport *port, int flags,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_epp_write_data");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->epp_write_data (priv, flags, buffer, len);
 }
@@ -299,8 +353,10 @@ ieee1284_epp_read_addr (struct parport *port, int flags, char *buffer,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_epp_read_addr");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->epp_read_addr (priv, flags, buffer, len);
 }
@@ -312,8 +368,10 @@ ieee1284_epp_write_addr (struct parport *port, int flags,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_epp_write_addr");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->epp_write_addr (priv, flags, buffer, len);
 }
@@ -325,8 +383,10 @@ ieee1284_ecp_read_data (struct parport *port, int flags, char *buffer,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_ecp_read_data");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->ecp_read_data (priv, flags, buffer, len);
 }
@@ -338,8 +398,10 @@ ieee1284_ecp_write_data (struct parport *port, int flags,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_ecp_write_data");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->ecp_write_data (priv, flags, buffer, len);
 }
@@ -351,8 +413,10 @@ ieee1284_ecp_read_addr (struct parport *port, int flags,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_ecp_read_addr");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->ecp_read_addr (priv, flags, buffer, len);
 }
@@ -364,8 +428,10 @@ ieee1284_ecp_write_addr (struct parport *port, int flags,
   struct parport_internal *priv = port->priv;
 
   if (!priv->claimed)
-    /* Need a claimed port. */
-    return E1284_INVALIDPORT;
+    {
+      dprintf (needs_claimed_port, "ieee1284_ecp_write_addr");
+      return E1284_INVALIDPORT;
+    }
 
   return priv->fn->ecp_write_addr (priv, flags, buffer, len);
 }
