@@ -87,16 +87,10 @@ check_dev_node (const char *type)
 #ifdef HAVE_LINUX
       if (!strcmp (type, "parport"))
 	{
-	  /* Make sure that we can actually claim the device.  This will
+	  /* Try to claim the device.  This will
 	   * force the low-level port driver to get loaded. */
-	  if (ioctl (fd, PPCLAIM) < 0)
-	    {
-	      dprintf ("couldn't claim %s\n", name);
-	      close (fd);
-	      continue;
-	    }
-
-	  ioctl (fd, PPRELEASE);
+	  if (ioctl (fd, PPCLAIM) == 0)
+	    ioctl (fd, PPRELEASE);
 	}
 #endif
 
