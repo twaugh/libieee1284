@@ -43,11 +43,20 @@ static void
 find_capabilities (int fd, int *c)
 {
   int m;
+
+  /* Work around a 2.4.x kernel bug by claiming the port for this
+   * even though we shouldn't have to. */
+  if (ioctl (fd, PPCLAIM))
+    goto guess;
+
   if (ioctl (fd, PPGETMODES, &m))
     {
+      ioctl (fd, PPRELEASE);
+ guess:
       *c |= CAP1284_ECP | CAP1284_ECPRLE | CAP1284_EPP;
       return;
     }
+  ioctl (fd, PPRELEASE);
 
   if (m & PARPORT_MODE_PCSPP)
     *c |= CAP1284_RAW;

@@ -1,3 +1,10 @@
+2002-01-03  Tim Waugh  <twaugh@redhat.com>
+
+	* test.c (main): Test ieee1284_open and ieee1284_close a little.
+
+	* access_ppdev.c (find_capabilities): Work around a 2.4.x kernel
+	bug by claiming the port before using PPGETMODES.
+
 2001-11-30  Tim Waugh  <twaugh@redhat.com>
 
 	* configure.in: Version 0.1.2 (devel).

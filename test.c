@@ -36,7 +36,13 @@ int main ()
   for (i = 0; i < pl.portc; i++)
     {
       char id[500];
+      unsigned int cap;
       printf ("  %s: ", pl.portv[i]->name);
+
+      /* Just try to open the port, then close it. */
+      if (ieee1284_open (pl.portv[i], 0, &cap))
+	printf ("(inaccessible) ");
+      else ieee1284_close (pl.portv[i]);
       if (ieee1284_get_deviceid (pl.portv[i], -1, F1284_FRESH, id, 500) > -1)
 	printf ("%s", class (id));
       else if (ieee1284_get_deviceid (pl.portv[i], -1, 0, id, 500) > -1)
