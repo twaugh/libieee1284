@@ -10,6 +10,7 @@
 <!ENTITY e1284rejected "<errorcode>E1284_REJECTED</errorcode>">
 <!ENTITY e1284timedout "<errorcode>E1284_TIMEDOUT</errorcode>">
 <!ENTITY e1284sys "<errorcode>E1284_SYS</errorcode>">
+<!ENTITY e1284noid "<errorcode>E1284_NOID</errorcode>">
 ]>
 <book id="index">
   <bookinfo>
@@ -370,7 +371,7 @@
 
 	<variablelist>
 	  <varlistentry>
-	    <term>&e1284ok;</term>
+	    <term>&e1284noid;</term>
 	    <listitem>
 	      <para>The device did not provide an IEEE 1284 Device ID
 	       when interrogated (perhaps by the operating system if
