@@ -10,7 +10,7 @@
 <!ENTITY e1284rejected "<errorcode>E1284_REJECTED</errorcode>">
 <!ENTITY e1284timedout "<errorcode>E1284_TIMEDOUT</errorcode>">
 ]>
-<book>
+<book id="index">
   <bookinfo>
     <title>Public interface of &libieee1284;</title>
 
@@ -210,7 +210,10 @@
 	    <listitem>
 	      <para>Success. <parameter>list</parameter> is filled in
 	       and must be destroyed using
-	       <function>ieee1284_free_ports</function>.</para>
+	       <citerefentry>
+		  <refentrytitle>ieee1284_free_ports</refentrytitle>
+		  <manvolnum>3</manvolnum>
+		</citerefentry>.</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -254,7 +257,10 @@
 	 <function>ieee1284_free_ports</function> giving it a pointer
 	 to the <structname>parport_list</structname> structure that
 	 holds the list of ports returned by
-	 <function>ieee1284_find_ports</function>.  Note that the
+	 <citerefentry>
+	    <refentrytitle>ieee1284_find_ports</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	  </citerefentry>.  Note that the
 	 ports are <emphasis>not</emphasis> reference counted, and so
 	 the port list must not be freed until the program no longer
 	 wishes to use the ports in the list.</para>
@@ -1225,6 +1231,9 @@
 	 transfer are possible: <firstterm>data</firstterm> and
 	 <firstterm>address</firstterm> (usually referred to as
 	 <firstterm>channel</firstterm> in ECP).</para>
+
+	<para>The supplied <parameter>buffer</parameter> must be at
+	 least <parameter>len</parameter> bytes long.</para>
       </refsect1>
 
       <refsect1>
