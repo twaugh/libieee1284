@@ -20,7 +20,9 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
 
+struct parport_internal;
 extern void dprintf (const char *fmt, ...);
+extern void ieee1284_display_status (struct parport_internal *port);
 
 #endif /* _DEBUG_H_ */
 
