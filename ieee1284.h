@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,11 +43,6 @@ enum E1284 {
 struct parport {
   /* An arbitrary name for the port */
   const char *name;
-
-  /* A set of bits indicating the capabilities of the port that we
-   *can use.  Whether hardware-assisted ECP is available; whether
-   * that includes DMA, etc. */
-  int modes;
 
   /* The base address of the port, if that has any meaning, or zero. */
   unsigned long base_addr;

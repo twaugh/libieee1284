@@ -1,3 +1,8 @@
+2002-01-16  Tim Waugh  <twaugh@redhat.com>
+
+	* ieee1284.h: Remove port->modes, since that's returned from
+	ieee1284_open now.
+
 2002-01-14  Tim Waugh  <twaugh@redhat.com>
 
 	* ieee1284.h: Enforce C linkage.
