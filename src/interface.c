@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002, 2003  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,31 @@ static const char *needs_open_port = \
 "%s called for port that wasn't opened (use ieee1284_open first)\n";
 static const char *needs_claimed_port = \
 "%s called for port that wasn't claimed (use ieee1284_claim first)\n";
+
+int
+ieee1284_ref (struct parport *port)
+{
+  struct parport_internal *priv = port->priv;
+  return ++priv->ref;
+}
+
+int
+ieee1284_unref (struct parport *port)
+{
+  struct parport_internal *priv = port->priv;
+  if (priv->opened && priv->ref == 1)
+    {
+      int ret;
+      debugprintf ("ieee1284_unref called for last reference to open port!\n");
+      ret = ieee1284_close (port);
+      if (ret == E1284_OK)
+	return 0;
+
+      return 1;
+    }
+
+  return deref_port (port);
+}
 
 int
 ieee1284_close (struct parport *port)

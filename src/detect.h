@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002, 2003  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -150,7 +150,7 @@ extern int capabilities;
 
 extern int detect_environment (int forbidden);
 
-extern void deref_port (struct parport *port);
+extern int deref_port (struct parport *port);
 
 #endif /* _DETECT_H_ */
 

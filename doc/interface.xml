@@ -17,7 +17,7 @@
 <book id="index">
   <bookinfo>
     <title>Public interface of &libieee1284;</title>
-    <subtitle>API 3.1</subtitle>
+    <subtitle>API 3.2</subtitle>
 
     <author>
       <firstname>Tim</firstname>
@@ -849,6 +849,71 @@
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
+      </refsect1>
+
+      <refsect1>
+	<title>See also</title>
+
+	<para><citerefentry>
+	    <refentrytitle>ieee1284_open</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	  </citerefentry></para>
+      </refsect1>
+    </refentry>
+
+    <refentry id="ref">
+      <refmeta>
+	<refentrytitle>ieee1284_ref</refentrytitle>
+	<manvolnum>3</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+	<refname>ieee1284_ref</refname>
+	<refname>ieee1284_unref</refname>
+	<refpurpose>modify a port's reference count</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<funcsynopsis>
+	  <funcsynopsisinfo>#include &lt;ieee1284.h&gt;</funcsynopsisinfo>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_ref</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+	  <funcprototype>
+	    <funcdef>int <function>ieee1284_unref</function></funcdef>
+	    <paramdef>struct parport *<parameter>port</parameter></paramdef>
+	  </funcprototype>
+	</funcsynopsis>
+      </refsynopsisdiv>
+
+      <refsect1>
+	<title>Description</title>
+
+	<para>If you want to free the port list from
+	 <function>ieee1284_find_ports</function> but open one of the
+	 ports later on, you will need to prevent it from being
+	 destroyed in <function>ieee1284_free_ports</function>.  Each
+	 port has a reference count, and you can use
+	 <function>ieee1284_ref</function> to increment it and
+	 <function>ieee1284_unref</function> to decrement it.</para>
+
+	<para>If you use <function>ieee1284_ref</function> at any
+	  stage, you must later call
+	  <function>ieee1284_unref</function> to relinquish the extra
+	  reference.  If you do not do this, the resources associated
+	  with the port will not be cleaned up.</para>
+
+	<para>If you have not previously used
+	  <function>ieee1284_ref</function> on a port, you must not
+	  use <function>ieee1284_unref</function> on it.</para>
+      </refsect1>
+
+      <refsect1>
+	<title>Return value</title>
+
+	<para>These functions return the number of references held
+	  after the increment or decrement.</para>
       </refsect1>
 
       <refsect1>

@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002, 2003  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -116,6 +116,9 @@ enum ieee1284_capabilities
 extern int ieee1284_open (struct parport *port, int flags, int *capabilities);
 
 extern int ieee1284_close (struct parport *port);
+
+extern int ieee1284_ref (struct parport *port);
+extern int ieee1284_unref (struct parport *port);
 
 extern int ieee1284_claim (struct parport *port);
 /* Must be called before any function below.  May fail. */

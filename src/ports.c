@@ -1,6 +1,6 @@
 /*
  * libieee1284 - IEEE 1284 library
- * Copyright (C) 2001, 2002  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2001, 2002, 2003  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -358,11 +358,12 @@ ieee1284_free_ports (struct parport_list *list)
   list->portc = 0;
 }
 
-void
+int
 deref_port (struct parport *p)
 {
   struct parport_internal *priv = p->priv;
-  if (!--priv->ref)
+  int count = --priv->ref;
+  if (!count)
     {
       debugprintf ("Destructor for port '%s'\n", p->name);
       if (priv->fn)
@@ -374,6 +375,7 @@ deref_port (struct parport *p)
       free (priv);
       free (p);
     }
+  return count;
 }
 
 /*
