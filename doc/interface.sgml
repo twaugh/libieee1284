@@ -9,6 +9,7 @@
 <!ENTITY e1284negfailed "<errorcode>E1284_NEGFAILED</errorcode>">
 <!ENTITY e1284rejected "<errorcode>E1284_REJECTED</errorcode>">
 <!ENTITY e1284timedout "<errorcode>E1284_TIMEDOUT</errorcode>">
+<!ENTITY e1284sys "<errorcode>E1284_SYS</errorcode>">
 ]>
 <book id="index">
   <bookinfo>
@@ -194,11 +195,23 @@
          <constant>NULL</constant>; it is there for when &libieee1284;
          has a configuration file format defined.</para>
 
-	<para>There are no flags currently defined, and so the
-	 <parameter>flags</parameter> parameter should be zero.</para>
+	<para>Available flags are:</para>
 
-	<remark>A good flag to define would be one for
-	 exclusivity.</remark>
+	<variablelist>
+	  <varlistentry>
+	    <term><constant>F1284_EXCL</constant></term>
+	    <listitem>
+	      <para>This device cannot share the port with any other
+	       device.  If this is the case it must be declared at
+	       this stage, so that other drivers trying to access the
+	       port know not to bother; otherwise they will wait until
+	       this driver releases the port, i.e. never.</para>
+
+	      <remark>The iopl/dev-port access methods don't support
+	       this yet, but the ppdev ones do.</remark>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
       </refsect1>
 
       <refsect1>
@@ -221,6 +234,14 @@
 	    <term>&e1284nomem;</term>
 	    <listitem>
 	      <para>There was not enough memory available.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284notimpl;</term>
+	    <listitem>
+	      <para>One or more of the supplied flags is not
+	       supported in this implementation.</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
@@ -347,9 +368,6 @@
 	 the Device ID may be longer than the buffer will
 	 allow.</para>
 
-	<remark>Note that the implementation needs some fixing to
-	 actually behave as documented.</remark>
-
 	<variablelist>
 	  <varlistentry>
 	    <term>&e1284ok;</term>
@@ -364,8 +382,12 @@
 	  <varlistentry>
 	    <term>&e1284notimpl;</term>
 	    <listitem>
-	      <para>This function is not implemented for this type of
-	       port or this type of system.</para>
+	      <para>One or more of the supplied flags is not supported
+	       in this implementation, or if no flags were supplied
+	       then this function is not implemented for this type of
+	       port or this type of system.  This can also be returned
+	       if a daisy chain address is specified but daisy chain
+	       Device IDs are not yet supported.</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -462,9 +484,10 @@
 	  <varlistentry>
 	    <term>&e1284ok;</term>
 	    <listitem>
-	      <para>Success.</para>
-	      <remark>When an exclusivity flag is provided, there
-	       should be a note here about reasonable behaviour.</remark>
+	      <para>Success.  Note that, unless the
+	       <constant>F1284_EXCL</constant> flag was specified to
+	       start with, the port should be released within a
+	       <quote>reasonable</quote> amount of time.</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -479,6 +502,15 @@
 	    <term>&e1284init;</term>
 	    <listitem>
 	      <para>There was a problem during port initialization.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284notavail;</term>
+	    <listitem>
+	      <para>One or more of the flags supplied to
+	       <function>ieee1284_find_ports</function> is not
+	       supported by this type of port.</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>
@@ -523,11 +555,10 @@
 	    <refentrytitle>ieee1284_claim</refentrytitle>
 	    <manvolnum>3</manvolnum>
 	  </citerefentry> by releasing the port for use by other
-	 drivers.  It is could practice to release the port whenever
-	 convenient.</para>
-
-	<remark>If it is never convenient to do so, the exclusivity
-	 flag should be specified at initialisation.</remark>
+	 drivers.  It is good practice to release the port whenever
+	 convenient.  If it is never convenient to do so, the
+	 <constant>F1284_EXCL</constant> flag should be specified at
+	 initialisation.</para>
       </refsect1>
     </refentry>
 
@@ -1006,18 +1037,6 @@
 	       of the same value may be transferred in only a few
 	       cycles.</para>
 	    </listitem>
-
-	    <listitem>
-	      <para><constant>M1284_ECPSWE</constant>:
-	       Software-emulated ECP is not a distinct wire protocol,
-	       but specifying this mode instructs the library to avoid
-	       using hardware assistance for the data transfer.</para>
-	    </listitem>
-
-	    <listitem>
-	      <para><constant>M1284_EPPSWE</constant>: As
-	       software-emulated ECP, but with EPP.</para>
-	    </listitem>
 	  </itemizedlist>
 	</refsect2>
       </refsect1>
@@ -1242,12 +1261,34 @@
 	<para>The supplied <parameter>buffer</parameter> must be at
 	 least <parameter>len</parameter> bytes long.</para>
 
-	<para>There are no <parameter>flags</parameter> defined yet,
-	 and so this parameter should be 0.</para>
+	<para>The <parameter>flags</parameter> may alter the behaviour
+	 slightly:</para>
 
-	<remark>Flags that will be defined in the future are for
-	 things like RLE, software emulation, and bounded
-	 ECP.</remark>
+	<variablelist>
+	  <varlistentry>
+	    <term><constant>F1284_SWE</constant></term>
+	    <listitem>
+	      <para>Don't use hardware assistance for the transfer,
+	       but instead set the parallel port pins according to the
+	       wire protocol.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><constant>F1284_RLE</constant> (for ECP only)</term>
+	    <listitem>
+	      <para>Use run length encoding.  If the
+	       peripheral is in ECP mode with RLE, calls to
+	       <function>ieee1284_ecp_read_data</function>
+	       <emphasis>must</emphasis> set this flag in order for
+	       the RLE from the peripheral to be interpreted
+	       correctly, and calls to
+	       <function>ieee1284_ecp_write_data</function>
+	       <emphasis>may</emphasis> set this flag in order to take
+	       advantage of RLE.</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
       </refsect1>
 
       <refsect1>
@@ -1260,8 +1301,8 @@
 	  <varlistentry>
 	    <term>&e1284notimpl;</term>
 	    <listitem>
-	      <para>This transfer mode is not yet implemented in
-	       &libieee1284;.</para>
+	      <para>This transfer mode and flags combination is not
+	       yet implemented in &libieee1284;.</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -1277,6 +1318,15 @@
 	    <term>&e1284nomem;</term>
 	    <listitem>
 	      <para>Not enough memory is available.</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>&e1284sys;</term>
+	    <listitem>
+	      <para>There was a problem at the operating system
+	       level.  The global variable <varname>errno</varname>
+	       has been set appropriately.</para>
 	    </listitem>
 	  </varlistentry>
 	</variablelist>

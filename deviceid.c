@@ -177,16 +177,16 @@ get_fresh (struct parport *port, int daisy,
 
   if (daisy > -1)
     /* No implementation yet for IEEE 1284.3 devices. */
-    return -ETRYNEXT;
+    return E1284_NOTIMPL;
 
   ieee1284_terminate (port);
   if (ieee1284_negotiate (port,
 			  M1284_NIBBLE | M1284_FLAG_DEVICEID) != E1284_OK)
-    return -ENODEVID;
+    return E1284_NOTAVAIL;
 
   got = ieee1284_nibble_read (port, buffer, 2);
   if (got < 2)
-    return -ENODEVID;
+    return E1284_NOTAVAIL;
 
   idlen = buffer[0] * 256 + buffer[1];
   if (idlen >= len - 2)
@@ -318,50 +318,13 @@ ieee1284_get_deviceid (struct parport *port, int daisy, int flags,
 	return ret;
 
       if (ret == -ENODEVID)
-	return -1;
+	return E1284_NOTAVAIL;
     }
 
-  if (ieee1284_claim (port))
-    return -1;
+  if ((ret = ieee1284_claim (port)) != E1284_OK)
+    return ret;
 
-#if 0
-  switch (priv->type)
-    {
-    case PPDEV_CAPABLE:
-      ret = get_using_ppdev (port, daisy, buffer, len);
-      if (ret > -1)
-	{
-	  ieee1284_release (port);
-	  return ret;
-	}
-
-      if (ret == -ENODEVID)
-	{
-	  ieee1284_release (port);
-	  return -1;
-	}
-      break;
-
-    case IO_CAPABLE:
-    case DEV_PORT_CAPABLE:
-      use_dev_port (priv->type == DEV_PORT_CAPABLE);
-      ret = get_using_io (port, daisy, buffer, len);
-      if (ret > -1)
-	{
-	  ieee1284_release (port);
-	  return ret;
-	}
-
-      if (ret == -ENODEVID)
-	{
-	  ieee1284_release (port);
-	  return -1;
-	}
-      break;
-    }
-#else
   ret = get_fresh (port, daisy, buffer, len);
-#endif
 
   ieee1284_release (port);
   return ret;

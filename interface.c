@@ -191,6 +191,14 @@ ieee1284_ecp_write_data (struct parport *port, int flags,
 }
 
 ssize_t
+ieee1284_ecp_read_addr (struct parport *port, int flags,
+			char *buffer, size_t len)
+{
+  struct parport_internal *priv = port->priv;
+  return priv->fn->ecp_read_addr (priv, flags, buffer, len);
+}
+
+ssize_t
 ieee1284_ecp_write_addr (struct parport *port, int flags,
 			 const char *buffer, size_t len)
 {

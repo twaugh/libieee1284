@@ -106,6 +106,7 @@ struct parport_internal
   int current_channel;
 
   const struct parport_access_methods *fn;
+  void *access_priv; /* For the access methods to use. */
 };
 
 #define IO_CAPABLE			(1<<0)

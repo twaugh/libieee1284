@@ -70,8 +70,15 @@ port_outb (struct parport_internal *port, unsigned char val,
 static int
 init (struct parport_internal *port)
 {
-  struct parport_access_methods *fn = malloc (sizeof *fn);
+  struct parport_access_methods *fn;
 
+  if (port->flags)
+    return E1284_NOTAVAIL;
+
+  /* TODO: To support F1284_EXCL here we need to open the relevant
+   * /dev/lp device. */
+
+  fn = malloc (sizeof *fn);
   if (!fn)
     return E1284_NOMEM;
 

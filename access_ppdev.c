@@ -47,11 +47,18 @@ init (struct parport_internal *port)
   if (port->fd < 0)
     return E1284_INIT;
 
+  if (port->flags & F1284_EXCL)
+    {
+      if (ioctl (port->fd, PPEXCL))
+	return E1284_INIT;
+    }
+
   if (port->interrupt == -1)
     /* Our implementation of do_nack_handshake relies on interrupts
      * being available.  They aren't, so use the default one instead. */
     fn->do_nack_handshake = default_do_nack_handshake;
   else *(port->selectable_fd) = port->fd;
+
 
   port->fn = fn;
   return E1284_OK;
@@ -216,6 +223,168 @@ do_nack_handshake (struct parport_internal *port,
   return E1284_OK;
 }
 
+static int
+set_mode (struct parport_internal *port, int mode, int flags, int addr)
+{
+  int m;
+  int ret = 0;
+
+  switch (mode)
+    {
+    case M1284_NIBBLE:
+    case M1284_BYTE:
+    case M1284_COMPAT:
+      m = mode;
+      break;
+
+    case M1284_ECP:
+      if (flags & F1284_RLE)
+	m = IEEE1284_MODE_ECPRLE;
+      else if (flags & F1284_SWE)
+	m = IEEE1284_MODE_ECPSWE;
+      else if (flags)
+	return E1284_NOTIMPL;
+      else m = IEEE1284_MODE_ECP;
+      break;
+
+    case M1284_EPP:
+      if (flags & F1284_SWE)
+	m = IEEE1284_MODE_EPPSWE;
+      else if (flags)
+	return E1284_NOTIMPL;
+      else m = IEEE1284_MODE_EPP;
+      break;
+
+    default:
+      return E1284_NOTIMPL;
+    }
+
+  m |= addr ? IEEE1284_ADDR : IEEE1284_DATA;
+  if (port->current_mode != m)
+    {
+      ret = ioctl (port->fd, PPSETMODE, &m);
+      if (!ret)
+	port->current_mode = m;
+    }
+
+  return ret;
+}
+
+static ssize_t
+translate_error_code (ssize_t e)
+{
+  if (e < 0)
+    return E1284_SYS;
+  return e;
+}
+
+static ssize_t
+nibble_read (struct parport_internal *port, char *buffer, size_t len)
+{
+  int ret;
+  ret = set_mode (port, M1284_NIBBLE, 0, 0);
+  if (!ret)
+    ret = translate_error_code (read (port->fd, buffer, len));
+  return ret;
+}
+
+static ssize_t
+compat_write (struct parport_internal *port, const char *buffer, size_t len)
+{
+  int ret;
+  ret = set_mode (port, M1284_COMPAT, 0, 0);
+  if (!ret)
+    ret = translate_error_code (write (port->fd, buffer, len));
+  return ret;
+}
+
+static ssize_t
+byte_read (struct parport_internal *port, char *buffer, size_t len)
+{
+  int ret;
+  ret = set_mode (port, M1284_BYTE, 0, 0);
+  if (!ret)
+    ret = translate_error_code (read (port->fd, buffer, len));
+  return ret;
+}
+
+static ssize_t
+epp_read_data (struct parport_internal *port, int flags,
+	       char *buffer, size_t len)
+{
+  int ret;
+  ret = set_mode (port, M1284_EPP, flags, 0);
+  if (!ret)
+    ret = translate_error_code (read (port->fd, buffer, len));
+  return ret;
+}
+
+static ssize_t
+epp_write_data (struct parport_internal *port, int flags,
+		const char *buffer, size_t len)
+{
+  int ret;
+  ret = set_mode (port, M1284_EPP, flags, 0);
+  if (!ret)
+    ret = translate_error_code (write (port->fd, buffer, len));
+  return ret;
+}
+
+static ssize_t
+epp_read_addr (struct parport_internal *port, int flags,
+	       char *buffer, size_t len)
+{
+  int ret;
+  ret = set_mode (port, M1284_EPP, flags, 1);
+  if (!ret)
+    ret = translate_error_code (read (port->fd, buffer, len));
+  return ret;
+}
+
+static ssize_t
+epp_write_addr (struct parport_internal *port, int flags,
+		const char *buffer, size_t len)
+{
+  int ret;
+  ret = set_mode (port, M1284_EPP, flags, 1);
+  if (!ret)
+    ret = translate_error_code (write (port->fd, buffer, len));
+  return ret;
+}
+
+static ssize_t
+ecp_read_data (struct parport_internal *port, int flags,
+	       char *buffer, size_t len)
+{
+  int ret;
+  ret = set_mode (port, M1284_ECP, flags, 0);
+  if (!ret)
+    ret = translate_error_code (read (port->fd, buffer, len));
+  return ret;
+}
+
+static ssize_t
+ecp_write_data (struct parport_internal *port, int flags,
+		const char *buffer, size_t len)
+{
+  int ret;
+  ret = set_mode (port, M1284_ECP, flags, 0);
+  if (!ret)
+    ret = translate_error_code (write (port->fd, buffer, len));
+  return ret;
+}
+
+static ssize_t
+ecp_write_addr (struct parport_internal *port, int flags,
+		const char *buffer, size_t len)
+{
+  int ret;
+  ret = set_mode (port, M1284_ECP, flags, 1);
+  if (!ret)
+    ret = translate_error_code (write (port->fd, buffer, len));
+  return ret;
+}
+
 const struct parport_access_methods ppdev_access_methods =
 {
   init,
@@ -241,17 +410,17 @@ const struct parport_access_methods ppdev_access_methods =
   default_terminate,
   default_ecp_fwd_to_rev,
   default_ecp_rev_to_fwd,
-  default_nibble_read,
-  default_compat_write,
-  default_byte_read,
-  default_epp_read_data,
-  default_epp_write_data,
-  default_epp_read_addr,
-  default_epp_write_addr,
-  default_ecp_read_data,
-  default_ecp_write_data,
+  nibble_read,
+  compat_write,
+  byte_read,
+  epp_read_data,
+  epp_write_data,
+  epp_read_addr,
+  epp_write_addr,
+  ecp_read_data,
+  ecp_write_data,
   default_ecp_read_addr,
-  default_ecp_write_addr
+  ecp_write_addr
 };
 
 /*

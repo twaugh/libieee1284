@@ -1,3 +1,28 @@
+2001-11-15  Tim Waugh  <twaugh@redhat.com>
+
+	* ieee1284.h: Add ieee1284_ecp_read_addr just in case anyone wants
+	it.
+	* interface.c (ieee1284_ecp_read_addr): Likewise.
+
+	* deviceid.c (get_fresh): Fixed for return value.
+
+	* state.c (ieee1284_claim): Return error code that init_port
+	returns.
+	(init_port): Return error code that fn->init returns.
+
+	* ports.c (add_port): Set flags on parport_internal struct.
+	(populate_from_parport): Likewise.
+	(populate_from_sys_dev_parport): Likewise.
+	(populate_by_guessing): Likewise.
+	(ieee1284_find_ports): Likewise.
+
+	* state.c (ieee1284_claim): Return E1284_INIT on error.
+
+	* ports.c: General clean-ups.
+
+	* detect.h (struct parport_internal): New member access_priv for
+	the access methods to use.
+
 2001-11-14  Tim Waugh  <twaugh@redhat.com>
 
 	* ports.c (ieee1284_find_ports): Watch out for flags we don't yet

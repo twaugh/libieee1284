@@ -34,7 +34,7 @@
 #define MAX_PORTS 20
 
 static int
-add_port (struct parport_list *list,
+add_port (struct parport_list *list, int flags,
 	  const char *name, const char *device, unsigned long base,
 	  int interrupt)
 {
@@ -43,17 +43,17 @@ add_port (struct parport_list *list,
 
   if (list->portc == (MAX_PORTS - 1))
     /* Ridiculous. */
-    return -1;
+    return E1284_NOMEM;
 
   p = malloc (sizeof *p);
   if (!p)
-    return -1;
+    return E1284_NOMEM;
 
   p->name = strdup (name);
   if (!p->name)
     {
       free (p);
-      return -1;
+      return E1284_NOMEM;
     }
 
   p->selectable_fd = -1;
@@ -63,7 +63,7 @@ add_port (struct parport_list *list,
     {
       free ((char *) (p->name));
       free (p);
-      return -1;
+      return E1284_NOMEM;
     }
 
   p->priv = priv;
@@ -73,7 +73,7 @@ add_port (struct parport_list *list,
       free (priv);
       free ((char *) (p->name));
       free (p);
-      return -1;
+      return E1284_NOMEM;
     }
 
   priv->base = base;
@@ -85,18 +85,19 @@ add_port (struct parport_list *list,
   priv->type = 0;
   priv->claimed = -1;
   priv->selectable_fd = &p->selectable_fd;
+  priv->flags = flags;
 
   list->portv[list->portc++] = p;
   return 0;
 }
 
 static int
-populate_from_parport (struct parport_list *list)
+populate_from_parport (struct parport_list *list, int flags)
 {
   struct dirent *de;
   DIR *parport = opendir ("/proc/parport");
   if (!parport)
-    return -1;
+    return E1284_SYS;
 
   de = readdir (parport);
   while (de)
@@ -149,7 +150,7 @@ populate_from_parport (struct parport_list *list)
 		}
 	    }
 
-	  add_port (list, de->d_name, device, base, interrupt);
+	  add_port (list, flags, de->d_name, device, base, interrupt);
 	}
 
       de = readdir (parport);
@@ -160,12 +161,12 @@ populate_from_parport (struct parport_list *list)
 }
 
 static int
-populate_from_sys_dev_parport (struct parport_list *list)
+populate_from_sys_dev_parport (struct parport_list *list, int flags)
 {
   struct dirent *de;
   DIR *parport = opendir ("/proc/sys/dev/parport");
   if (!parport)
-    return -1;
+    return E1284_SYS;
 
   de = readdir (parport);
   while (de)
@@ -222,7 +223,7 @@ populate_from_sys_dev_parport (struct parport_list *list)
 		interrupt = strtol (contents, NULL, 0);
 	    }
       
-	  add_port (list, de->d_name, device, base, interrupt);
+	  add_port (list, flags, de->d_name, device, base, interrupt);
 	}
 
       de = readdir (parport);
@@ -233,11 +234,11 @@ populate_from_sys_dev_parport (struct parport_list *list)
 }
 
 static int
-populate_by_guessing (struct parport_list *list)
+populate_by_guessing (struct parport_list *list, int flags)
 {
-  add_port (list, "0x378", "/dev/port", 0x378, -1);
-  add_port (list, "0x278", "/dev/port", 0x278 ,-1);
-  add_port (list, "0x3bc", "/dev/port", 0x3bc, -1);
+  add_port (list, flags, "0x378", "/dev/port", 0x378, -1);
+  add_port (list, flags, "0x278", "/dev/port", 0x278 ,-1);
+  add_port (list, flags, "0x3bc", "/dev/port", 0x3bc, -1);
   return 0;
 }
 
@@ -246,19 +247,17 @@ int
 ieee1284_find_ports (struct parport_list *list,
 		     const char *config_file, int flags)
 {
-  /* We don't support any flags yet. */
-  if (flags)
-    return E1284_NOTIMPL;
-
-  detect_environment (0);
   list->portc = 0;
   list->portv = malloc (sizeof(char*) * MAX_PORTS);
+  if (!list->portv)
+    return E1284_NOMEM;
 
+  detect_environment (0);
   if (capabilities & PROC_SYS_DEV_PARPORT_CAPABLE)
-    populate_from_sys_dev_parport (list);
+    populate_from_sys_dev_parport (list, flags);
   else if (capabilities & PROC_PARPORT_CAPABLE)
-    populate_from_parport (list);
-  else populate_by_guessing (list);
+    populate_from_parport (list, flags);
+  else populate_by_guessing (list, flags);
 
   if (list->portc == 0)
     {

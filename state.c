@@ -37,45 +37,48 @@ static int
 init_port (struct parport *port)
 {
   struct parport_internal *priv = port->priv;
+  int ret = E1284_INIT;
+
   if ((capabilities & PPDEV_CAPABLE) && priv->device)
     {
       priv->type = PPDEV_CAPABLE;
       priv->fn = &ppdev_access_methods;
-      if (!priv->fn->init (priv))
-	return 0;
+      ret = priv->fn->init (priv);
     }
 
-  if (capabilities & IO_CAPABLE)
+  if (ret && (capabilities & IO_CAPABLE))
     {
       priv->type = IO_CAPABLE;
       priv->fn = &io_access_methods;
-      if (!priv->fn->init (priv))
-	return 0;
+      ret = priv->fn->init (priv);
     }
 
-  if (capabilities & DEV_PORT_CAPABLE)
+  if (ret && (capabilities & DEV_PORT_CAPABLE))
     {
       priv->type = DEV_PORT_CAPABLE;
       priv->fn = &io_access_methods;
-      if (!priv->fn->init (priv))
-	return 0;
+      ret = priv->fn->init (priv);
     }
 
-  return -1;
+  return ret;
 }
 
 int
 ieee1284_claim (struct parport *port)
 {
   struct parport_internal *priv = port->priv;
+  int ret;
   if (priv->type == 0)
-    if (init_port (port))
-      return -1;
+    {
+      ret = init_port (port);
+      if (ret)
+	return ret;
+    }
 
   switch (priv->type)
     {
     case 0: /* no way to talk to port.  Shouldn't get here. */
-      return -1;
+      return E1284_INIT;
 
     case PPDEV_CAPABLE:
       if (!ioctl (priv->fd, PPCLAIM))
