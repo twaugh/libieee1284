@@ -1,5 +1,9 @@
 2001-11-15  Tim Waugh  <twaugh@redhat.com>
 
+	* configure.in: Version 0.1.0 (devel).
+
+2001-11-15  Tim Waugh  <twaugh@redhat.com>
+
 	* ieee1284.h: Add ieee1284_ecp_read_addr just in case anyone wants
 	it.
 	* interface.c (ieee1284_ecp_read_addr): Likewise.
