@@ -40,11 +40,11 @@ locations), and if not then it will try asking the device itself.  If
 fails, it will try /dev/port.  And the application doesn't have to
 care.
 
-The interface is set out in the header file, ieee1284.h.  If this
-doesn't do something that you think it should, or it does something in
-a way that doesn't make sense to you, please let me know so that I can
-fix it.  I need feedback on the interface to know whether it is
-working.
+The interface is set out in the header file, ieee1284.h, and in the
+SGML document doc/interface.sgml.  If this doesn't do something that
+you think it should, or it does something in a way that doesn't make
+sense to you, please let me know so that I can fix it.  I need
+feedback on the interface to know whether it is working.
 
 --
 Tim Waugh <tim@cyberelk.net>
