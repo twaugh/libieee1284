@@ -1,4 +1,9 @@
-Still to do:
+To fix in the API:
+
+- A way of giving a previously-opened file descriptor to the library to
+  use as the ppdev device (needed in print filters, for instance).
+
+Still to do in the implementation:
 
 - F1284_EXCL for iopl() and /dev/port (use /dev/lp0).  This needs
   configuration file support.
@@ -7,6 +12,8 @@ Still to do:
   the pins.
 
 - Bounded ECP mode.
+
+- Notice/handle USB printers, at least for device IDs.
 
 --
 Tim Waugh <tim@cyberelk.net>
