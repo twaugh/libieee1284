@@ -69,8 +69,7 @@ check_proc_type (void)
   int which = 0;
   struct stat st;
   if (stat ("/proc/sys/dev/parport", &st) == 0 &&
-      S_ISDIR (st.st_mode) &&
-      st.st_nlink > 2)
+      S_ISDIR (st.st_mode))
     {
       which = PROC_SYS_DEV_PARPORT_CAPABLE;
       debugprintf ("This system has /proc/sys/dev/parport\n");
