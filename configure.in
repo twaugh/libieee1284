@@ -33,6 +33,9 @@ case "{$host}" in
 *86-*-freebsd* | *86-*-kfreebsd*)
         AC_DEFINE(HAVE_FBSD_I386,1,enable FreeBSD /dev/io access)
 ;;
+*86-*-netbsd*)
+        AC_DEFINE(HAVE_NBSD_I386,1,enable NetBSD i386 ioperm access)
+;;
 *86-*-solaris*)
         AC_DEFINE(HAVE_SOLARIS,1,enable solaris iop access)
 	solaris_io=true

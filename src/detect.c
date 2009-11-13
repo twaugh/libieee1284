@@ -46,6 +46,8 @@
 #elif defined(HAVE_OBSD_I386)
 /* for i386_get_ioperm and i386_set_ioperm */
 #include <machine/sysarch.h>
+#elif defined(HAVE_NBSD_I386)
+#include "access.h"
 #elif defined(HAVE_SOLARIS)
 #include <sys/ddi.h>
 #include <sys/sunddi.h>
@@ -169,6 +171,15 @@ check_io (void)
     close(fd);
     return 1;
   }
+
+  #elif defined(HAVE_NBSD_I386)
+/*
+    FIXME: how to test
+*/     
+    capabilities |= IO_CAPABLE;
+    debugprintf ("We can use I386_GET_IOPERM\n");
+    return 1;
+
   #elif defined(HAVE_LINUX)
   #ifdef HAVE_SYS_IO_H
   if (ioperm (0x378 /* say */, 3, 1) == 0) {

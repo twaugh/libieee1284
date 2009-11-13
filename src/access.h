@@ -61,6 +61,10 @@ delay (int which)
 #endif
 }
 
+#if defined(HAVE_NBSD_I386)
+void netbsd_ioport(int port);
+#endif
+
 /*
  * Local Variables:
  * eval: (c-set-style "gnu")

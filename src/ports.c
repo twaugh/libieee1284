@@ -154,6 +154,7 @@ add_port (struct parport_list *list, int flags,
   return 0;
 }
 
+#ifdef __linux
 static int
 populate_from_parport (struct parport_list *list, int flags)
 {
@@ -229,7 +230,9 @@ populate_from_parport (struct parport_list *list, int flags)
   return 0;
 #endif
 }
+#endif /* __linux */
 
+#ifdef __linux
 static int
 populate_from_sys_dev_parport (struct parport_list *list, int flags)
 {
@@ -319,6 +322,7 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
   return 0;
 #endif
 }
+#endif /* __linux */
 
 static int
 populate_nt_ports (struct parport_list *list, int flags)
@@ -356,6 +360,11 @@ populate_by_guessing (struct parport_list *list, int flags)
   add_port (list, flags, "0x378", "/dev/io", NULL, 0x378, 0, -1);
   add_port (list, flags, "0x278", "/dev/io", NULL, 0x278, 0, -1);
   add_port (list, flags, "0x3bc", "/dev/io", NULL, 0x3bc, 0, -1);
+#elif defined(HAVE_NBSD_I386)
+  /* FIXME Get the right names for NetBSD */
+  add_port (list, flags, "0x378", "/dev/port", NULL, 0x378, 0, -1);
+  add_port (list, flags, "0x278", "/dev/port", NULL, 0x278, 0, -1);
+  add_port (list, flags, "0x3bc", "/dev/port", NULL, 0x3bc, 0, -1);
 #elif defined(HAVE_SOLARIS)
   add_port (list, flags, "0x378", "/devices/pseudo/iop@0:iop", NULL, 0x378, 0, -1);
   add_port (list, flags, "0x278", "/devices/pseudo/iop@0:iop", NULL, 0x278, 0, -1);
@@ -376,11 +385,14 @@ ieee1284_find_ports (struct parport_list *list, int flags)
     return E1284_NOMEM;
 
   detect_environment (0);
+#ifdef __linux
   if (capabilities & PROC_SYS_DEV_PARPORT_CAPABLE)
     populate_from_sys_dev_parport (list, flags);
   else if (capabilities & PROC_PARPORT_CAPABLE)
     populate_from_parport (list, flags);
-  else if (capabilities & LPT_CAPABLE)
+#else /* __linux */
+  if (capabilities & LPT_CAPABLE)
+#endif /* __linux */
     populate_nt_ports (list, flags);
   else 
     populate_by_guessing (list, flags);

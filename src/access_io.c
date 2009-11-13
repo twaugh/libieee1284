@@ -120,6 +120,25 @@ set_bitmap(unsigned long *bitmap, short base, short extent, int new_value)
   }
 }
 
+#elif defined(HAVE_NBSD_I386)
+#include <sys/syscall.h>
+#include <machine/sysarch.h>
+#include <machine/pio.h>
+
+/* netbsd_ioport(port)  permit access to an I/O port.
+ * port                 I/O address to enable
+ */
+void
+netbsd_ioport(int port) {
+  u_long iomap[32];
+  struct i386_set_ioperm_args ioperm;
+
+  ioperm.iomap = iomap;
+  syscall(SYS_sysarch, I386_GET_IOPERM, (char *) &ioperm);
+  iomap[port >> 5] &= ~(1 << (port & 0x1f));
+  syscall(SYS_sysarch, I386_SET_IOPERM, (char *) &ioperm);
+}
+
 #endif
 
 
@@ -127,7 +146,7 @@ static unsigned char
 raw_inb (struct parport_internal *port, unsigned long addr)
 {
 #if (defined(HAVE_LINUX) && defined(HAVE_SYS_IO_H)) || defined(HAVE_CYGWIN_9X) \
-	|| defined(HAVE_OBSD_I386) || defined(HAVE_FBSD_I386)
+	|| defined(HAVE_OBSD_I386) || defined(HAVE_FBSD_I386) || defined(HAVE_NBSD_i386)
   return inb ((unsigned short)addr);
 
 #elif defined(HAVE_SOLARIS)
@@ -146,7 +165,7 @@ static void
 raw_outb (struct parport_internal *port, unsigned char val, unsigned long addr)
 {
 #if (defined(HAVE_LINUX) && defined(HAVE_SYS_IO_H)) || defined(HAVE_CYGWIN_9X) \
-	|| defined(HAVE_OBSD_I386) || defined(HAVE_FBSD_I386)
+	|| defined(HAVE_OBSD_I386) || defined(HAVE_FBSD_I386) || defined(HAVE_NBSD_i386)
 #if defined(__i386__) || defined(__x86_64__) || defined(_MSC_VER)
   outb_p (val, (unsigned short)addr);
 #else
@@ -234,6 +253,10 @@ init (struct parport *pport, int flags, int *capabilities)
 	}
 
       free(iomap);
+#elif defined(HAVE_NBSD_I386)
+      netbsd_ioport(port->base);
+      netbsd_ioport(port->base +1);
+      netbsd_ioport(port->base +2);
 #elif defined(HAVE_SOLARIS)
       if((port->fd=open("/devices/pseudo/iop@0:iop", O_RDWR)) < 0)
       {
