@@ -1,5 +1,6 @@
 2010-06-23  Tim Waugh  <twaugh@redhat.com>
 
+	* src/ieee1284module.c: Fixed warnings.
 	* src/ports.c: Fixed build.
 
 2009-11-13  Tim Waugh  <twaugh@redhat.com>
