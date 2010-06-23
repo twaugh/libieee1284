@@ -154,7 +154,7 @@ add_port (struct parport_list *list, int flags,
   return 0;
 }
 
-#ifdef __linux
+#ifdef HAVE_LINUX
 static int
 populate_from_parport (struct parport_list *list, int flags)
 {
@@ -230,9 +230,9 @@ populate_from_parport (struct parport_list *list, int flags)
   return 0;
 #endif
 }
-#endif /* __linux */
+#endif /* HAVE_LINUX */
 
-#ifdef __linux
+#ifdef HAVE_LINUX
 static int
 populate_from_sys_dev_parport (struct parport_list *list, int flags)
 {
@@ -322,7 +322,7 @@ populate_from_sys_dev_parport (struct parport_list *list, int flags)
   return 0;
 #endif
 }
-#endif /* __linux */
+#endif /* HAVE_LINUX */
 
 static int
 populate_nt_ports (struct parport_list *list, int flags)
@@ -385,15 +385,15 @@ ieee1284_find_ports (struct parport_list *list, int flags)
     return E1284_NOMEM;
 
   detect_environment (0);
-#ifdef __linux
+#ifdef HAVE_LINUX
   if (capabilities & PROC_SYS_DEV_PARPORT_CAPABLE)
     populate_from_sys_dev_parport (list, flags);
   else if (capabilities & PROC_PARPORT_CAPABLE)
     populate_from_parport (list, flags);
-#else /* __linux */
+#else /* HAVE_LINUX */
   if (capabilities & LPT_CAPABLE)
-#endif /* __linux */
     populate_nt_ports (list, flags);
+#endif /* HAVE_LINUX */
   else 
     populate_by_guessing (list, flags);
 
