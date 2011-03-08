@@ -190,6 +190,33 @@ Parport_open (ParportObject *self, PyObject *args)
 }
 
 static PyObject *
+Parport_get_irq_fd (ParportObject *self)
+{
+	int fd = ieee1284_get_irq_fd (self->port);
+	if (fd < 0) {
+		handle_error (fd);
+		return NULL;
+	}
+
+	return PyInt_FromLong (fd);
+}
+
+static PyObject *
+Parport_clear_irq (ParportObject *self)
+{
+	int portcount = 0;
+	int r;
+
+	int fd = ieee1284_clear_irq (self->port, &portcount);
+	if (r < 0) {
+		handle_error (r);
+		return NULL;
+	}
+
+	return PyInt_FromLong (portcount);
+}
+
+static PyObject *
 Parport_close (ParportObject *self)
 {
 	int r = ieee1284_close (self->port);
@@ -484,6 +511,12 @@ PyMethodDef Parport_methods[] = {
 	{ "close", (PyCFunction) Parport_close, METH_NOARGS,
 	  "close() -> None\n"
 	  "Closes a port." },
+	{ "get_irq_fd", (PyCFunction) Parport_get_irq_fd, METH_VARARGS,
+	  "get_irq_fd() -> int\n"
+	  "Returns a pollable IRQ file descriptor." },
+	{ "clear_irq", (PyCFunction) Parport_clear_irq, METH_NOARGS,
+	  "clear_irq(portcount) -> int\n"
+	  "Clears IRQ and returns number of IRQs raised." },
 	{ "claim", (PyCFunction) Parport_claim, METH_NOARGS,
 	  "claim() -> None\n"
 	  "Claims a port." },

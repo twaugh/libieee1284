@@ -1,3 +1,8 @@
+2011-03-08  Tim Waugh  <twaugh@redhat.com>
+
+	* src/ieee1284module.c: Added bindings for get_irq_fd and
+	clear_irq.  Patch by Sergey Temerkhanov.
+
 2010-06-23  Tim Waugh  <twaugh@redhat.com>
 
 	* src/ieee1284module.c: Fixed warnings.
