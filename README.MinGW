@@ -1,10 +1,11 @@
 Notes on libieee1284 on MinGW
 -----------------------------
 
-The default access method in MinGW is to use the NTVDM access.  Please read
-README.winNT before you use this system, such that you know exactly how bad it
-is.  If you want 9x style port access in MinGW, you will need to uncomment the
-line in configure.in to enable it.  It is never enabled by default.  
+On versions of libieee1284 up to 0.2.11 you had to chose at compile time
+if you wanted to use the NTVDM method for Windows NT or the direct I/O port
+access for Windows 9x. Libieee1284 now uses a runtime check to detect if
+it is on a Windows version that allows direct I/O. The only drawback of
+this is that you now need windows.h for the GetVersion() prototype.
 
 The MinGW port is the work of Daniel Horchner, and much appreciated.  He was
 also good enough to find a few bugs in my code while he was at it.

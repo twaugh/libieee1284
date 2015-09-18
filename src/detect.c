@@ -51,7 +51,7 @@
 #elif defined(HAVE_SOLARIS)
 #include <sys/ddi.h>
 #include <sys/sunddi.h>
-#elif defined(HAVE_CYGWIN_NT)
+#elif defined(HAVE_CYGWIN_NT) || defined(HAVE_CYGWIN_9X)
 #ifdef HAVE_W32API_WINDOWS_H
 #include <w32api/windows.h>
 #else
@@ -202,10 +202,12 @@ check_io (void)
   }
   debugprintf ("We can't use IOP, nothing will work\n");
   #elif defined(HAVE_CYGWIN_9X)
-  /* note: 95 allows apps direct IO access */
-  debugprintf ("Taking a guess on port availability (win9x)\n");
-  capabilities |= IO_CAPABLE;
-  return 1;
+  /* note: Win32s/95/98/ME allows apps direct IO access */
+  if (GetVersion() & (1 << 31)) {
+    debugprintf ("Taking a guess on port availability (win9x)\n");
+    capabilities |= IO_CAPABLE;
+    return 1;
+  }
   #endif
 
   return 0;
