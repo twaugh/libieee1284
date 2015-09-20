@@ -36,7 +36,7 @@
 #include "detect.h"
 
 #ifdef HAVE_CYGWIN_NT
-#ifdef __CYGWIN__
+#ifdef HAVE_W32API_WINDOWS_H
 #include <w32api/windows.h>
 #else /* Not cygwin really */
 /* Don't include windows.h if it isn't necessary. That's why this is here and

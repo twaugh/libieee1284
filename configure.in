@@ -40,21 +40,16 @@ case "{$host}" in
         AC_DEFINE(HAVE_SOLARIS,1,enable solaris iop access)
 	solaris_io=true
 ;;
-*-*-cygwin*)
-        dnl Strip version number from uname and make sure we're on NT not 9x
-        case `uname -s | sed 's/-.*$//'` in
-        CYGWIN_NT*)
-                AC_CHECK_HEADER(w32api/windows.h, [
-      	                AC_DEFINE(HAVE_CYGWIN_NT,1,enable w32api access)
-	        ], AC_MSG_ERROR(You need the cygwin w32api files on NT)) 
-        ;;
-        *)
-      	        AC_DEFINE(HAVE_CYGWIN_9X,1,enable win95 access)
-        ;;
-        esac
-;;
-*-*-mingw*)
-dnl        AC_DEFINE(HAVE_CYGWIN_9X,1,enable win95 access)
+*-*-cygwin* | *-*-mingw*)
+	windows_h_found=false
+	AC_CHECK_HEADERS([windows.h] [w32api/windows.h], [
+		windows_h_found=true
+		break
+	])
+	AS_VAR_IF(windows_h_found, [false], [
+		AC_MSG_ERROR(windows.h not found)
+	])
+	AC_DEFINE(HAVE_CYGWIN_9X,1,enable win95 access)
         AC_DEFINE(HAVE_CYGWIN_NT,1,enable w32api access)
 ;;
 *)

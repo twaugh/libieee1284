@@ -52,7 +52,7 @@
 #include <sys/ddi.h>
 #include <sys/sunddi.h>
 #elif defined(HAVE_CYGWIN_NT)
-#ifdef __CYGWIN__
+#ifdef HAVE_W32API_WINDOWS_H
 #include <w32api/windows.h>
 #else
 #include <windows.h>
