@@ -75,7 +75,17 @@ if test $ac_cv_use_python = yes; then
 AM_PATH_PYTHON
 fi
 
+AC_CHECK_TYPE([ssize_t],,,[#include <sys/types.h>])
+if test $ac_cv_type_ssize_t != yes; then
+	AC_CHECK_TYPE([SSIZE_T],
+		AC_SUBST([SSIZE_T_IN_BASETSD_H], 1),
+		AC_MSG_ERROR([No definition of ssize_t found.]),
+		[#include <basetsd.h>])
+else
+		AC_SUBST([SSIZE_T_IN_BASETSD_H], 0)
+fi
+
 dnl Checks for library functions.
 
-AC_CONFIG_FILES(Makefile libieee1284.spec)
+AC_CONFIG_FILES([Makefile libieee1284.spec include/ieee1284.h])
 AC_OUTPUT

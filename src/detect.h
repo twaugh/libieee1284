@@ -24,18 +24,7 @@
 #ifndef _DETECT_H_
 #define _DETECT_H_
 
-#include <stdlib.h>
-#ifndef _MSC_VER
-#include <sys/time.h>
-#else
-#include <winsock2.h>
-#endif
-
-#if (defined __MINGW32__ || defined _MSC_VER) && !defined OWN_SSIZE_T
-#include <basetsd.h> /* for SSIZE_T */
-#define OWN_SSIZE_T
-typedef SSIZE_T ssize_t;
-#endif
+#include "ieee1284.h"
 
 struct parport;
 struct parport_internal;
