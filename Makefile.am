@@ -30,6 +30,9 @@ bin_PROGRAMS = libieee1284_test
 libieee1284_test_SOURCES = tests/test.c
 libieee1284_test_LDADD = libieee1284.la
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libieee1284.pc
+
 # Python bindings
 src_ieee1284module_la_SOURCES = src/ieee1284module.c
 if PYTHON
