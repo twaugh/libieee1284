@@ -74,6 +74,7 @@ man3_MANS = doc/libieee1284.3 \
 	doc/ieee1284_ecp_read_data.3 doc/ieee1284_ecp_write_data.3 \
 	doc/ieee1284_ecp_read_addr.3 doc/ieee1284_ecp_write_addr.3 \
 	doc/ieee1284_get_irq_fd.3 \
+	doc/ieee1284_clear_irq.3 \
 	doc/ieee1284_set_timeout.3
 
 $(man3_MANS): $(top_srcdir)/doc/interface.xml
