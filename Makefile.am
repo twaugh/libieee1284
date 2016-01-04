@@ -86,7 +86,7 @@ doc/interface.pdf: $(top_srcdir)/doc/interface.xml
 EXTRA_DIST = libieee1284.spec doc/interface.xml doc/interface.txt \
 		$(man3_MANS) solaris_io/LICENSE solaris_io/README \
 		solaris_io/INSTALL solaris_io/iop.conf \
-		README.FreeBSD README.OpenBSD README.Solaris \
+		README.FreeBSD README.MinGW README.OpenBSD README.Solaris \
 		README.win95 README.winNT \
 		include/config.h.vc6 README.VC6 Makefile.vc6 ieee1284.def
 
