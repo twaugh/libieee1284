@@ -195,7 +195,7 @@ check_io (void)
   
   #elif defined(HAVE_SOLARIS)
   int fd;
-  if (fd=open("/devices/pseudo/iop@0:iop", O_RDWR) > 0) {
+  if ((fd=open("/devices/pseudo/iop@0:iop", O_RDWR)) > 0) {
     capabilities |= IO_CAPABLE;
     debugprintf ("We can use iop\n");
     return 1;
