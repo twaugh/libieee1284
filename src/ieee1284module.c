@@ -579,7 +579,7 @@ WRITE_METHOD(ecp_write_addr)
 /***/
 
 static PyTypeObject ParportType = {
-	PyObject_HEAD_INIT(NULL)
+	PyVarObject_HEAD_INIT(NULL, 0)
 	"ieee1284.Parport",	/* const char *tp_name; */
 	sizeof (ParportObject),	/* Py_ssize_t tp_basicsize */
 	0,		/* Py_ssize_t tp_itemsize; */
